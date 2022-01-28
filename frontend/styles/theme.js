@@ -1,3 +1,4 @@
 export const theme = {
-  colors: { red: 'red' }
+  colors: { red: 'red' },
+  fontFamily: 'Inter, sans-serif',
 };

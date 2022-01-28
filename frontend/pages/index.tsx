@@ -1,8 +1,6 @@
 const Home = () => (
   <div>
-    <h1>
-      Welcome to VisionSync!
-    </h1>
+    Home
   </div>
 );
 

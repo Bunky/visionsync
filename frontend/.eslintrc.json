@@ -23,7 +23,7 @@
     "react/function-component-definition": "off",
     "react-hooks/exhaustive-deps": "warn",
     "react-hooks/rules-of-hooks": "error",
-    "no-use-before-define": "warn",
+    "no-use-before-define": "off",
     "import/prefer-default-export": "off"
   }
 }
