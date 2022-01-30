@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
+// import { useMutation, useQueryClient } from 'react-query';
 import { useRouter } from 'next/router';
 import {
-  Text, Menu as Dropdown, Divider, Skeleton, Group
+  Menu as Dropdown, Skeleton, Group
 } from '@mantine/core';
 import {
-  IoSettingsOutline, IoSearchOutline, IoLogOutOutline
+  IoSettingsOutline, IoLogOutOutline
 } from 'react-icons/io5';
 import useUser from '../../../hooks/useUser';
+import useLogout from '../../../hooks/useLogout';
 import User from './User';
 
 const Menu = () => {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   const router = useRouter();
+  const logout = useLogout();
   const { data: user, status: userStatus } = useUser();
   const [open, setOpen] = useState(false);
 
@@ -24,31 +26,31 @@ const Menu = () => {
     }
   }, [user]);
 
-  const mutateLogout = useMutation(async () => fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/logout`, {
-    method: 'GET',
-    credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-    },
-  }), {
-    onMutate: async () => {
-      await queryClient.cancelQueries('user');
+  // const mutateLogout = useMutation(async () => fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/logout`, {
+  //   method: 'GET',
+  //   credentials: 'include',
+  //   headers: {
+  //     Accept: 'application/json',
+  //   },
+  // }), {
+  //   onMutate: async () => {
+  //     await queryClient.cancelQueries('user');
 
-      // Optimistically clear user data
-      const previousUser = queryClient.getQueryData('user');
-      queryClient.setQueryData('user', { unauthorised: true });
-      return previousUser;
-    },
-    onError: (err, variables, previousUser) => {
-      // If error, reset user data
-      queryClient.setQueryData('user', previousUser);
-      alert(`Failed to logout? ${err}`);
-    },
-    onSettled: () => {
-      // Refetch after success or error
-      queryClient.invalidateQueries('user');
-    },
-  });
+  //     // Optimistically clear user data
+  //     const previousUser = queryClient.getQueryData('user');
+  //     queryClient.setQueryData('user', { unauthorised: true });
+  //     return previousUser;
+  //   },
+  //   onError: (err, variables, previousUser) => {
+  //     // If error, reset user data
+  //     queryClient.setQueryData('user', previousUser);
+  //     alert(`Failed to logout? ${err}`);
+  //   },
+  //   onSettled: () => {
+  //     // Refetch after success or error
+  //     queryClient.invalidateQueries('user');
+  //   },
+  // });
 
   if (userStatus === 'success' && !user.unauthorised) {
     return (
@@ -74,7 +76,7 @@ const Menu = () => {
 
         <Dropdown.Label>Account</Dropdown.Label>
         <Dropdown.Item icon={<IoSettingsOutline />}>User Settings</Dropdown.Item>
-        <Dropdown.Item icon={<IoLogOutOutline />} onClick={() => mutateLogout.mutate()} color="red">Logout</Dropdown.Item>
+        <Dropdown.Item icon={<IoLogOutOutline />} onClick={() => logout.mutate()} color="red">Logout</Dropdown.Item>
       </Dropdown>
     );
   }

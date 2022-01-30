@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
@@ -11,6 +10,8 @@ import {
 } from 'react-icons/io5';
 import styled from 'styled-components';
 import useUser from '../hooks/useUser';
+import useSignup from '../hooks/useSignup';
+import useUniqueEmail from '../hooks/useUniqueEmail';
 
 const requirements = [
   { re: /[0-9]/, label: 'Includes number' },
@@ -33,9 +34,10 @@ const getStrength = (password: string) => {
 };
 
 const Signup = () => {
-  const queryClient = useQueryClient();
   const router = useRouter();
   const { data: user, status: userStatus } = useUser();
+  const signup = useSignup();
+  const uniqueEmail = useUniqueEmail();
   const [loading, setLoading] = useState(false);
   const [loadingEmail, setLoadingEmail] = useState(false);
   const [popoverOpened, setPopoverOpened] = useState(false);
@@ -52,7 +54,6 @@ const Signup = () => {
     validationRules: {
       firstName: (value) => value.trim().length >= 2,
       lastName: (value) => value.trim().length >= 2,
-      // eslint-disable-next-line max-len, no-control-regex
       email: (value) => validateEmail(value),
       password: (value) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value),
       confirmPassword: (val, values) => val === values.password,
@@ -79,62 +80,43 @@ const Signup = () => {
   // eslint-disable-next-line max-len, no-control-regex
   const validateEmail = (email) => /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(email);
 
-  const mutateSignup = useMutation(async (newAccount) => fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/signup`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(newAccount),
-  }), {
-    onMutate: async () => {
-      setLoading(true);
-      await queryClient.cancelQueries('user');
-    },
-    onError: ({ error: queryError }) => {
-      setError(queryError.toString());
-    },
-    onSuccess: async (data) => {
-      const json = await data.json();
-      if (json.authenticated) {
-        queryClient.invalidateQueries('user');
-      } else {
-        setError(json.message);
-      }
-    },
-    onSettled: () => {
-      setLoading(false);
-    }
-  });
-
-  const mutateEmail = useMutation(async () => fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/email`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email: form.values.email }),
-  }), {
-    onMutate: async () => {
-      setLoadingEmail(true);
-    },
-    onSuccess: async (data) => {
-      const res = await data.json();
-      if (!res.unique) {
-        form.setFieldError('email', 'Email taken');
-      }
-    },
-    onSettled: () => {
-      setLoadingEmail(false);
-    }
-  });
-
   const submitSignup = (data) => {
     setError(null);
+    setLoading(true);
+
     const { confirmPassword, ...newAccount } = data;
-    mutateSignup.mutate(newAccount);
+    signup.mutate(newAccount, {
+      onError: ({ error: queryError }) => {
+        setError(queryError.toString());
+      },
+      onSuccess: async (res) => {
+        const json = await res.json();
+        if (!json.authenticated) {
+          setError(json.message);
+        }
+      },
+      onSettled: () => {
+        setLoading(false);
+      }
+    });
+  };
+
+  const checkEmail = () => {
+    form.validateField('email');
+    if (form.values.email) {
+      setLoadingEmail(true);
+      uniqueEmail.mutateAsync(form.values.email, {
+        onSuccess: async (data) => {
+          const res = await data.json();
+          if (!res.unique) {
+            form.setFieldError('email', 'Email taken');
+          }
+        },
+        onSettled: () => {
+          setLoadingEmail(false);
+        }
+      });
+    }
   };
 
   const strength = getStrength(form.values.password);
@@ -173,11 +155,7 @@ const Signup = () => {
               label="Email"
               placeholder="your@email.com"
               icon={<IoMailOutline />}
-              onBlur={() => {
-                form.validateField('email');
-                console.log(form);
-                if (form.values.email) mutateEmail.mutateAsync();
-              }}
+              onBlur={checkEmail}
               {...form.getInputProps('email')}
               rightSection={
                 loadingEmail

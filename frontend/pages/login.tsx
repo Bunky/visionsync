@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
@@ -9,10 +8,11 @@ import { useForm } from '@mantine/hooks';
 import { IoLockClosedOutline, IoMailOutline } from 'react-icons/io5';
 import styled from 'styled-components';
 import useUser from '../hooks/useUser';
+import useLogin from '../hooks/useLogin';
 
 const Login = () => {
-  const queryClient = useQueryClient();
   const router = useRouter();
+  const login = useLogin();
   const { data: user, status: userStatus } = useUser();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -40,38 +40,23 @@ const Login = () => {
     }
   }, [user]);
 
-  const mutateLogin = useMutation(async (newAccount) => fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/login`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(newAccount),
-  }), {
-    onMutate: async () => {
-      setLoading(true);
-      await queryClient.cancelQueries('user');
-    },
-    onError: ({ error: queryError }) => {
-      setError(queryError.toString());
-    },
-    onSuccess: async (data) => {
-      const json = await data.json();
-      if (json.authenticated) {
-        queryClient.invalidateQueries('user');
-      } else {
-        setError(json.message);
-      }
-    },
-    onSettled: () => {
-      setLoading(false);
-    }
-  });
-
   const submitLogin = (data) => {
     setError(null);
-    mutateLogin.mutate(data);
+    setLoading(true);
+    login.mutate(data, {
+      onError: ({ error: queryError }) => {
+        setError(queryError.toString());
+      },
+      onSuccess: async (res) => {
+        const json = await res.json();
+        if (!json.authenticated) {
+          setError(json.message);
+        }
+      },
+      onSettled: () => {
+        setLoading(false);
+      }
+    });
   };
 
   return (
