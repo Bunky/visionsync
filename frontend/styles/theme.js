@@ -1,4 +1,4 @@
 export const theme = {
-  colors: { red: 'red' },
+  primaryColor: 'violet',
   fontFamily: 'Inter, sans-serif',
 };

@@ -5,14 +5,18 @@ import {
 import styled from 'styled-components';
 
 interface UserButtonProps extends UnstyledButtonProps {
-  name: string;
+  firstName: string;
+  lastName: string;
 }
 
 const Menu = forwardRef<HTMLButtonElement, UserButtonProps>(
-  ({ name, ...others }: UserButtonProps, ref) => (
+  ({ firstName, lastName, ...others }: UserButtonProps, ref) => (
     <Container spacing="sm" ref={ref} {...others}>
-      <Avatar color="violet" radius="xl" size="sm">{name.split(' ')[0].substring(0, 1)}</Avatar>
-      <Text size="sm" weight={400}>{name}</Text>
+      <Avatar color="violet" radius="xl" size="sm">
+        {firstName.substring(0, 1)}
+        {lastName.substring(0, 1)}
+      </Avatar>
+      <Text size="sm" weight={400}>{`${firstName} ${lastName}`}</Text>
     </Container>
   )
 );
