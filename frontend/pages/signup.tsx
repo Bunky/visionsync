@@ -61,7 +61,7 @@ const Signup = () => {
     },
     errorMessages: {
       firstName: 'First name is required',
-      lastName: 'First name is required',
+      lastName: 'Last name is required',
       email: 'Invalid email',
       password: 'Invalid password',
       confirmPassword: "Passwords don't match",
