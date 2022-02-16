@@ -1,5 +1,4 @@
-# Using machine learning to derive statistics from football broadcasts in 
-real-time 
+# Using machine learning to derive statistics from football broadcasts in real-time 
 
 
 ## Introduction 
@@ -9,7 +8,7 @@ Statistics are used in a variety of industries related to football, such as broa
 
 The proposed solution involves development of a full-stack web application to analyse football matches through broadcast feeds to derive statistics in real-time using machine learning. As an example, heatmaps and player paths can be derived from player positions on the pitch by using homography and player tracking (see Figure 1 and Figure 2). A solution such as this could be used by broadcast studios such as BT Sports or football club coaches for player performance analysis. 
 
-[figures]
+![image](https://user-images.githubusercontent.com/10551558/154180493-6af025c2-6e41-48fa-b35d-f4b257045cb7.png)
 
 Development of the solution will involve multiple phases such as requirements elicitation, design, development, and testing. Through research, requirements will be formed to outline the core features and functionality of the application. The design stage will produce mock-ups and wireframes following accessible UI and UX design standards, and the development and testing stages will take place following agile methodology building upon a minimum-viable product, with end-to-end testing throughout. 
 
@@ -21,11 +20,12 @@ One of the main challenges that will be faced with this implementation is the cr
 
 For the solution, below is a list of high-level requirements that are subject to change. 
 
-[table]
 
-## High-Level Requirements
+
+### High-Level Requirements
 
 |1 | Webapp | Interactive web UI allowing users to easily manage and view analysed videos. |
+|---|---|---|
 |2 | Video Integration |Allow users to add any video for analysis through upload, stream or supplied YouTube link. |
 |3 | Data Analysis | Derive statistics from variables from analysed feed such as player positions, possession, player movement.|
 |4 | Analysis Presentation | Present analysis in real-time on the webapp in an easy-to-understand format.|
