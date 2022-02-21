@@ -48,7 +48,7 @@ def main():
     else:
       cv.imshow("Result", frame)
       
-    homography = get_homography(frame, intersections)
+    # homography = get_homography(frame, intersections)
                 
     if cv.waitKey(1) == ord("q"):
         break
@@ -190,7 +190,9 @@ def classify_line(line):
   length_of_line = math.hypot(x2-x1, y2-y1)
   angle_of_line = math.degrees(math.atan2(-(y2-y1), x2-x1))
   if angle_of_line < 0:
-    angle_of_line = angle_of_line * -1
+    norm_angle_of_line = angle_of_line * -1
+  else:
+    norm_angle_of_line = angle_of_line
 
   # Center Line
   centre_min_length = cv.getTrackbarPos("centre_min_length", "Result Controls")
@@ -232,22 +234,22 @@ def classify_line(line):
   # LineID, Point1, Point2, Angle of line, Length of line
   
   # Centre line
-  if centre_min_angle < angle_of_line < centre_max_angle and centre_min_length < length_of_line < centre_max_length:
+  if centre_min_angle < norm_angle_of_line < centre_max_angle and centre_min_length < length_of_line < centre_max_length:
     return [1, [x1, y1], [x2, y2], angle_of_line, length_of_line]
   # Goal line
-  elif goal_min_angle < angle_of_line < goal_max_angle and goal_min_length < length_of_line < goal_max_length: # Need to add check to make sure line is near the border of the field
+  elif goal_min_angle < norm_angle_of_line < goal_max_angle and goal_min_length < length_of_line < goal_max_length: # Need to add check to make sure line is near the border of the field
     return [6, [x1, y1], [x2, y2], angle_of_line, length_of_line]
   # Box line
-  elif box_min_angle < angle_of_line < box_max_angle and box_min_length < length_of_line < box_max_length:
+  elif box_min_angle < norm_angle_of_line < box_max_angle and box_min_length < length_of_line < box_max_length:
     return [3, [x1, y1], [x2, y2], angle_of_line, length_of_line]
   # 6yrd line
-  elif six_min_angle < angle_of_line < six_max_angle and six_min_length < length_of_line < six_max_length:
+  elif six_min_angle < norm_angle_of_line < six_max_angle and six_min_length < length_of_line < six_max_length:
     return [5, [x1, y1], [x2, y2], angle_of_line, length_of_line]
   # Box Edge line
-  elif boxedge_min_angle < angle_of_line < boxedge_max_angle and boxedge_min_length < length_of_line < boxedge_max_length:
+  elif boxedge_min_angle < norm_angle_of_line < boxedge_max_angle and boxedge_min_length < length_of_line < boxedge_max_length:
     return [4, [x1, y1], [x2, y2], angle_of_line, length_of_line]
   # Side line
-  elif side_min_angle < angle_of_line < side_max_angle and side_min_length < length_of_line < side_max_length:
+  elif side_min_angle < norm_angle_of_line < side_max_angle and side_min_length < length_of_line < side_max_length:
     return [2, [x1, y1], [x2, y2], angle_of_line, length_of_line]
   
   # Return unclassified line for debug
