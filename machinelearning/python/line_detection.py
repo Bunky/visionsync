@@ -38,16 +38,17 @@ def main():
     if lines is not None:
       # Filter/prune lines (combines lines that are duplicates etc)
       lines = prune_lines(lines)      
-      cv.putText(frame, f"Lines: {str(len(lines))}", (50, 100), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 128, 255), 2, cv.LINE_AA)
       
-      frame_with_lines, intersections = generate_lines(frame, lines)
+      frame_with_lines, valid_lines = generate_lines(frame, lines)
+      frame_with_intersections, intersections = generate_intersections(frame_with_lines, valid_lines)
 
+      cv.putText(frame, f"Lines: {str(len(valid_lines))}", (50, 100), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 128, 255), 2, cv.LINE_AA)
       cv.putText(frame, f"Intersections: {str(len(intersections))}", (50, 150), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 128, 128), 2, cv.LINE_AA)
-      cv.imshow("Result", frame_with_lines)
-      
-      homography = get_homography(frame, intersections)
+      cv.imshow("Result", frame_with_intersections)
     else:
       cv.imshow("Result", frame)
+      
+    homography = get_homography(frame, intersections)
                 
     if cv.waitKey(1) == ord("q"):
         break
@@ -61,11 +62,12 @@ def get_homography(frame, intersections):
   if len(intersections) < 4:
     return False
   
+  # Gets first 4 intersections
   source = np.array([
-    [intersections[0][0], intersections[0][1]],
-    [intersections[1][0], intersections[1][1]],
-    [intersections[2][0], intersections[2][1]],
-    [intersections[3][0], intersections[3][1]],
+    [intersections[0][2][0], intersections[0][2][1]],
+    [intersections[1][2][0], intersections[1][2][1]],
+    [intersections[2][2][0], intersections[2][2][1]],
+    [intersections[3][2][0], intersections[3][2][1]],
   ])
  
   # Source points will be collected from lines, either intersections or end of lines, and will map to the destination points by classifying the lines
@@ -141,17 +143,10 @@ def get_histogram(frame):
     plt.draw()
     plt.pause(0.001)  
   
-def prune_lines(lines):
-  min_distance = cv.getTrackbarPos('min_distance', "Post Prune")
-  min_angle = cv.getTrackbarPos('min_angle', "Post Prune")
-  bundler = HoughBundler(min_distance, min_angle)
-  lines = bundler.process_lines(lines)
-  return lines
-  
-def classify_line(angle, length):
-  return True
+def line_intersection(line1, line2):
+  line1 = [line1[1], line1[2]]
+  line2 = [line2[1], line2[2]]
 
-def line_intersection(frame, line1, line2):
   xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
   ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
 
@@ -166,103 +161,143 @@ def line_intersection(frame, line1, line2):
   x = det(d, xdiff) / div
   y = det(d, ydiff) / div
   
-  # Draw point
-  cv.circle(frame, (int(x), int(y)), 5, (0, 255, 255), 2, cv.LINE_AA)
+  # Point ouside of boundaries - removed temporarily
+  if 0 < x < 640 and 0 < y < 480:
+    return [x, y]
+  else:
+    return False
 
-  return x, y
+def generate_intersections(frame, lines):
+  intersections = []
+  
+  # Get intersections
+  for index, line1 in enumerate(lines):
+    for line2 in lines[index+1:]:
+      intersection = line_intersection(line1, line2)
+      if intersection is not False:
+        # Line1 ID, Line2 ID, intersection point
+        intersections.append([line1[0], line2[0], intersection])
+        
+  # Draw intersections
+  for intersection in intersections:
+    cv.circle(frame, (int(intersection[2][0]), int(intersection[2][1])), 5, (0, 255, 255), 2, cv.LINE_AA)
+  
+  return frame, intersections
+ 
+def classify_line(line):
+  x1, y1, x2, y2 = line[0]
+    
+  length_of_line = math.hypot(x2-x1, y2-y1)
+  angle_of_line = math.degrees(math.atan2(-(y2-y1), x2-x1))
+  if angle_of_line < 0:
+    angle_of_line = angle_of_line * -1
+
+  # Center Line
+  centre_min_length = cv.getTrackbarPos("centre_min_length", "Result Controls")
+  centre_max_length = cv.getTrackbarPos("centre_max_length", "Result Controls")
+  centre_min_angle = cv.getTrackbarPos("centre_min_angle", "Result Controls")
+  centre_max_angle = cv.getTrackbarPos("centre_max_angle", "Result Controls")
+  
+  # Goal Line
+  goal_min_length = cv.getTrackbarPos("goal_min_length", "Result Controls")
+  goal_max_length = cv.getTrackbarPos("goal_max_length", "Result Controls")
+  goal_min_angle = cv.getTrackbarPos("goal_min_angle", "Result Controls")
+  goal_max_angle = cv.getTrackbarPos("goal_max_angle", "Result Controls")
+  
+  # Box Line
+  box_min_length = cv.getTrackbarPos("box_min_length", "Result Controls")
+  box_max_length = cv.getTrackbarPos("box_max_length", "Result Controls")
+  box_min_angle = cv.getTrackbarPos("box_min_angle", "Result Controls")
+  box_max_angle = cv.getTrackbarPos("box_max_angle", "Result Controls")
+  
+  # 6yrd Line
+  six_min_length = cv.getTrackbarPos("six_min_length", "Result Controls")
+  six_max_length = cv.getTrackbarPos("six_max_length", "Result Controls")
+  six_min_angle = cv.getTrackbarPos("six_min_angle", "Result Controls")
+  six_max_angle = cv.getTrackbarPos("six_max_angle", "Result Controls")
+  
+  # Box Edge Line
+  boxedge_min_length = cv.getTrackbarPos("boxedge_min_length", "Result Controls")
+  boxedge_max_length = cv.getTrackbarPos("boxedge_max_length", "Result Controls")
+  boxedge_min_angle = cv.getTrackbarPos("boxedge_min_angle", "Result Controls")
+  boxedge_max_angle = cv.getTrackbarPos("boxedge_max_angle", "Result Controls")
+  
+  # Side Line
+  side_min_length = cv.getTrackbarPos("side_min_length", "Result Controls")
+  side_max_length = cv.getTrackbarPos("side_max_length", "Result Controls")
+  side_min_angle = cv.getTrackbarPos("side_min_angle", "Result Controls")
+  side_max_angle = cv.getTrackbarPos("side_max_angle", "Result Controls")
+    
+  # Return line with classification
+  # LineID, Point1, Point2, Angle of line, Length of line
+  
+  # Centre line
+  if centre_min_angle < angle_of_line < centre_max_angle and centre_min_length < length_of_line < centre_max_length:
+    return [1, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+  # Goal line
+  elif goal_min_angle < angle_of_line < goal_max_angle and goal_min_length < length_of_line < goal_max_length: # Need to add check to make sure line is near the border of the field
+    return [6, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+  # Box line
+  elif box_min_angle < angle_of_line < box_max_angle and box_min_length < length_of_line < box_max_length:
+    return [3, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+  # 6yrd line
+  elif six_min_angle < angle_of_line < six_max_angle and six_min_length < length_of_line < six_max_length:
+    return [5, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+  # Box Edge line
+  elif boxedge_min_angle < angle_of_line < boxedge_max_angle and boxedge_min_length < length_of_line < boxedge_max_length:
+    return [4, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+  # Side line
+  elif side_min_angle < angle_of_line < side_max_angle and side_min_length < length_of_line < side_max_length:
+    return [2, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+  
+  # Return unclassified line for debug
+  # return [0, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+  return False
 
 def generate_lines(frame, lines):
   valid_lines = []
 
   for line in lines:
-    x1, y1, x2, y2 = line[0]
-    
-    length_of_line = math.hypot(x2-x1, y2-y1)
-    angle_of_line = math.degrees(math.atan2(-(y2-y1), x2-x1))
-    if angle_of_line < 0:
-      angle_of_line = angle_of_line * -1
+    classified_line = classify_line(line)
+    if classified_line is not False:
+      valid_lines.append(classified_line)
+      
+  # Draw valid lines
+  for line in valid_lines:
+    if line[0] == 1:
+      cv.line(frame, line[1], line[2], (255, 0, 0), 2, cv.LINE_AA)
+      cv.putText(frame, str("C: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1, cv.LINE_AA)
+    elif line[0] == 2:
+      cv.line(frame, line[1], line[2], (0, 255, 255), 2, cv.LINE_AA)
+      cv.putText(frame, str("S: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1, cv.LINE_AA)
+    elif line[0] == 3:
+      cv.line(frame, line[1], line[2], (0, 0, 255), 2, cv.LINE_AA)
+      cv.putText(frame, str("B: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv.LINE_AA)
+    elif line[0] == 4:
+      cv.line(frame, line[1], line[2], (255, 255, 0), 2, cv.LINE_AA)
+      cv.putText(frame, str("BE: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1, cv.LINE_AA)
+    elif line[0] == 5:
+      cv.line(frame, line[1], line[2], (0, 128, 128), 2, cv.LINE_AA)
+      cv.putText(frame, str("6: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 128, 128), 1, cv.LINE_AA)
+    elif line[0] == 6:
+      cv.line(frame, line[1], line[2], (0, 255, 0), 2, cv.LINE_AA)
+      cv.putText(frame, str("G: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv.LINE_AA)
+    # Unclassified for debug
+    # elif line[0] == 0:
+    #   cv.line(frame, line[1], line[2], (0, 0, 0), 2, cv.LINE_AA)
+    #   cv.putText(frame, str("G: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv.LINE_AA)
 
-    # Center Line
-    centre_min_length = cv.getTrackbarPos("centre_min_length", "Result Controls")
-    centre_max_length = cv.getTrackbarPos("centre_max_length", "Result Controls")
-    centre_min_angle = cv.getTrackbarPos("centre_min_angle", "Result Controls")
-    centre_max_angle = cv.getTrackbarPos("centre_max_angle", "Result Controls")
-    
-    # Goal Line
-    goal_min_length = cv.getTrackbarPos("goal_min_length", "Result Controls")
-    goal_max_length = cv.getTrackbarPos("goal_max_length", "Result Controls")
-    goal_min_angle = cv.getTrackbarPos("goal_min_angle", "Result Controls")
-    goal_max_angle = cv.getTrackbarPos("goal_max_angle", "Result Controls")
-    
-    # Box Line
-    box_min_length = cv.getTrackbarPos("box_min_length", "Result Controls")
-    box_max_length = cv.getTrackbarPos("box_max_length", "Result Controls")
-    box_min_angle = cv.getTrackbarPos("box_min_angle", "Result Controls")
-    box_max_angle = cv.getTrackbarPos("box_max_angle", "Result Controls")
-    
-    # 6yrd Line
-    six_min_length = cv.getTrackbarPos("six_min_length", "Result Controls")
-    six_max_length = cv.getTrackbarPos("six_max_length", "Result Controls")
-    six_min_angle = cv.getTrackbarPos("six_min_angle", "Result Controls")
-    six_max_angle = cv.getTrackbarPos("six_max_angle", "Result Controls")
-    
-    # Box Edge Line
-    boxedge_min_length = cv.getTrackbarPos("boxedge_min_length", "Result Controls")
-    boxedge_max_length = cv.getTrackbarPos("boxedge_max_length", "Result Controls")
-    boxedge_min_angle = cv.getTrackbarPos("boxedge_min_angle", "Result Controls")
-    boxedge_max_angle = cv.getTrackbarPos("boxedge_max_angle", "Result Controls")
-    
-    # Side Line
-    side_min_length = cv.getTrackbarPos("side_min_length", "Result Controls")
-    side_max_length = cv.getTrackbarPos("side_max_length", "Result Controls")
-    side_min_angle = cv.getTrackbarPos("side_min_angle", "Result Controls")
-    side_max_angle = cv.getTrackbarPos("side_max_angle", "Result Controls")
-     
-    # classify_line(line)
-    
-    # Centre line
-    if centre_min_angle < angle_of_line < centre_max_angle and centre_min_length < length_of_line < centre_max_length:
-      cv.line(frame, (x1, y1), (x2, y2), (255, 0, 0), 2, cv.LINE_AA)
-      cv.putText(frame, str("C: {:.2f}".format(angle_of_line)), (x1, y1), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1, cv.LINE_AA)
-      valid_lines.append([[x1, y1],[x2, y2]])
-    # Goal line
-    elif goal_min_angle < angle_of_line < goal_max_angle and goal_min_length < length_of_line < goal_max_length: # Need to add check to make sure line is near the border of the field
-      cv.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2, cv.LINE_AA)
-      cv.putText(frame, str("G: {:.2f}".format(angle_of_line)), (x1, y1), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv.LINE_AA)
-      valid_lines.append([[x1, y1],[x2, y2]])
-    # Box line
-    elif box_min_angle < angle_of_line < box_max_angle and box_min_length < length_of_line < box_max_length:
-      cv.line(frame, (x1, y1), (x2, y2), (0, 0, 255), 2, cv.LINE_AA)
-      cv.putText(frame, str("B: {:.2f}".format(angle_of_line)), (x1, y1), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv.LINE_AA)
-      valid_lines.append([[x1, y1],[x2, y2]])
-    # 6yrd line
-    elif six_min_angle < angle_of_line < six_max_angle and six_min_length < length_of_line < six_max_length:
-      cv.line(frame, (x1, y1), (x2, y2), (0, 128, 128), 2, cv.LINE_AA)
-      cv.putText(frame, str("6: {:.2f}".format(angle_of_line)), (x1, y1), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 128, 128), 1, cv.LINE_AA)
-      valid_lines.append([[x1, y1],[x2, y2]])
-    # Box Edge line
-    elif boxedge_min_angle < angle_of_line < boxedge_max_angle and boxedge_min_length < length_of_line < boxedge_max_length:
-      cv.line(frame, (x1, y1), (x2, y2), (255, 255, 0), 2, cv.LINE_AA)
-      cv.putText(frame, str("BE: {:.2f}".format(angle_of_line)), (x1, y1), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1, cv.LINE_AA)
-      valid_lines.append([[x1, y1],[x2, y2]])
-    # Side line
-    elif side_min_angle < angle_of_line < side_max_angle and side_min_length < length_of_line < side_max_length:
-      cv.line(frame, (x1, y1), (x2, y2), (0, 255, 255), 2, cv.LINE_AA)
-      cv.putText(frame, str("S: {:.2f}".format(angle_of_line)), (x1, y1), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1, cv.LINE_AA)
-      valid_lines.append([[x1, y1],[x2, y2]])
     # else:
-    #   cv.line(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)#
-    
-  # Draw intersections 
-  intersections = []
-  for index, line1 in enumerate(valid_lines):
-    for line2 in valid_lines[index+1:]:
-      intersection = line_intersection(frame, line1, line2)
-      if intersection is not False:
-        intersections.append(intersection)
-        
-  return frame, intersections
-  
+    #   cv.line(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)#        
+  return frame, valid_lines
+ 
+def prune_lines(lines):
+  min_distance = cv.getTrackbarPos('min_distance', "Post Prune")
+  min_angle = cv.getTrackbarPos('min_angle', "Post Prune")
+  bundler = HoughBundler(min_distance, min_angle)
+  lines = bundler.process_lines(lines)
+  return lines
+ 
 def hough(frame):
   threshold = cv.getTrackbarPos('threshold', "Result Controls")
   minLineLength = cv.getTrackbarPos('minLineLength', "Result Controls")
@@ -271,7 +306,6 @@ def hough(frame):
   rho = cv.getTrackbarPos('rho', "Result Controls")
 
   return cv.HoughLinesP(frame, rho, resolution * np.pi/180, threshold=threshold, minLineLength=minLineLength, maxLineGap=maxLineGap)
-  # return cv.HoughLines(frame, 1, resolution * np.pi/180, threshold=threshold)
 
 def closing(frame):
   size = cv.getTrackbarPos('size', 'Closing')
