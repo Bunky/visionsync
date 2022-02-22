@@ -175,7 +175,7 @@ def generate_intersections(frame, lines):
     for line2 in lines[index+1:]:
       intersection = line_intersection(line1, line2)
       if intersection is not False:
-        # Line1 ID, Line2 ID, intersection point
+        # Line1 ID, Line2 ID, intersection point, intersection side (0, 1), intersection far/near (0, 1)
         intersections.append([line1[0], line2[0], intersection])
         
   # Draw intersections
@@ -193,6 +193,12 @@ def classify_line(line):
     norm_angle_of_line = angle_of_line * -1
   else:
     norm_angle_of_line = angle_of_line
+    
+  # Horizontal/Vertical classification
+  if norm_angle_of_line < 15:
+    direction = 1
+  else:
+    direction = 0
 
   # Center Line
   centre_min_length = cv.getTrackbarPos("centre_min_length", "Result Controls")
@@ -231,29 +237,29 @@ def classify_line(line):
   side_max_angle = cv.getTrackbarPos("side_max_angle", "Result Controls")
     
   # Return line with classification
-  # LineID, Point1, Point2, Angle of line, Length of line
+  # LineID, Point1, Point2, Angle of line, Length of line, Line vert/hori
   
   # Centre line
   if centre_min_angle < norm_angle_of_line < centre_max_angle and centre_min_length < length_of_line < centre_max_length:
-    return [1, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+    return [1, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
   # Goal line
   elif goal_min_angle < norm_angle_of_line < goal_max_angle and goal_min_length < length_of_line < goal_max_length: # Need to add check to make sure line is near the border of the field
-    return [6, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+    return [6, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
   # Box line
   elif box_min_angle < norm_angle_of_line < box_max_angle and box_min_length < length_of_line < box_max_length:
-    return [3, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+    return [3, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
   # 6yrd line
   elif six_min_angle < norm_angle_of_line < six_max_angle and six_min_length < length_of_line < six_max_length:
-    return [5, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+    return [5, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
   # Box Edge line
   elif boxedge_min_angle < norm_angle_of_line < boxedge_max_angle and boxedge_min_length < length_of_line < boxedge_max_length:
-    return [4, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+    return [4, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
   # Side line
   elif side_min_angle < norm_angle_of_line < side_max_angle and side_min_length < length_of_line < side_max_length:
-    return [2, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+    return [2, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
   
   # Return unclassified line for debug
-  # return [0, [x1, y1], [x2, y2], angle_of_line, length_of_line]
+  # return [0, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
   return False
 
 def generate_lines(frame, lines):
@@ -266,6 +272,15 @@ def generate_lines(frame, lines):
       
   # Draw valid lines
   for line in valid_lines:
+
+    # Direction of line
+    if line[5] == 0:
+      # vertical
+      cv.circle(frame, (int(line[1][0]), int(line[1][1] - 10)), 5, (0, 0, 255), -1, cv.LINE_AA)
+    else:
+      # horizontal
+      cv.circle(frame, (int(line[1][0]), int(line[1][1] - 10)), 5, (0, 255, 0), -1, cv.LINE_AA)
+    
     if line[0] == 1:
       cv.line(frame, line[1], line[2], (255, 0, 0), 2, cv.LINE_AA)
       cv.putText(frame, str("C: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1, cv.LINE_AA)
