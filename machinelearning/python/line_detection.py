@@ -2,19 +2,23 @@ import numpy as np
 import cv2 as cv
 import math
 import matplotlib.pyplot as plt
-from scipy.signal import find_peaks
+from scipy.signal import find_peaks, peak_widths
 import itertools
 from torch import threshold_
+import time
 
 def main():
   create_windows()
   video = get_source()
 
   while True:
+    start_time = time.time()
     ret, frame = video.read()
     
     # Processing
-    # colour_histogram = get_histogram(frame)
+    # if cv.waitKey(1) == ord("w"):
+    # h, s, v = get_histogram(frame)
+
     crowd_mask = generate_crowd_mask(frame)
     player_mask = generate_player_mask(frame)
     
@@ -42,16 +46,23 @@ def main():
       frame_with_lines, valid_lines = generate_lines(frame, lines)
       frame_with_intersections, intersections = generate_intersections(frame_with_lines, valid_lines)
 
-      cv.putText(frame, f"Lines: {str(len(valid_lines))}", (50, 100), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 128, 255), 2, cv.LINE_AA)
-      cv.putText(frame, f"Intersections: {str(len(intersections))}", (50, 150), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 128, 128), 2, cv.LINE_AA)
+      cv.putText(frame, f"Lines: {str(len(valid_lines))}", (25, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 255), 1, cv.LINE_AA)
+      cv.putText(frame, f"Intersections: {str(len(intersections))}", (25, 100), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 128), 1, cv.LINE_AA)
+      
+      # Print FPS
+      cv.putText(frame, f"FPS: {str(1.0 / (time.time() - start_time))}", (300, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 255), 1, cv.LINE_AA)
+      
       cv.imshow("Result", frame_with_intersections)
     else:
+      # Print FPS
+      cv.putText(frame, f"FPS: {str(1.0 / (time.time() - start_time))}", (300, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 255), 1, cv.LINE_AA)
+
       cv.imshow("Result", frame)
       
-    # homography = get_homography(frame, intersections)
+    # homography = get_homography(frame, intersections) 
                 
     if cv.waitKey(1) == ord("q"):
-        break
+      break
 
   # When everything done, release the capture
   video.release()
@@ -104,44 +115,80 @@ def get_homography(frame, intersections):
 
   cv.imshow("Homography", img_draw_matches)
 
-tmp = False
-def get_histogram(frame):
-  # hist_h = cv.calcHist([frame[:,:,0]], [0], None, [256], [0,256])
-  # hist_s = cv.calcHist([frame[:,:,1]], [0], None, [256], [0,256])
-  # hist_v = cv.calcHist([frame[:,:,2]], [0], None, [256], [0,256])
+def get_range(hist, colour):
+  # Get peaks -  add sliders to params to see how they affect results :)
+  x = []
+  for pnt in hist:
+    x.append(pnt[0])
+  x = np.array(x)
   
-  # [32] is frequency bin, the lower these are, faster it runs, realistically i dont need to be checking each 256, so for speed only check x
-  hist_h = cv.calcHist([frame[:,:,0]], [0], None, [32], [0,256]) 
-  hist_s = cv.calcHist([frame[:,:,1]], [0], None, [32], [0,256])
-  hist_v = cv.calcHist([frame[:,:,2]], [0], None, [32], [0,256])
+  prominence = cv.getTrackbarPos("prominence", "FindPeaks")
+  width = cv.getTrackbarPos("width", "FindPeaks")
+  distance = cv.getTrackbarPos("distance", "FindPeaks")
+  height = cv.getTrackbarPos("height", "FindPeaks")
+  threshold = cv.getTrackbarPos("threshold", "FindPeaks")
+  rel_height = cv.getTrackbarPos("rel_height", "FindPeaks")
   
-  # x = [val[0] for val in hist_h]; 
+  # Find peaks
+  peaks, properties = find_peaks(x, height, threshold, distance, prominence, width)
   
-  # peaks, properties = find_peaks(x, prominence=1, width=20)
+  # Find peak widths
+  results_full = peak_widths(x, peaks, rel_height / 100)
+  min_val = results_full[2] # left point of peak
+  max_val = results_full[3] # right point of peak
   
-  # plt.plot(x)
+  # print(results_full)
+  
   # plt.plot(peaks, x[peaks], "x")
-  # # plt.vlines(x=peaks, ymin=x[peaks] - properties["prominences"], ymax=x[peaks], color="C1")
-  # # plt.hlines(y=properties["width_heights"], xmin=properties["left_ips"], xmax=properties["right_ips"], color="C1")
-  # plt.show()
+  # plt.vlines(x=peaks, ymin=x[peaks] - properties["prominences"], ymax=x[peaks], color="C1")
+  # plt.hlines(y=properties["width_heights"], xmin=properties["left_ips"], xmax=properties["right_ips"], color="C1")
+  # plt.hlines(y=properties["width_heights"], xmin=properties["left_bases"], xmax=properties["right_bases"], color="C1")
+
+  plt.vlines(x=min_val, ymin=0, ymax=x[peaks], color=colour)
+  plt.vlines(x=max_val, ymin=0, ymax=x[peaks], color=colour)
+  plt.axvspan(min_val, max_val, color=colour, alpha=0.5, lw=0)
+
+  # plt.hlines(*results_full[1:], color="C3")
   
-  # plt.plot(hist_h, color='c', label="h")
-  # plt.plot(hist_s, color='m', label="s")
-  # plt.plot(hist_v, color='y', label="v")
-  
+  return [min_val, max_val]
+
+tmp = False
+def get_histogram(frame): 
+  # [256] is frequency bin, the lower these are, faster it runs, realistically i dont need to be checking each 256, so for speed only check x
+  hist_h = cv.calcHist([frame[:,:,0]], [0], None, [256], [0, 256]) 
+  hist_s = cv.calcHist([frame[:,:,1]], [0], None, [256], [0, 256])
+  hist_v = cv.calcHist([frame[:,:,2]], [0], None, [256], [0, 256])
+ 
   global tmp
   if tmp:
     tmp = False   
-    plt.ion()
-    plt.legend()
-    plt.show()
+    # plt.ion()
+    # plt.legend()
+    # plt.show()
   else:
-    plt.clf()
-    plt.plot(hist_h, color='c', label="h")
-    plt.plot(hist_s, color='m', label="s")
-    plt.plot(hist_v, color='y', label="v")
-    plt.draw()
-    plt.pause(0.001)  
+    # plt.clf()
+
+    # Get range of peaks for green
+    h_range = get_range(hist_h, 'c')
+    s_range = get_range(hist_s, 'm')
+    v_range = get_range(hist_v, 'y')
+    
+    # Plot graphs     
+    # plt.plot(hist_h, color='c', label="h")
+    # plt.plot(hist_s, color='m', label="s")
+    # plt.plot(hist_v, color='y', label="v")
+    # plt.draw()
+    # plt.pause(0.001)
+    
+    # Set trackbar positions (for now instead of parsing to masks)
+    cv.setTrackbarPos("Hue Min", "CrowdMask Controls", int(h_range[0]))
+    cv.setTrackbarPos("Hue Max", "CrowdMask Controls", int(h_range[1]))
+    # cv.setTrackbarPos("Sat Min", "CrowdMask Controls", int(s_range[0]))
+    # cv.setTrackbarPos("Sat Max", "CrowdMask Controls", int(s_range[1]))
+    # cv.setTrackbarPos("Val Min", "CrowdMask Controls", int(v_range[0]))
+    # cv.setTrackbarPos("Val Max", "CrowdMask Controls", int(v_range[1]))
+    
+    return h_range, s_range, v_range
   
 def line_intersection(line1, line2):
   line1 = [line1[1], line1[2]]
@@ -272,7 +319,6 @@ def generate_lines(frame, lines):
       
   # Draw valid lines
   for line in valid_lines:
-
     # Direction of line
     if line[5] == 0:
       # vertical
@@ -639,9 +685,17 @@ def add_inputs():
   cv.createTrackbar("side_min_length", "Result Controls", 150, 360, on_change)
   cv.createTrackbar("side_max_length", "Result Controls", 600, 600, on_change)
   
-  # ================================================== Prune  ================================================
+  # ================================================== Prune ================================================
   cv.createTrackbar("min_distance", "Post Prune", 10, 100, on_change)
   cv.createTrackbar("min_angle", "Post Prune", 5, 100, on_change)
+  
+  # ================================================ FindPeaks ==============================================
+  cv.createTrackbar("prominence", "FindPeaks", 0, 256, on_change)
+  cv.createTrackbar("width", "FindPeaks", 0, 256, on_change)
+  cv.createTrackbar("height", "FindPeaks", 7500, 20000, on_change)
+  cv.createTrackbar("threshold", "FindPeaks", 0, 256, on_change)
+  cv.createTrackbar("distance", "FindPeaks", 256, 256, on_change)
+  cv.createTrackbar("rel_height", "FindPeaks", 95, 100, on_change)
 
 def create_windows():
   cv.namedWindow("PlayerMask")
@@ -668,7 +722,7 @@ def create_windows():
   cv.resizeWindow('Result Controls', 600, 800)
   
   cv.namedWindow("Post Prune")
-
+  cv.namedWindow("FindPeaks")
   cv.namedWindow("Homography")
   
   add_inputs()
