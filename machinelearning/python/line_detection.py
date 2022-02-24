@@ -43,14 +43,18 @@ def main():
       # Filter/prune lines (combines lines that are duplicates etc)
       lines = prune_lines(lines)      
       
-      frame_with_lines, valid_lines = generate_lines(frame, lines)
-      frame_with_intersections, intersections = generate_intersections(frame_with_lines, valid_lines)
+      frame_with_lines, v_lines, h_lines = generate_lines(frame, lines)
+      frame_with_intersections, intersections = generate_intersections(frame_with_lines, v_lines, h_lines)
+      
+      homography = get_homography(frame, intersections)
 
-      cv.putText(frame, f"Lines: {str(len(valid_lines))}", (25, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 255), 1, cv.LINE_AA)
+      cv.putText(frame, f"Lines: {str(len(v_lines) + len(h_lines))}", (25, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 255), 1, cv.LINE_AA)
       cv.putText(frame, f"Intersections: {str(len(intersections))}", (25, 100), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 128), 1, cv.LINE_AA)
       
       # Print FPS
       cv.putText(frame, f"FPS: {str(1.0 / (time.time() - start_time))}", (300, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 255), 1, cv.LINE_AA)
+      
+      # frame = tmp_draw_targets(frame)
       
       cv.imshow("Result", frame_with_intersections)
     else:
@@ -58,9 +62,7 @@ def main():
       cv.putText(frame, f"FPS: {str(1.0 / (time.time() - start_time))}", (300, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 255), 1, cv.LINE_AA)
 
       cv.imshow("Result", frame)
-      
-    # homography = get_homography(frame, intersections) 
-                
+                      
     if cv.waitKey(1) == ord("q"):
       break
 
@@ -68,6 +70,14 @@ def main():
   video.release()
   cv.destroyAllWindows()
   
+def tmp_draw_targets(frame):
+  global intersection_dict
+  
+  for intersection in intersection_dict:
+    cv.circle(frame, (int(intersection["x"] * 640), int(intersection["y"] * 480)), 5, (255, 255, 255), 2, cv.LINE_AA)
+  
+  return frame
+
 def get_homography(frame, intersections):
   
   if len(intersections) < 4:
@@ -75,34 +85,87 @@ def get_homography(frame, intersections):
   
   # Gets first 4 intersections
   source = np.array([
-    [intersections[0][2][0], intersections[0][2][1]],
-    [intersections[1][2][0], intersections[1][2][1]],
-    [intersections[2][2][0], intersections[2][2][1]],
-    [intersections[3][2][0], intersections[3][2][1]],
+    [intersections[0]["x"], intersections[0]["y"]],
+    [intersections[1]["x"], intersections[1]["y"]],
+    [intersections[2]["x"], intersections[2]["y"]],
+    [intersections[3]["x"], intersections[3]["y"]],
   ])
- 
-  # Source points will be collected from lines, either intersections or end of lines, and will map to the destination points by classifying the lines
-  # source = np.array([
-  #   [50, 50],
-  #   [590, 50],
-  #   [0, 430],
-  #   [750, 430]
-  # ])
   
-  # Destination points will be a fixed square topdown map of points
+  destination1 = []
+  destination2 = []
+  destination3 = []
+  destination4 = []
+
+  for int_dict in intersection_dict:
+    if int_dict["id"] == intersections[0]["id"]:
+      destination1 = [int_dict["x"] * 640, int_dict["y"] * 480]
+      # destination1 = [int(0.0231 * 640), int(0.2009 * 480)]
+      continue
+      
+    if int_dict["id"] == intersections[1]["id"]:
+      destination2 = [int_dict["x"] * 640, int_dict["y"] * 480]
+      # destination2 = [int(0.1759 * 640), int(0.7882 * 480)]
+      continue
+      
+    if int_dict["id"] == intersections[2]["id"]:
+      destination3 = [int_dict["x"] * 640, int_dict["y"] * 480]
+      # destination3 = [int(0.1759 * 640), int(0.2009 * 480)]
+      continue
+      
+    if int_dict["id"] == intersections[3]["id"]:
+      destination4 = [int_dict["x"] * 640, int_dict["y"] * 480]
+      # destination4 = [int(0.0725 * 640), int(0.2009 * 480)]
+      continue
+  
+  # Make sure destination points have all been set
+  if len(destination1) == 0:
+    return False
+  if len(destination2) == 0:
+    return False
+  if len(destination3) == 0:
+    return False
+  if len(destination4) == 0:
+    return False  
+
+  # Destination points
   destination = np.array([
-    [50, 50],
-    [590, 50],
-    [50, 430],
-    [590, 430]
+    destination1,
+    destination2,
+    destination3,
+    destination4
   ])
+  
+  # Make sure destination points are not all on same axis
+  tmp_x_axis_check = False
+  tmp_y_axis_check = False
+  tmp_x = destination[0][0]
+  tmp_y = destination[0][1]
+  for pnt in destination:
+    if pnt[0] != tmp_x:
+      tmp_x_axis_check = True
+    if pnt[1] != tmp_y:
+      tmp_y_axis_check = True
+      
+    tmp_x = pnt[0]
+    tmp_y = pnt[1]
+    
+  if tmp_x_axis_check == False or tmp_y_axis_check == False:
+    return False
+
   src_pts = np.array(source).reshape(-1,1,2)
   dst_pts = np.array(destination).reshape(-1,1,2)
-
-  random_color = (list(np.random.choice(range(256), size=3)))  
+  
+  # print("------intersections------")
+  # print(intersections)
+  # print("------src_pts------")
+  # print(src_pts)
+  # print("------dst_pts------")
+  # print(dst_pts)
 
   H, _ = cv.findHomography(src_pts, dst_pts)
   warped_frame = cv.warpPerspective(frame, H, (600, 480), frame, cv.INTER_NEAREST, cv.BORDER_CONSTANT,  0)
+  
+  tmp_draw_targets(warped_frame)
 
   img_draw_matches = cv.hconcat([frame, warped_frame])
   for i in range(len(source)):
@@ -111,7 +174,7 @@ def get_homography(frame, intersections):
     pt2 = np.dot(H, pt1)
     pt2 = pt2/pt2[2]
     end = (int(frame.shape[1] + pt2[0]), int(pt2[1]))
-    cv.line(img_draw_matches, tuple([int(j) for j in source[i]]), end, (int(random_color[0]), int(random_color[1]), int(random_color[2])), 2)
+    cv.line(img_draw_matches, tuple([int(j) for j in source[i]]), end, (255, 255, 255), 2, cv.LINE_AA)
 
   cv.imshow("Homography", img_draw_matches)
 
@@ -191,8 +254,8 @@ def get_histogram(frame):
     return h_range, s_range, v_range
   
 def line_intersection(line1, line2):
-  line1 = [line1[1], line1[2]]
-  line2 = [line2[1], line2[2]]
+  line1 = [line1["point1"], line1["point2"]]
+  line2 = [line2["point1"], line2["point2"]]
 
   xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
   ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
@@ -214,20 +277,43 @@ def line_intersection(line1, line2):
   else:
     return False
 
-def generate_intersections(frame, lines):
+def generate_intersections(frame, v_lines, h_lines):
   intersections = []
   
-  # Get intersections
-  for index, line1 in enumerate(lines):
-    for line2 in lines[index+1:]:
-      intersection = line_intersection(line1, line2)
+  for vline in v_lines:
+    for hline in h_lines:
+      intersection = line_intersection(vline, hline)
       if intersection is not False:
-        # Line1 ID, Line2 ID, intersection point, intersection side (0, 1), intersection far/near (0, 1)
-        intersections.append([line1[0], line2[0], intersection])
+        
+        if vline["angle"] > 0: 
+          v_side = 1
+        else:
+          v_side = 0
+
+        # Work out horizontal side (left of right)
+        if vline["angle"] > 0 and hline["angle"] < 0: 
+          h_side = 0
+        else:
+          h_side = 1
+        
+        for int_dict in intersection_dict:
+          if int_dict["v_line"] == vline["id"] and int_dict["h_line"] == hline["id"]:
+            if int_dict["v_side"] == v_side and int_dict["h_side"] == h_side:             
+              intersections.append({
+                "id": int_dict["id"],
+                "v_line": vline["id"],
+                "h_line": hline["id"],
+                "h_side": h_side,
+                "v_side": v_side,
+                "x": intersection[0],
+                "y": intersection[1]
+              })
+              break
         
   # Draw intersections
   for intersection in intersections:
-    cv.circle(frame, (int(intersection[2][0]), int(intersection[2][1])), 5, (0, 255, 255), 2, cv.LINE_AA)
+    cv.circle(frame, (int(intersection["x"]), int(intersection["y"])), 5, (0, 255, 255), 2, cv.LINE_AA)
+    cv.putText(frame, str(intersection["id"]), (int(intersection["x"]), int(intersection["y"])), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv.LINE_AA)
   
   return frame, intersections
  
@@ -287,64 +373,104 @@ def classify_line(line):
   # LineID, Point1, Point2, Angle of line, Length of line, Line vert/hori
   
   # Centre line
+  lineId = 0
   if centre_min_angle < norm_angle_of_line < centre_max_angle and centre_min_length < length_of_line < centre_max_length:
-    return [1, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
+    lineId = 1
   # Goal line
   elif goal_min_angle < norm_angle_of_line < goal_max_angle and goal_min_length < length_of_line < goal_max_length: # Need to add check to make sure line is near the border of the field
-    return [6, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
+    lineId = 6
   # Box line
   elif box_min_angle < norm_angle_of_line < box_max_angle and box_min_length < length_of_line < box_max_length:
-    return [3, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
+    lineId = 3
   # 6yrd line
   elif six_min_angle < norm_angle_of_line < six_max_angle and six_min_length < length_of_line < six_max_length:
-    return [5, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
+    lineId = 5
   # Box Edge line
   elif boxedge_min_angle < norm_angle_of_line < boxedge_max_angle and boxedge_min_length < length_of_line < boxedge_max_length:
-    return [4, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
+    lineId = 4
   # Side line
   elif side_min_angle < norm_angle_of_line < side_max_angle and side_min_length < length_of_line < side_max_length:
-    return [2, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
+    lineId = 2
   
-  # Return unclassified line for debug
-  # return [0, [x1, y1], [x2, y2], angle_of_line, length_of_line, direction]
-  return False
+  if lineId == 0:
+    return False # unclassified line
+  else:
+    return {
+      "id": lineId,
+      "point1": [x1, y1],
+      "point2": [x2, y2],
+      "angle": angle_of_line,
+      "length": length_of_line,
+      "direction": direction
+    }
 
 def generate_lines(frame, lines):
-  valid_lines = []
+  v_lines = []
+  h_lines = []
 
   for line in lines:
     classified_line = classify_line(line)
     if classified_line is not False:
-      valid_lines.append(classified_line)
+      # Split lines into horizontal/vertical groups using their classifed lines
+      if classified_line["id"] == 2 or classified_line["id"] == 4:
+        # cv.line(frame, classified_line[1], classified_line[2], (255, 0, 0), 2, cv.LINE_AA)
+        h_lines.append(classified_line)
+      else:
+        # cv.line(frame, classified_line[1], classified_line[2], (0, 0, 255), 2, cv.LINE_AA)
+        v_lines.append(classified_line)
+      
+      # Split lines into horizontal/vertical groups using line angle
+      # tmpAngle = classified_line["angle"]
+      # if tmpAngle < 0:
+      #   tmpAngle = tmpAngle * -1
+
+      # if tmpAngle < 15:
+      #   # cv.line(frame, classified_line["point1"], classified_line["point2"], (255, 0, 0), 2, cv.LINE_AA)
+      #   h_lines.append(classified_line)
+      # else:
+      #   # cv.line(frame, classified_line["point1"], classified_line["point2"], (0, 0, 255), 2, cv.LINE_AA)
+      #   v_lines.append(classified_line)
       
   # Draw valid lines
-  for line in valid_lines:
-    # Direction of line
-    if line[5] == 0:
-      # vertical
-      cv.circle(frame, (int(line[1][0]), int(line[1][1] - 10)), 5, (0, 0, 255), -1, cv.LINE_AA)
-    else:
-      # horizontal
-      cv.circle(frame, (int(line[1][0]), int(line[1][1] - 10)), 5, (0, 255, 0), -1, cv.LINE_AA)
-    
-    if line[0] == 1:
-      cv.line(frame, line[1], line[2], (255, 0, 0), 2, cv.LINE_AA)
-      cv.putText(frame, str("C: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1, cv.LINE_AA)
-    elif line[0] == 2:
-      cv.line(frame, line[1], line[2], (0, 255, 255), 2, cv.LINE_AA)
-      cv.putText(frame, str("S: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1, cv.LINE_AA)
-    elif line[0] == 3:
-      cv.line(frame, line[1], line[2], (0, 0, 255), 2, cv.LINE_AA)
-      cv.putText(frame, str("B: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv.LINE_AA)
-    elif line[0] == 4:
-      cv.line(frame, line[1], line[2], (255, 255, 0), 2, cv.LINE_AA)
-      cv.putText(frame, str("BE: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1, cv.LINE_AA)
-    elif line[0] == 5:
-      cv.line(frame, line[1], line[2], (0, 128, 128), 2, cv.LINE_AA)
-      cv.putText(frame, str("6: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 128, 128), 1, cv.LINE_AA)
-    elif line[0] == 6:
-      cv.line(frame, line[1], line[2], (0, 255, 0), 2, cv.LINE_AA)
-      cv.putText(frame, str("G: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv.LINE_AA)
+  for line in v_lines:
+    if line["id"] == 1:
+      cv.line(frame, line["point1"], line["point2"], (255, 0, 0), 2, cv.LINE_AA)
+      cv.putText(frame, str("C: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1, cv.LINE_AA)
+    elif line["id"] == 2:
+      cv.line(frame, line["point1"], line["point2"], (0, 255, 255), 2, cv.LINE_AA)
+      cv.putText(frame, str("S: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1, cv.LINE_AA)
+    elif line["id"] == 3:
+      cv.line(frame, line["point1"], line["point2"], (0, 0, 255), 2, cv.LINE_AA)
+      cv.putText(frame, str("B: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv.LINE_AA)
+    elif line["id"] == 4:
+      cv.line(frame, line["point1"], line["point2"], (255, 255, 0), 2, cv.LINE_AA)
+      cv.putText(frame, str("BE: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1, cv.LINE_AA)
+    elif line["id"] == 5:
+      cv.line(frame, line["point1"], line["point2"], (0, 128, 128), 2, cv.LINE_AA)
+      cv.putText(frame, str("6: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 128, 128), 1, cv.LINE_AA)
+    elif line["id"] == 6:
+      cv.line(frame, line["point1"], line["point2"], (0, 255, 0), 2, cv.LINE_AA)
+      cv.putText(frame, str("G: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv.LINE_AA)
+      
+  for line in h_lines:
+    if line["id"] == 1:
+      cv.line(frame, line["point1"], line["point2"], (255, 0, 0), 2, cv.LINE_AA)
+      cv.putText(frame, str("C: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1, cv.LINE_AA)
+    elif line["id"] == 2:
+      cv.line(frame, line["point1"], line["point2"], (0, 255, 255), 2, cv.LINE_AA)
+      cv.putText(frame, str("S: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1, cv.LINE_AA)
+    elif line["id"] == 3:
+      cv.line(frame, line["point1"], line["point2"], (0, 0, 255), 2, cv.LINE_AA)
+      cv.putText(frame, str("B: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv.LINE_AA)
+    elif line["id"] == 4:
+      cv.line(frame, line["point1"], line["point2"], (255, 255, 0), 2, cv.LINE_AA)
+      cv.putText(frame, str("BE: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1, cv.LINE_AA)
+    elif line["id"] == 5:
+      cv.line(frame, line["point1"], line["point2"], (0, 128, 128), 2, cv.LINE_AA)
+      cv.putText(frame, str("6: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 128, 128), 1, cv.LINE_AA)
+    elif line["id"] == 6:
+      cv.line(frame, line["point1"], line["point2"], (0, 255, 0), 2, cv.LINE_AA)
+      cv.putText(frame, str("G: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv.LINE_AA)
     # Unclassified for debug
     # elif line[0] == 0:
     #   cv.line(frame, line[1], line[2], (0, 0, 0), 2, cv.LINE_AA)
@@ -352,7 +478,7 @@ def generate_lines(frame, lines):
 
     # else:
     #   cv.line(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)#        
-  return frame, valid_lines
+  return frame, v_lines, h_lines
  
 def prune_lines(lines):
   min_distance = cv.getTrackbarPos('min_distance', "Post Prune")
@@ -863,5 +989,264 @@ class HoughBundler:
             merged_lines_all.extend(merged_lines)
                 
     return np.asarray(merged_lines_all)
+
+# X,Y are in pct!
+intersection_dict = [{
+  "id": 1,
+  "v_line": 6,
+  "h_line": 2,
+  "h_side": 0,
+  "v_side": 1,
+  "x": 0.0231,
+  "y": 0.0344
+}, {
+  "id": 2,
+  "v_line": 6,
+  "h_line": 4,
+  "h_side": 0,
+  "v_side": 1,
+  "x": 0.0231,
+  "y": 0.2009
+}, {
+  "id": 3,
+  "v_line": 6,
+  "h_line": 4,
+  "h_side": 0,
+  "v_side": 0,
+  "x": 0.0231,
+  "y": 0.7882
+}, {
+  "id": 4,
+  "v_line": 6,
+  "h_line": 2,
+  "h_side": 0,
+  "v_side": 0,
+  "x": 0.0231,
+  "y": 0.9644
+}, {
+  "id": 5,
+  "v_line": 5,
+  "h_line": 2,
+  "h_side": 0,
+  "v_side": 1,
+  "x": 0.0725,
+  "y": 0.0344
+}, {
+  "id": 6,
+  "v_line": 5,
+  "h_line": 4,
+  "h_side": 0,
+  "v_side": 1,
+  "x": 0.0725,
+  "y": 0.2009
+}, {
+  "id": 7, # Invalid point - no h line
+  "v_line": 5,
+  "h_line": 0,
+  "h_side": 0,
+  "v_side": 1,
+  "x": 0.0725,
+  "y": 0.3677
+}, {
+  "id": 8, # Invalid point - no h line
+  "v_line": 5,
+  "h_line": 0,
+  "h_side": 0,
+  "v_side": 0,
+  "x": 0.0725,
+  "y": 0.6301
+}, {
+  "id": 9,
+  "v_line": 5,
+  "h_line": 4,
+  "h_side": 0,
+  "v_side": 0,
+  "x": 0.0725,
+  "y": 0.7882
+}, {
+  "id": 10,
+  "v_line": 5,
+  "h_line": 2,
+  "h_side": 0,
+  "v_side": 0,
+  "x": 0.0725,
+  "y": 0.9644
+}, {
+  "id": 11,
+  "v_line": 3,
+  "h_line": 2,
+  "h_side": 0,
+  "v_side": 1,
+  "x": 0.1759,
+  "y": 0.0344
+}, {
+  "id": 12,
+  "v_line": 3,
+  "h_line": 4,
+  "h_side": 0,
+  "v_side": 1,
+  "x": 0.1759,
+  "y": 0.2009
+}, {
+  "id": 13,
+  "v_line": 3,
+  "h_line": 4,
+  "h_side": 0,
+  "v_side": 0,
+  "x": 0.1759,
+  "y": 0.7882
+}, {
+  "id": 14,
+  "v_line": 3,
+  "h_line": 2,
+  "h_side": 0,
+  "v_side": 0,
+  "x": 0.1759,
+  "y": 0.9644
+}, {
+  "id": 15, # This is the center line - doesn't need left/right side
+  "v_line": 1,
+  "h_line": 2,
+  "h_side": -1,
+  "v_side": 1,
+  "x": 0.5,
+  "y": 0.0344
+}, {
+  "id": 16, # This is the center line - doesn't need left/right side
+  "v_line": 1,
+  "h_line": 4,
+  "h_side": -1,
+  "v_side": 1,
+  "x": 0.5,
+  "y": 0.2009
+}, {
+  "id": 17, # This is the center line - doesn't need left/right side
+  "v_line": 1,
+  "h_line": 4,
+  "h_side": -1,
+  "v_side": 0,
+  "x": 0.5,
+  "y": 0.7882
+}, {
+  "id": 18, # This is the center line - doesn't need left/right side
+  "v_line": 1,
+  "h_line": 2,
+  "h_side": -1,
+  "v_side": 0,
+  "x": 0.5,
+  "y": 0.9644
+}, {
+  "id": 19,
+  "v_line": 3,
+  "h_line": 2,
+  "h_side": 1,
+  "v_side": 1,
+  "x": 0.8234,
+  "y": 0.0344
+}, {
+  "id": 20,
+  "v_line": 3,
+  "h_line": 4,
+  "h_side": 1,
+  "v_side": 1,
+  "x": 0.8234,
+  "y": 0.2009
+}, {
+  "id": 21,
+  "v_line": 3,
+  "h_line": 4,
+  "h_side": 1,
+  "v_side": 0,
+  "x": 0.8234,
+  "y": 0.7882
+}, {
+  "id": 22,
+  "v_line": 3,
+  "h_line": 2,
+  "h_side": 1,
+  "v_side": 0,
+  "x": 0.8234,
+  "y": 0.9644
+}, {
+  "id": 23,
+  "v_line": 5,
+  "h_line": 2,
+  "h_side": 1,
+  "v_side": 1,
+  "x": 0.9273,
+  "y": 0.0344
+}, {
+  "id": 24,
+  "v_line": 5,
+  "h_line": 4,
+  "h_side": 1,
+  "v_side": 1,
+  "x": 0.9273,
+  "y": 0.2009
+}, {
+  "id": 25, # Invalid point - no h line
+  "v_line": 5,
+  "h_line": 0,
+  "h_side": 1,
+  "v_side": 1,
+  "x": 0.9273,
+  "y": 0.3677
+}, {
+  "id": 26, # Invalid point - no h line
+  "v_line": 5,
+  "h_line": 0,
+  "h_side": 1,
+  "v_side": 0,
+  "x": 0.9273,
+  "y": 0.6301
+}, {
+  "id": 27,
+  "v_line": 5,
+  "h_line": 4,
+  "h_side": 1,
+  "v_side": 0,
+  "x": 0.9273,
+  "y": 0.7882
+}, {
+  "id": 28,
+  "v_line": 5,
+  "h_line": 2,
+  "h_side": 1,
+  "v_side": 0,
+  "x": 0.9273,
+  "y": 0.9644
+}, {
+  "id": 29,
+  "v_line": 6,
+  "h_line": 2,
+  "h_side": 1,
+  "v_side": 1,
+  "x": 0.9771,
+  "y": 0.0344
+}, {
+  "id": 30,
+  "v_line": 6,
+  "h_line": 4,
+  "h_side": 1,
+  "v_side": 1,
+  "x": 0.9771,
+  "y": 0.2009
+}, {
+  "id": 31,
+  "v_line": 6,
+  "h_line": 4,
+  "h_side": 1,
+  "v_side": 0,
+  "x": 0.9771,
+  "y": 0.7882
+}, {
+  "id": 32,
+  "v_line": 6,
+  "h_line": 2,
+  "h_side": 1,
+  "v_side": 0,
+  "x": 0.9771,
+  "y": 0.9644
+}]
   
 main()
