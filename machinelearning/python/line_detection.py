@@ -6,15 +6,20 @@ from scipy.signal import find_peaks, peak_widths
 import itertools
 from torch import threshold_
 import time
+import torch
+from bounding_box import bounding_box as bb
 
 def main():
   create_windows()
   video = get_source()
+  
+  # Load model
+  model = torch.hub.load('ultralytics/yolov5', 'custom', path='../../../../Data/training/yolov5/runs/train/exp13/weights/best.pt')
 
   while True:
     start_time = time.time()
     ret, frame = video.read()
-    
+   
     # Processing
     # if cv.waitKey(1) == ord("w"):
     # h, s, v = get_histogram(frame)
@@ -39,26 +44,29 @@ def main():
     
     lines = hough(eroded)
     
+    # Player detection
+    frame, detections = detect_players(frame, model)
+    
     if lines is not None:
       # Filter/prune lines (combines lines that are duplicates etc)
       lines = prune_lines(lines)      
       
       frame_with_lines, v_lines, h_lines = generate_lines(frame, lines)
       frame_with_intersections, intersections = generate_intersections(frame_with_lines, v_lines, h_lines)
-      
-      homography = get_homography(frame, intersections)
+     
+      matrix, src_pts = get_homography(intersections)
+      if len(src_pts) > 0:
+        transformed_detections = transform_detections(detections, matrix)
+        apply_homography(frame, matrix, transformed_detections, src_pts)
 
+      # Print debug info
       cv.putText(frame, f"Lines: {str(len(v_lines) + len(h_lines))}", (25, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 255), 1, cv.LINE_AA)
       cv.putText(frame, f"Intersections: {str(len(intersections))}", (25, 100), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 128), 1, cv.LINE_AA)
-      
-      # Print FPS
       cv.putText(frame, f"FPS: {str(1.0 / (time.time() - start_time))}", (300, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 255), 1, cv.LINE_AA)
-      
-      # frame = tmp_draw_targets(frame)
-      
+     
       cv.imshow("Result", frame_with_intersections)
     else:
-      # Print FPS
+      # Print debug info
       cv.putText(frame, f"FPS: {str(1.0 / (time.time() - start_time))}", (300, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 255), 1, cv.LINE_AA)
 
       cv.imshow("Result", frame)
@@ -69,6 +77,47 @@ def main():
   # When everything done, release the capture
   video.release()
   cv.destroyAllWindows()
+
+def apply_homography(frame, matrix, transformed_detections, src_pts):
+  warped_frame = cv.warpPerspective(frame, matrix, (600, 480), frame, cv.INTER_NEAREST, cv.BORDER_CONSTANT, 0)
+  tmp_draw_targets(warped_frame)
+  
+  for detection in transformed_detections:
+    cv.circle(warped_frame, (int(detection["x"]), int(detection["y"])), 5, (0, 0, 255), 4, cv.LINE_AA)
+
+  frame_compare = cv.hconcat([frame, warped_frame])
+  for i in range(len(src_pts)):
+    pt1 = np.array([src_pts[i][0], src_pts[i][1], 1])
+    pt1 = pt1.reshape(3, 1)
+    pt2 = np.dot(matrix, pt1)
+    pt2 = pt2/pt2[2]
+    end = (int(frame.shape[1] + pt2[0]), int(pt2[1]))
+    cv.line(frame_compare, tuple([int(j) for j in src_pts[i]]), end, (255, 255, 255), 2, cv.LINE_AA)
+  
+  cv.imshow("Homography", frame_compare)
+
+def transform_detections(detections, matrix):
+  transformed_detection = []
+  for index, row in detections.iterrows():
+    # Use ymax and xcentre as the point at the players feet
+    feet = np.array([[[row['xmin'] + ((row['xmax'] - row['xmin']) / 2), row['ymax']]]], dtype=np.float32)
+    feet_converted = cv.perspectiveTransform(feet, matrix)
+
+    transformed_detection.append({
+      "x": feet_converted[0][0][0],
+      "y": feet_converted[0][0][1]
+    })
+    
+  return transformed_detection
+
+def detect_players(frame, model):
+  detections = model(frame)
+  detections = detections.pandas().xyxy[0]
+  for index, row in detections.iterrows():
+    bb.add(frame, row['xmin'], row['ymin'], row['xmax'], row['ymax'], row['name'], "purple")
+    cv.circle(frame, (int(row['xmin'] + ((row['xmax'] - row['xmin']) / 2)), int(row["ymax"])), 2, (0, 0, 255), 2, cv.LINE_AA)
+  
+  return frame, detections
   
 def tmp_draw_targets(frame):
   global intersection_dict
@@ -78,10 +127,9 @@ def tmp_draw_targets(frame):
   
   return frame
 
-def get_homography(frame, intersections):
-  
+def get_homography(intersections):
   if len(intersections) < 4:
-    return False
+    return False, []
   
   # Gets first 4 intersections
   source = np.array([
@@ -119,13 +167,13 @@ def get_homography(frame, intersections):
   
   # Make sure destination points have all been set
   if len(destination1) == 0:
-    return False
+    return False, []
   if len(destination2) == 0:
-    return False
+    return False, []
   if len(destination3) == 0:
-    return False
+    return False, []
   if len(destination4) == 0:
-    return False  
+    return False, []  
 
   # Destination points
   destination = np.array([
@@ -150,33 +198,14 @@ def get_homography(frame, intersections):
     tmp_y = pnt[1]
     
   if tmp_x_axis_check == False or tmp_y_axis_check == False:
-    return False
+    return False, []
 
   src_pts = np.array(source).reshape(-1,1,2)
   dst_pts = np.array(destination).reshape(-1,1,2)
   
-  # print("------intersections------")
-  # print(intersections)
-  # print("------src_pts------")
-  # print(src_pts)
-  # print("------dst_pts------")
-  # print(dst_pts)
-
   H, _ = cv.findHomography(src_pts, dst_pts)
-  warped_frame = cv.warpPerspective(frame, H, (600, 480), frame, cv.INTER_NEAREST, cv.BORDER_CONSTANT,  0)
   
-  tmp_draw_targets(warped_frame)
-
-  img_draw_matches = cv.hconcat([frame, warped_frame])
-  for i in range(len(source)):
-    pt1 = np.array([source[i][0], source[i][1], 1])
-    pt1 = pt1.reshape(3, 1)
-    pt2 = np.dot(H, pt1)
-    pt2 = pt2/pt2[2]
-    end = (int(frame.shape[1] + pt2[0]), int(pt2[1]))
-    cv.line(img_draw_matches, tuple([int(j) for j in source[i]]), end, (255, 255, 255), 2, cv.LINE_AA)
-
-  cv.imshow("Homography", img_draw_matches)
+  return H, source
 
 def get_range(hist, colour):
   # Get peaks -  add sliders to params to see how they affect results :)
@@ -788,21 +817,21 @@ def add_inputs():
   
   cv.createTrackbar("goal_min_angle", "Result Controls", 13, 500, on_change)
   cv.createTrackbar("goal_max_angle", "Result Controls", 19, 500, on_change)
-  cv.createTrackbar("goal_min_length", "Result Controls", 300, 360, on_change)
+  cv.createTrackbar("goal_min_length", "Result Controls", 150, 360, on_change)
   cv.createTrackbar("goal_max_length", "Result Controls", 600, 600, on_change)
   
   cv.createTrackbar("box_min_angle", "Result Controls", 20, 500, on_change)
   cv.createTrackbar("box_max_angle", "Result Controls", 35, 500, on_change)
-  cv.createTrackbar("box_min_length", "Result Controls", 200, 360, on_change)
+  cv.createTrackbar("box_min_length", "Result Controls", 200, 100, on_change)
   cv.createTrackbar("box_max_length", "Result Controls", 450, 600, on_change)
   
   cv.createTrackbar("six_min_angle", "Result Controls", 10, 500, on_change)
-  cv.createTrackbar("six_max_angle", "Result Controls", 20, 500, on_change)
-  cv.createTrackbar("six_min_length", "Result Controls", 150, 360, on_change)
+  cv.createTrackbar("six_max_angle", "Result Controls", 22, 500, on_change)
+  cv.createTrackbar("six_min_length", "Result Controls", 100, 360, on_change)
   cv.createTrackbar("six_max_length", "Result Controls", 250, 360, on_change)
   
-  cv.createTrackbar("boxedge_min_angle", "Result Controls", 15, 500, on_change)
-  cv.createTrackbar("boxedge_max_angle", "Result Controls", 23, 500, on_change)
+  cv.createTrackbar("boxedge_min_angle", "Result Controls", 5, 500, on_change)
+  cv.createTrackbar("boxedge_max_angle", "Result Controls", 10, 500, on_change)
   cv.createTrackbar("boxedge_min_length", "Result Controls", 50, 360, on_change)
   cv.createTrackbar("boxedge_max_length", "Result Controls", 250, 600, on_change)
   
