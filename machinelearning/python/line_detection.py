@@ -84,8 +84,18 @@ def apply_homography(frame, matrix, transformed_detections, src_pts):
   
   for detection in transformed_detections:
     cv.circle(warped_frame, (int(detection["x"]), int(detection["y"])), 5, (0, 0, 255), 4, cv.LINE_AA)
+    
+  # Temporary birds-eye-view output
+  biv_frame = cv.imread('templines.png')
+  for detection in transformed_detections:
+    if detection["class"] == 0:
+      cv.circle(biv_frame, (int(detection["x"]), int(detection["y"])), 3, (0, 0, 255), 4, cv.LINE_AA)
+    elif detection["class"] == 1:
+      cv.circle(biv_frame, (int(detection["x"]), int(detection["y"])), 3, (255, 0, 255), 4, cv.LINE_AA)
+    elif detection["class"] == 2:
+      cv.circle(biv_frame, (int(detection["x"]), int(detection["y"])), 3, (0, 255, 255), 4, cv.LINE_AA)
 
-  frame_compare = cv.hconcat([frame, warped_frame])
+  frame_compare = cv.hconcat([frame, warped_frame, biv_frame])
   for i in range(len(src_pts)):
     pt1 = np.array([src_pts[i][0], src_pts[i][1], 1])
     pt1 = pt1.reshape(3, 1)
@@ -104,6 +114,7 @@ def transform_detections(detections, matrix):
     feet_converted = cv.perspectiveTransform(feet, matrix)
 
     transformed_detection.append({
+      "class": row['class'],
       "x": feet_converted[0][0][0],
       "y": feet_converted[0][0][1]
     })
