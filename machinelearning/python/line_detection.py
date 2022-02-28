@@ -15,6 +15,8 @@ def main():
   
   # Load model
   model = torch.hub.load('ultralytics/yolov5', 'custom', path='../../../../Data/training/yolov5/runs/train/exp13/weights/best.pt')
+  
+  last_matrix = False
 
   while True:
     start_time = time.time()
@@ -58,6 +60,10 @@ def main():
       if len(src_pts) > 0:
         transformed_detections = transform_detections(detections, matrix)
         apply_homography(frame, matrix, transformed_detections, src_pts)
+        last_matrix = matrix
+      elif type(last_matrix) != bool:
+        transformed_detections = transform_detections(detections, last_matrix)
+        apply_homography(frame, last_matrix, transformed_detections, src_pts)
 
       # Print debug info
       cv.putText(frame, f"Lines: {str(len(v_lines) + len(h_lines))}", (25, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 255), 1, cv.LINE_AA)
@@ -141,59 +147,27 @@ def tmp_draw_targets(frame):
 def get_homography(intersections):
   if len(intersections) < 4:
     return False, []
+    
+  # Create src points array
+  source = []
+  for intersection in intersections:
+    source.append([intersection["x"], intersection["y"]])
+  source = np.array(source)
   
-  # Gets first 4 intersections
-  source = np.array([
-    [intersections[0]["x"], intersections[0]["y"]],
-    [intersections[1]["x"], intersections[1]["y"]],
-    [intersections[2]["x"], intersections[2]["y"]],
-    [intersections[3]["x"], intersections[3]["y"]],
-  ])
-  
-  destination1 = []
-  destination2 = []
-  destination3 = []
-  destination4 = []
+  # Create dst points array
+  destination = []
+  for intersection in intersections:
+    temp_dest = []
+    for int_dict in intersection_dict:
+      if int_dict["id"] == intersection["id"]:
+        temp_dest = [int_dict["x"] * 640, int_dict["y"] * 480]
+        destination.append(temp_dest)
+        # break
+    
+    if len(temp_dest) == 0:
+      return False, []
+  destination = np.array(destination)
 
-  for int_dict in intersection_dict:
-    if int_dict["id"] == intersections[0]["id"]:
-      destination1 = [int_dict["x"] * 640, int_dict["y"] * 480]
-      # destination1 = [int(0.0231 * 640), int(0.2009 * 480)]
-      continue
-      
-    if int_dict["id"] == intersections[1]["id"]:
-      destination2 = [int_dict["x"] * 640, int_dict["y"] * 480]
-      # destination2 = [int(0.1759 * 640), int(0.7882 * 480)]
-      continue
-      
-    if int_dict["id"] == intersections[2]["id"]:
-      destination3 = [int_dict["x"] * 640, int_dict["y"] * 480]
-      # destination3 = [int(0.1759 * 640), int(0.2009 * 480)]
-      continue
-      
-    if int_dict["id"] == intersections[3]["id"]:
-      destination4 = [int_dict["x"] * 640, int_dict["y"] * 480]
-      # destination4 = [int(0.0725 * 640), int(0.2009 * 480)]
-      continue
-  
-  # Make sure destination points have all been set
-  if len(destination1) == 0:
-    return False, []
-  if len(destination2) == 0:
-    return False, []
-  if len(destination3) == 0:
-    return False, []
-  if len(destination4) == 0:
-    return False, []  
-
-  # Destination points
-  destination = np.array([
-    destination1,
-    destination2,
-    destination3,
-    destination4
-  ])
-  
   # Make sure destination points are not all on same axis
   tmp_x_axis_check = False
   tmp_y_axis_check = False
@@ -211,6 +185,7 @@ def get_homography(intersections):
   if tmp_x_axis_check == False or tmp_y_axis_check == False:
     return False, []
 
+  # Reshape for homography
   src_pts = np.array(source).reshape(-1,1,2)
   dst_pts = np.array(destination).reshape(-1,1,2)
   
