@@ -31,7 +31,9 @@ def main():
     
     grey_frame = turn_grey(frame)
     blur_frame = blur(grey_frame)
-    # thresh_frame = threshold(blur_frame)
+    
+    # masked_frame = add_masks(blur_frame, crowd_mask, player_mask)
+    # thresh_frame = threshold(masked_frame)
     # tophat = generate_tophat(blur_frame, crowd_mask, player_mask)
     
     canny_edged = generate_canny(blur_frame)
@@ -66,14 +68,14 @@ def main():
         apply_homography(frame, last_matrix, transformed_detections, src_pts)
 
       # Print debug info
-      cv.putText(frame, f"Lines: {str(len(v_lines) + len(h_lines))}", (25, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 255), 1, cv.LINE_AA)
-      cv.putText(frame, f"Intersections: {str(len(intersections))}", (25, 100), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 128), 1, cv.LINE_AA)
-      cv.putText(frame, f"FPS: {str(1.0 / (time.time() - start_time))}", (300, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 255), 1, cv.LINE_AA)
+      cv.putText(frame, f"Lines: {str(len(v_lines) + len(h_lines))}", (25, 430), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 255), 1, cv.LINE_AA)
+      cv.putText(frame, f"Intersections: {str(len(intersections))}", (25, 445), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 128), 1, cv.LINE_AA)
+      cv.putText(frame, f"FPS: {str(1.0 / (time.time() - start_time))}", (25, 460), cv.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 255), 1, cv.LINE_AA)
      
       cv.imshow("Result", frame_with_intersections)
     else:
       # Print debug info
-      cv.putText(frame, f"FPS: {str(1.0 / (time.time() - start_time))}", (300, 75), cv.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 255), 1, cv.LINE_AA)
+      cv.putText(frame, f"FPS: {str(1.0 / (time.time() - start_time))}", (25, 460), cv.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 255), 1, cv.LINE_AA)
 
       cv.imshow("Result", frame)
                       
@@ -486,18 +488,12 @@ def generate_lines(frame, lines):
     elif line["id"] == 6:
       cv.line(frame, line["point1"], line["point2"], (0, 255, 0), 2, cv.LINE_AA)
       cv.putText(frame, str("G: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv.LINE_AA)
-    # Unclassified for debug
-    # elif line[0] == 0:
-    #   cv.line(frame, line[1], line[2], (0, 0, 0), 2, cv.LINE_AA)
-    #   cv.putText(frame, str("G: {:.2f}".format(line[3])), line[1], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv.LINE_AA)
-
-    # else:
-    #   cv.line(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)#        
+     
   return frame, v_lines, h_lines
  
 def prune_lines(lines):
-  min_distance = cv.getTrackbarPos('min_distance', "Post Prune")
-  min_angle = cv.getTrackbarPos('min_angle', "Post Prune")
+  min_distance = cv.getTrackbarPos('min_distance', "Pre Prune")
+  min_angle = cv.getTrackbarPos('min_angle', "Pre Prune")
   bundler = HoughBundler(min_distance, min_angle)
   lines = bundler.process_lines(lines)
   return lines
@@ -761,7 +757,7 @@ def add_inputs():
   
   # ================================================ Threshhold ==============================================
 
-  cv.createTrackbar("thresh", "Threshold", 180, 360, on_change)
+  cv.createTrackbar("thresh", "Threshold", 130, 360, on_change)
   cv.createTrackbar("max_val", "Threshold", 255, 360, on_change)
   
   # ================================================= Tophat =================================================
@@ -827,8 +823,8 @@ def add_inputs():
   cv.createTrackbar("side_max_length", "Result Controls", 600, 600, on_change)
   
   # ================================================== Prune ================================================
-  cv.createTrackbar("min_distance", "Post Prune", 10, 100, on_change)
-  cv.createTrackbar("min_angle", "Post Prune", 5, 100, on_change)
+  cv.createTrackbar("min_distance", "Pre Prune", 10, 100, on_change)
+  cv.createTrackbar("min_angle", "Pre Prune", 5, 100, on_change)
   
   # ================================================ FindPeaks ==============================================
   cv.createTrackbar("prominence", "FindPeaks", 0, 256, on_change)
@@ -862,7 +858,7 @@ def create_windows():
   cv.namedWindow("Result Controls", cv.WINDOW_NORMAL)
   cv.resizeWindow('Result Controls', 600, 800)
   
-  cv.namedWindow("Post Prune")
+  cv.namedWindow("Pre Prune")
   cv.namedWindow("FindPeaks")
   cv.namedWindow("Homography")
   
