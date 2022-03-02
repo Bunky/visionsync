@@ -9,6 +9,9 @@ import time
 import torch
 from bounding_box import bounding_box as bb
 
+# resolution = (1920, 1080)
+resolution = (640, 480)
+
 def main():
   create_windows()
   video = get_source()
@@ -87,7 +90,7 @@ def main():
   cv.destroyAllWindows()
 
 def apply_homography(frame, matrix, transformed_detections, src_pts):
-  warped_frame = cv.warpPerspective(frame, matrix, (600, 480), frame, cv.INTER_NEAREST, cv.BORDER_CONSTANT, 0)
+  warped_frame = cv.warpPerspective(frame, matrix, dsize=resolution, flags=cv.INTER_NEAREST, borderMode=cv.BORDER_CONSTANT, borderValue=0)
   tmp_draw_targets(warped_frame)
   
   for detection in transformed_detections:
@@ -95,6 +98,7 @@ def apply_homography(frame, matrix, transformed_detections, src_pts):
     
   # Temporary birds-eye-view output
   biv_frame = cv.imread('templines.png')
+  biv_frame = cv.resize(biv_frame, resolution)
   for detection in transformed_detections:
     if detection["class"] == 0:
       cv.circle(biv_frame, (int(detection["x"]), int(detection["y"])), 3, (0, 0, 255), 4, cv.LINE_AA)
@@ -142,7 +146,7 @@ def tmp_draw_targets(frame):
   global intersection_dict
   
   for intersection in intersection_dict:
-    cv.circle(frame, (int(intersection["x"] * 640), int(intersection["y"] * 480)), 5, (255, 255, 255), 2, cv.LINE_AA)
+    cv.circle(frame, (int(intersection["x"] * resolution[0]), int(intersection["y"] * resolution[1])), 4, (0, 255, 255), 5, cv.LINE_AA)
   
   return frame
 
@@ -162,7 +166,7 @@ def get_homography(intersections):
     temp_dest = []
     for int_dict in intersection_dict:
       if int_dict["id"] == intersection["id"]:
-        temp_dest = [int_dict["x"] * 640, int_dict["y"] * 480]
+        temp_dest = [int_dict["x"] * resolution[0], int_dict["y"] * resolution[1]]
         destination.append(temp_dest)
         # break
     
@@ -288,8 +292,10 @@ def line_intersection(line1, line2):
   x = det(d, xdiff) / div
   y = det(d, ydiff) / div
   
-  # Point ouside of boundaries - removed temporarily
-  if 0 < x < 640 and 0 < y < 480:
+  # # Point ouside of boundaries - removed temporarily
+  # if 0 < x < resolution[0] and 0 < y < resolution[1]:
+  # Filter out points over 2x away from viewport
+  if -resolution[0] < x < resolution[0] * 2 and -resolution[1] < y < resolution[1] * 2:
     return [x, y]
   else:
     return False
@@ -867,8 +873,11 @@ def create_windows():
 def get_source():
   cap = cv.VideoCapture(0)
   if not cap.isOpened():
-      print("Cannot open camera")
-      exit()
+    print("Cannot open camera")
+    exit()
+      
+  cap.set(cv.CAP_PROP_FRAME_WIDTH, resolution[0])
+  cap.set(cv.CAP_PROP_FRAME_HEIGHT, resolution[1])
       
   return cap
 
