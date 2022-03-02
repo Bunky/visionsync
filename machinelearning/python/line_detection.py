@@ -101,11 +101,11 @@ def apply_homography(frame, matrix, transformed_detections, src_pts):
   biv_frame = cv.resize(biv_frame, resolution)
   for detection in transformed_detections:
     if detection["class"] == 0:
-      cv.circle(biv_frame, (int(detection["x"]), int(detection["y"])), 3, (0, 0, 255), 4, cv.LINE_AA)
+      cv.circle(biv_frame, (int(detection["x"]), int(detection["y"])), 3, detection['colour'], 4, cv.LINE_AA)
     elif detection["class"] == 1:
-      cv.circle(biv_frame, (int(detection["x"]), int(detection["y"])), 3, (255, 0, 255), 4, cv.LINE_AA)
+      cv.circle(biv_frame, (int(detection["x"]), int(detection["y"])), 3, detection['colour'], 4, cv.LINE_AA)
     elif detection["class"] == 2:
-      cv.circle(biv_frame, (int(detection["x"]), int(detection["y"])), 3, (0, 255, 255), 4, cv.LINE_AA)
+      cv.circle(biv_frame, (int(detection["x"]), int(detection["y"])), 3, detection['colour'], 4, cv.LINE_AA)
 
   frame_compare = cv.hconcat([frame, warped_frame, biv_frame])
   for i in range(len(src_pts)):
@@ -120,25 +120,104 @@ def apply_homography(frame, matrix, transformed_detections, src_pts):
 
 def transform_detections(detections, matrix):
   transformed_detection = []
-  for index, row in detections.iterrows():
+  for detection in detections:
     # Use ymax and xcentre as the point at the players feet
-    feet = np.array([[[row['xmin'] + ((row['xmax'] - row['xmin']) / 2), row['ymax']]]], dtype=np.float32)
+    feet = np.array([[[detection['xmin'] + ((detection['xmax'] - detection['xmin']) / 2), detection['ymax']]]], dtype=np.float32)
     feet_converted = cv.perspectiveTransform(feet, matrix)
 
     transformed_detection.append({
-      "class": row['class'],
+      "class": detection['class'],
+      "colour": detection['colour'],
       "x": feet_converted[0][0][0],
       "y": feet_converted[0][0][1]
     })
     
   return transformed_detection
 
+def classify_players(frame, detections):
+  classified_detections = []
+  temp_detection = []
+  
+  for index, row in detections.iterrows():
+    if row['class'] == 0:
+      # Crop the frame to bounding box
+      cropped_frame = frame[int(row['ymin']):int(row['ymax']), int(row['xmin']):int(row['xmax'])]
+      
+      # Player pitch mask
+      hue_min = cv.getTrackbarPos("Hue Min", "Players")
+      hue_max = cv.getTrackbarPos("Hue Max", "Players")
+      sat_min = cv.getTrackbarPos("Sat Min", "Players")
+      sat_max = cv.getTrackbarPos("Sat Max", "Players")
+      val_min = cv.getTrackbarPos("Val Min", "Players")
+      val_max = cv.getTrackbarPos("Val Max", "Players")
+      
+      lower = np.array([hue_min, sat_min, val_min])
+      upper = np.array([hue_max, sat_max, val_max])
+
+      mask = cv.inRange(cropped_frame, lower, upper)
+      output = cv.bitwise_and(cropped_frame, cropped_frame, mask=mask)
+
+      # Get average colour
+      mean = cv.mean(cropped_frame, mask=mask)
+      # row["colour"] = (mean[0], mean[1], mean[2])
+      
+      # Home team
+      home_blue_min = cv.getTrackbarPos("home_blue_min", "Players")
+      home_green_min = cv.getTrackbarPos("home_green_min", "Players")
+      home_red_min = cv.getTrackbarPos("home_red_min", "Players")
+      home_blue_max = cv.getTrackbarPos("home_blue_max", "Players")
+      home_green_max = cv.getTrackbarPos("home_green_max", "Players")
+      home_red_max = cv.getTrackbarPos("home_red_max", "Players")
+      
+      # Away team
+      away_blue_min = cv.getTrackbarPos("away_blue_min", "Players")
+      away_green_min = cv.getTrackbarPos("away_green_min", "Players")
+      away_red_min = cv.getTrackbarPos("away_red_min", "Players")
+      away_blue_max = cv.getTrackbarPos("away_blue_max", "Players")
+      away_green_max = cv.getTrackbarPos("away_green_max", "Players")
+      away_red_max = cv.getTrackbarPos("away_red_max", "Players")
+      
+      # If mean colour is within threshold range for home team parameters
+      if home_blue_min < mean[0] < home_blue_max and home_green_min < mean[1] < home_green_max and home_red_min < mean[2] < home_red_max:
+        row["colour"] = (0, 0, 255)
+      elif away_blue_min < mean[0] < away_blue_max and away_green_min < mean[1] < away_green_max and away_red_min < mean[2] < away_red_max:
+        row["colour"] = (255, 0, 0)
+      else:
+        row["colour"] = (0, 255, 255) # Likely the refs - so yellow
+
+      # Output for preview
+      output = cv.resize(output, (50, 100))
+      temp_detection.append(output)
+
+    elif row['class'] == 1: # ball
+      row["colour"] = (255, 255, 255)
+    elif row['class'] == 2: # goal
+      row["colour"] = (0, 255, 0)
+    
+    classified_detections.append(row)
+    
+  # Show all players to help aid with filtering
+  def concat_tile(im_list_2d):
+    return cv.vconcat([cv.resize(cv.hconcat(im_list_h), (500, 100)) for im_list_h in im_list_2d])
+  
+  def chunks(lst, n):
+    for i in range(0, len(lst), n):
+      yield lst[i:i + n]
+
+  detections_list = list(chunks(temp_detection, 5))
+  im_tile = concat_tile(detections_list)
+  cv.imshow("Detected Players", im_tile)
+
+  return classified_detections  
+
 def detect_players(frame, model):
   detections = model(frame)
-  detections = detections.pandas().xyxy[0]
-  for index, row in detections.iterrows():
-    bb.add(frame, row['xmin'], row['ymin'], row['xmax'], row['ymax'], row['name'], "purple")
-    cv.circle(frame, (int(row['xmin'] + ((row['xmax'] - row['xmin']) / 2)), int(row["ymax"])), 2, (0, 0, 255), 2, cv.LINE_AA)
+  detections = detections.pandas().xyxy[0]    
+  detections = classify_players(frame, detections)
+  
+  for detection in detections:
+    bb.add(frame, detection['xmin'], detection['ymin'], detection['xmax'], detection['ymax'], detection['name'], "purple")
+    cv.circle(frame, (int(detection['xmin'] + ((detection['xmax'] - detection['xmin']) / 2)), int(detection["ymax"])), 2, detection['colour'], 2, cv.LINE_AA)
   
   return frame, detections
   
@@ -714,8 +793,8 @@ def generate_crowd_mask(frame):
 
 def add_inputs():
   # =============================================== Player Mask ==============================================
-  cv.createTrackbar("Hue Min", "PlayerMask Controls", 0, 179, on_change)
-  cv.createTrackbar("Hue Max", "PlayerMask Controls", 38, 179, on_change)
+  cv.createTrackbar("Hue Min", "PlayerMask Controls", 0, 255, on_change)
+  cv.createTrackbar("Hue Max", "PlayerMask Controls", 38, 255, on_change)
   cv.createTrackbar("Sat Min", "PlayerMask Controls", 0, 255, on_change)
   cv.createTrackbar("Sat Max", "PlayerMask Controls", 255, 255, on_change)
   cv.createTrackbar("Val Min", "PlayerMask Controls", 72, 255, on_change)
@@ -736,8 +815,8 @@ def add_inputs():
   cv.createTrackbar("invert", "PlayerMask Controls", 0, 1, on_change)
           
   # =============================================== Crowd Mask ===============================================
-  cv.createTrackbar("Hue Min", "CrowdMask Controls", 22, 179, on_change)
-  cv.createTrackbar("Hue Max", "CrowdMask Controls", 47, 179, on_change)
+  cv.createTrackbar("Hue Min", "CrowdMask Controls", 22, 255, on_change)
+  cv.createTrackbar("Hue Max", "CrowdMask Controls", 47, 255, on_change)
   cv.createTrackbar("Sat Min", "CrowdMask Controls", 40, 255, on_change)
   cv.createTrackbar("Sat Max", "CrowdMask Controls", 255, 255, on_change)
   cv.createTrackbar("Val Min", "CrowdMask Controls", 75, 255, on_change)
@@ -839,6 +918,28 @@ def add_inputs():
   cv.createTrackbar("threshold", "FindPeaks", 0, 256, on_change)
   cv.createTrackbar("distance", "FindPeaks", 256, 256, on_change)
   cv.createTrackbar("rel_height", "FindPeaks", 95, 100, on_change)
+  
+  # ================================================ Players ==============================================
+  cv.createTrackbar("Hue Min", "Players", 0, 255, on_change)
+  cv.createTrackbar("Hue Max", "Players", 255, 255, on_change)
+  cv.createTrackbar("Sat Min", "Players", 0, 255, on_change)
+  cv.createTrackbar("Sat Max", "Players", 255, 255, on_change)
+  cv.createTrackbar("Val Min", "Players", 175, 255, on_change)
+  cv.createTrackbar("Val Max", "Players", 255, 255, on_change)
+  
+  cv.createTrackbar("home_blue_min", "Players", 0, 255, on_change)
+  cv.createTrackbar("home_green_min", "Players", 0, 255, on_change)
+  cv.createTrackbar("home_red_min", "Players", 0, 255, on_change)
+  cv.createTrackbar("home_blue_max", "Players", 255, 255, on_change)
+  cv.createTrackbar("home_green_max", "Players", 255, 255, on_change)
+  cv.createTrackbar("home_red_max", "Players", 215, 255, on_change)
+  
+  cv.createTrackbar("away_blue_min", "Players", 182, 255, on_change)
+  cv.createTrackbar("away_green_min", "Players", 172, 255, on_change)
+  cv.createTrackbar("away_red_min", "Players", 182, 255, on_change)
+  cv.createTrackbar("away_blue_max", "Players", 255, 255, on_change)
+  cv.createTrackbar("away_green_max", "Players", 255, 255, on_change)
+  cv.createTrackbar("away_red_max", "Players", 255, 255, on_change)
 
 def create_windows():
   cv.namedWindow("PlayerMask")
@@ -866,6 +967,9 @@ def create_windows():
   
   cv.namedWindow("Pre Prune")
   cv.namedWindow("FindPeaks")
+  cv.namedWindow("Players")
+  cv.resizeWindow('Players', 600, 800)
+  cv.namedWindow("Detected Players")
   cv.namedWindow("Homography")
   
   add_inputs()
