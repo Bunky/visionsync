@@ -1,26 +1,32 @@
+const http = require('http');
 const express = require('express');
 const passport = require('passport');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const MongoSessionStore = require('connect-mongo');
 require('dotenv').config();
+const { Server } = require("socket.io");
+const { socketConnection } = require("./utils/socket-io");
+
+const { temp } = require("./processor/lineDetection");
 
 // =================================================================================================
 //                                       Web Server Configuration
 // =================================================================================================
 
-const server = express();
-server.use(express.json());
-server.use(express.urlencoded());
+const app = module.exports.app = express();
+const server = http.createServer(app);
+app.use(express.json());
+app.use(express.urlencoded());
 
-server.use((req, res, next) => {
+app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', req.headers.origin);
   res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
 
-server.use(session({
+app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
@@ -37,11 +43,17 @@ server.use(session({
 }));
 
 // =================================================================================================
+//                                               SocketIO
+// =================================================================================================
+
+socketConnection(server);
+
+// =================================================================================================
 //                                       PassportJS Configuration
 // =================================================================================================
 
-server.use(passport.initialize());
-server.use(passport.session());
+app.use(passport.initialize());
+app.use(passport.session());
 
 passport.serializeUser((user, done) => {
   done(null, user);
@@ -55,7 +67,8 @@ passport.deserializeUser((user, done) => {
 //                                            API Routes
 // =================================================================================================
 
-server.use('/user', require('./routes/user'));
+app.use('/user', require('./routes/user'));
+app.use('/config', require('./routes/config'));
 
 // =================================================================================================
 //                                           MongoAtlas Config
@@ -76,4 +89,6 @@ connection.once('open', () => {
 server.listen(process.env.PORT, (err) => {
   if (err) throw err;
   console.info(`> Ready on http://localhost:${process.env.PORT}`);
+
+  temp();
 });

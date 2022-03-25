@@ -9,6 +9,8 @@ import { MantineProvider } from '@mantine/core';
 import GlobalStyles from '../styles/globalStyles';
 import Layout from '../components/Layout/Layout';
 import { theme } from '../styles/theme';
+import { RecoilRoot } from 'recoil';
+import { NotificationsProvider } from '@mantine/notifications';
 
 const App = (props: AppProps) => {
   const { Component, pageProps } = props;
@@ -50,13 +52,17 @@ const App = (props: AppProps) => {
           ...theme
         }}
       >
-        <QueryClientProvider client={queryClient}>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-          <GlobalStyles />
-          <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
-        </QueryClientProvider>
+        <NotificationsProvider>
+          <QueryClientProvider client={queryClient}>
+            <RecoilRoot>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+              <GlobalStyles />
+              <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+            </RecoilRoot>
+          </QueryClientProvider>
+        </NotificationsProvider>
       </MantineProvider>
     </>
   );

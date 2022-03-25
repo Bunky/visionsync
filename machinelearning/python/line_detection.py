@@ -9,15 +9,26 @@ import time
 import torch
 from bounding_box import bounding_box as bb
 
+import tensorflow as tf
+import tensorflow_hub as hub
+from matplotlib import pyplot as plt
+from matplotlib.collections import LineCollection
+import matplotlib.patches as patches
+
 # resolution = (1920, 1080)
 resolution = (640, 480)
+poses = False
 
 def main():
   create_windows()
   video = get_source()
   
-  # Load model
+  # Load models
   model = torch.hub.load('ultralytics/yolov5', 'custom', path='../../../../Data/training/yolov5/runs/train/exp13/weights/best.pt')
+  module = None
+  if poses == True:
+    module = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
+  input_size = 192
   
   last_matrix = False
 
@@ -52,7 +63,7 @@ def main():
     lines = hough(eroded)
     
     # Player detection
-    frame, detections = detect_players(frame, model)
+    frame, detections = detect_players(frame, model, module, input_size)
     
     if lines is not None:
       # Filter/prune lines (combines lines that are duplicates etc)
@@ -88,6 +99,144 @@ def main():
   # When everything done, release the capture
   video.release()
   cv.destroyAllWindows()
+
+# Dictionary that maps from joint names to keypoint indices.
+KEYPOINT_DICT = {
+  'nose': 0,
+  'left_eye': 1,
+  'right_eye': 2,
+  'left_ear': 3,
+  'right_ear': 4,
+  'left_shoulder': 5,
+  'right_shoulder': 6,
+  'left_elbow': 7,
+  'right_elbow': 8,
+  'left_wrist': 9,
+  'right_wrist': 10,
+  'left_hip': 11,
+  'right_hip': 12,
+  'left_knee': 13,
+  'right_knee': 14,
+  'left_ankle': 15,
+  'right_ankle': 16
+}
+# Maps bones to a matplotlib color name.
+KEYPOINT_EDGE_INDS_TO_COLOR = {
+  (0, 1): 'm',
+  (0, 2): 'c',
+  (1, 3): 'm',
+  (2, 4): 'c',
+  (0, 5): 'm',
+  (0, 6): 'c',
+  (5, 7): 'm',
+  (7, 9): 'm',
+  (6, 8): 'c',
+  (8, 10): 'c',
+  (5, 6): 'y',
+  (5, 11): 'm',
+  (6, 12): 'c',
+  (11, 12): 'y',
+  (11, 13): 'm',
+  (13, 15): 'm',
+  (12, 14): 'c',
+  (14, 16): 'c'
+}
+
+def _keypoints_and_edges_for_display(keypoints_with_scores, height, width, keypoint_threshold=0.11):
+  keypoints_all = []
+  keypoint_edges_all = []
+  edge_colors = []
+  num_instances, _, _, _ = keypoints_with_scores.shape
+  for idx in range(num_instances):
+    kpts_x = keypoints_with_scores[0, idx, :, 1]
+    kpts_y = keypoints_with_scores[0, idx, :, 0]
+    kpts_scores = keypoints_with_scores[0, idx, :, 2]
+    kpts_absolute_xy = np.stack(
+        [width * np.array(kpts_x), height * np.array(kpts_y)], axis=-1)
+    kpts_above_thresh_absolute = kpts_absolute_xy[
+        kpts_scores > keypoint_threshold, :]
+    keypoints_all.append(kpts_above_thresh_absolute)
+
+    for edge_pair, color in KEYPOINT_EDGE_INDS_TO_COLOR.items():
+      if (kpts_scores[edge_pair[0]] > keypoint_threshold and
+          kpts_scores[edge_pair[1]] > keypoint_threshold):
+        x_start = kpts_absolute_xy[edge_pair[0], 0]
+        y_start = kpts_absolute_xy[edge_pair[0], 1]
+        x_end = kpts_absolute_xy[edge_pair[1], 0]
+        y_end = kpts_absolute_xy[edge_pair[1], 1]
+        line_seg = np.array([[x_start, y_start], [x_end, y_end]])
+        keypoint_edges_all.append(line_seg)
+        edge_colors.append(color)
+  if keypoints_all:
+    keypoints_xy = np.concatenate(keypoints_all, axis=0)
+  else:
+    keypoints_xy = np.zeros((0, 17, 2))
+
+  if keypoint_edges_all:
+    edges_xy = np.stack(keypoint_edges_all, axis=0)
+  else:
+    edges_xy = np.zeros((0, 2, 2))
+  return keypoints_xy, edges_xy, edge_colors
+
+def draw_pose_on_image(image, keypoints_with_scores, crop_region=None, close_figure=False, output_image_height=None):
+  height, width, channel = image.shape
+  aspect_ratio = float(width) / height
+  fig, ax = plt.subplots(figsize=(12 * aspect_ratio, 12))
+  # To remove the huge white borders
+  fig.tight_layout(pad=0)
+  ax.margins(0)
+  ax.set_yticklabels([])
+  ax.set_xticklabels([])
+  plt.axis('off')
+
+  im = ax.imshow(image)
+  line_segments = LineCollection([], linewidths=(4), linestyle='solid')
+  ax.add_collection(line_segments)
+  # Turn off tick labels
+  scat = ax.scatter([], [], s=60, color='#FF1493', zorder=3)
+
+  (keypoint_locs, keypoint_edges,
+   edge_colors) = _keypoints_and_edges_for_display(
+       keypoints_with_scores, height, width)
+
+  line_segments.set_segments(keypoint_edges)
+  line_segments.set_color(edge_colors)
+  if keypoint_edges.shape[0]:
+    line_segments.set_segments(keypoint_edges)
+    line_segments.set_color(edge_colors)
+  if keypoint_locs.shape[0]:
+    scat.set_offsets(keypoint_locs)
+
+  if crop_region is not None:
+    xmin = max(crop_region['x_min'] * width, 0.0)
+    ymin = max(crop_region['y_min'] * height, 0.0)
+    rec_width = min(crop_region['x_max'], 0.99) * width - xmin
+    rec_height = min(crop_region['y_max'], 0.99) * height - ymin
+    rect = patches.Rectangle(
+        (xmin,ymin),rec_width,rec_height,
+        linewidth=1,edgecolor='b',facecolor='none')
+    ax.add_patch(rect)
+
+  fig.canvas.draw()
+  image_from_plot = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
+  image_from_plot = image_from_plot.reshape(
+      fig.canvas.get_width_height()[::-1] + (3,))
+  plt.close(fig)
+  if output_image_height is not None:
+    output_image_width = int(output_image_height / height * width)
+    image_from_plot = cv.resize(
+        image_from_plot, dsize=(output_image_width, output_image_height),
+         interpolation=cv.INTER_CUBIC)
+  return image_from_plot
+
+def movenet(image, module):
+  model = module.signatures['serving_default']
+
+  image = tf.cast(image, dtype=tf.int32)
+  outputs = model(image)
+  keypoints_with_scores = outputs['output_0'].numpy()
+
+  return keypoints_with_scores
 
 def apply_homography(frame, matrix, transformed_detections, src_pts):
   warped_frame = cv.warpPerspective(frame, matrix, dsize=resolution, flags=cv.INTER_NEAREST, borderMode=cv.BORDER_CONSTANT, borderValue=0)
@@ -134,9 +283,10 @@ def transform_detections(detections, matrix):
     
   return transformed_detection
 
-def classify_players(frame, detections):
+def classify_players(frame, detections, module, input_size):
   classified_detections = []
   temp_detection = []
+  temp_pose = []
   
   for index, row in detections.iterrows():
     if row['class'] == 0:
@@ -185,6 +335,18 @@ def classify_players(frame, detections):
       else:
         row["colour"] = (0, 255, 255) # Likely the refs - so yellow
 
+      # Movenet
+      if poses == True:
+        input_image = tf.expand_dims(cropped_frame, axis=0)
+        input_image = tf.image.resize_with_pad(input_image, input_size, input_size)
+
+        keypoints_with_scores = movenet(input_image, module)
+        
+        movenet_image = tf.expand_dims(cropped_frame, axis=0)
+        movenet_image = tf.cast(tf.image.resize_with_pad(movenet_image, 400, 400), dtype=tf.int32)
+        output_overlay = draw_pose_on_image(np.squeeze(movenet_image.numpy(), axis=0), keypoints_with_scores)
+        temp_pose.append(output_overlay)
+
       # Output for preview
       output = cv.resize(output, (50, 100))
       temp_detection.append(output)
@@ -197,23 +359,28 @@ def classify_players(frame, detections):
     classified_detections.append(row)
     
   # Show all players to help aid with filtering
-  def concat_tile(im_list_2d):
-    return cv.vconcat([cv.resize(cv.hconcat(im_list_h), (500, 100)) for im_list_h in im_list_2d])
+  def concat_tile(im_list_2d, row_size):
+    return cv.vconcat([cv.resize(cv.hconcat(im_list_h), row_size) for im_list_h in im_list_2d])
   
   def chunks(lst, n):
     for i in range(0, len(lst), n):
       yield lst[i:i + n]
 
   detections_list = list(chunks(temp_detection, 5))
-  im_tile = concat_tile(detections_list)
+  im_tile = concat_tile(detections_list, (500, 100))
   cv.imshow("Detected Players", im_tile)
+  
+  if poses == True:
+    detections_list = list(chunks(temp_pose, 3))
+    im_tile = concat_tile(detections_list, (1200, 400))
+    cv.imshow("Player Poses", im_tile)
 
   return classified_detections  
 
-def detect_players(frame, model):
+def detect_players(frame, model, module, input_size):
   detections = model(frame)
   detections = detections.pandas().xyxy[0]    
-  detections = classify_players(frame, detections)
+  detections = classify_players(frame, detections, module, input_size)
   
   for detection in detections:
     bb.add(frame, detection['xmin'], detection['ymin'], detection['xmax'], detection['ymax'], detection['name'], "purple")
@@ -422,6 +589,7 @@ def generate_intersections(frame, v_lines, h_lines):
 def classify_line(line):
   x1, y1, x2, y2 = line[0]
     
+  line_midpoint = ((x1 + x2) / 2, (y1 + y2) / 2) 
   length_of_line = math.hypot(x2-x1, y2-y1)
   angle_of_line = math.degrees(math.atan2(-(y2-y1), x2-x1))
   if angle_of_line < 0:
@@ -501,6 +669,7 @@ def classify_line(line):
       "id": lineId,
       "point1": [x1, y1],
       "point2": [x2, y2],
+      "midpoint": line_midpoint,
       "angle": angle_of_line,
       "length": length_of_line,
       "direction": direction
@@ -513,7 +682,10 @@ def generate_lines(frame, lines):
   for line in lines:
     classified_line = classify_line(line)
     if classified_line is not False:
-      # Split lines into horizontal/vertical groups using their classifed lines
+      # Draw midpoint
+      cv.circle(frame, (int(classified_line["midpoint"][0]), int(classified_line["midpoint"][1])), 5, (255, 0, 255), 5, cv.LINE_AA)
+      
+      # Split lines into horizontal/vertical groups using their classifed lines      
       if classified_line["id"] == 2 or classified_line["id"] == 4:
         # cv.line(frame, classified_line[1], classified_line[2], (255, 0, 0), 2, cv.LINE_AA)
         h_lines.append(classified_line)
@@ -970,6 +1142,7 @@ def create_windows():
   cv.namedWindow("Players")
   cv.resizeWindow('Players', 600, 800)
   cv.namedWindow("Detected Players")
+  cv.namedWindow("Player Poses")
   cv.namedWindow("Homography")
   
   add_inputs()

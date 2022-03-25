@@ -1,0 +1,101 @@
+{
+  "preview": {
+    "enabled": true,
+    "stage": "crowdMask",
+    "follow": false
+  },
+  "crowdMask": {
+    "hsv": {
+      "lower": [22, 40, 75],
+      "upper": [47, 255, 255]
+    },
+    "erosion": {
+      "enabled": true,
+      "size": 5,
+      "shape": 2
+    },
+    "dilation": {
+      "enabled": true,
+      "size": 20,
+      "shape": 2
+    },
+    "closing": {
+      "enabled": false,
+      "size": 2,
+      "shape": 0
+    },
+    "opening": {
+      "enabled": false,
+      "size": 0,
+      "shape": 0
+    },  
+    "invert": false,
+    "overlap": true
+  },
+  "playerMask": {
+    "hsv": {
+      "lower": [0, 0, 72],
+      "upper": [38, 255, 255]
+    },
+    "erosion": {
+      "enabled": true,
+      "size": 4,
+      "shape": 2
+    },
+    "dilation": {
+      "enabled": true,
+      "size": 2,
+      "shape": 2
+    },
+    "closing": {
+      "enabled": false,
+      "size": 2,
+      "shape": 0
+    },
+    "opening": {
+      "enabled": false,
+      "size": 0,
+      "shape": 0
+    },  
+    "invert": false,
+    "overlap": true
+  },
+  "canny": {
+    "masked": true,
+    "blur": {
+      "enabled": false,
+      "size": 1
+    },
+    "thresholdOne": 30,
+    "thresholdTwo": 120,
+    "closing": {
+      "enabled": false,
+      "size": 2,
+      "shape": 0
+    },
+    "opening": {
+      "enabled": false,
+      "size": 0,
+      "shape": 0
+    },
+    "dilation": {
+      "enabled": false,
+      "size": 2,
+      "shape": 0
+    },
+    "erosion": {
+      "enabled": false,
+      "size": 2,
+      "shape": 0
+    },
+    "overlap": false
+  },
+  "lines": {
+    "threshold": 87,
+    "minLineLength": 23,
+    "maxLineGap": 57,
+    "resolution": 1,
+    "rho": 1,
+    "prune": false
+  }
+}
