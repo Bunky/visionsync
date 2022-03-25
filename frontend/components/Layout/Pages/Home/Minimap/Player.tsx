@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Tooltip, AspectRatio
 } from '@mantine/core';
@@ -7,7 +6,6 @@ import { motion } from 'framer-motion';
 import usePlayerStatModal from '../../../../../hooks/usePlayerStatModal';
 
 interface PlayerProps {
-  id: string;
   player: {
     coordinates: Array<number>;
     name: string;
@@ -34,10 +32,14 @@ const Player = ({ playerId, color, player }: PlayerProps) => {
         }}
       >
         <AspectRatio ratio={1}>
-          <Dot open={state.open && state.playerId === playerId} color={color} onClick={() => setState({
-            open: true,
-            playerId
-          })} />
+          <Dot
+            open={state.open && state.playerId === playerId}
+            color={color}
+            onClick={() => setState({
+              open: true,
+              playerId
+            })}
+          />
         </AspectRatio>
       </Tooltip>
     </Container>
@@ -46,7 +48,7 @@ const Player = ({ playerId, color, player }: PlayerProps) => {
 
 const Container = styled(motion.div).attrs(({ position }) => ({
   transition: {
-    type: "tween",
+    type: 'tween',
     duration: 1
   },
   animate: {
@@ -61,8 +63,8 @@ const Container = styled(motion.div).attrs(({ position }) => ({
 `;
 
 const Dot = styled(motion.div).attrs(({ open }) => ({
-  initial: "closed",
-  animate: open ? "opened" : "closed",
+  initial: 'closed',
+  animate: open ? 'opened' : 'closed',
   whileHover: {
     scale: 1.3,
     border: '1px solid rgba(255,255,255,1)',
@@ -98,6 +100,5 @@ const Dot = styled(motion.div).attrs(({ open }) => ({
   width: 100%;
   cursor: pointer;
 `;
-
 
 export default Player;

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useQueryClient } from "react-query";
-import io from 'Socket.IO-client';
+import { useEffect, useState } from 'react';
+import { useQueryClient } from 'react-query';
+import io from 'socket.io-client';
 
 const useSettingsSocket = () => {
   const queryClient = useQueryClient();
@@ -22,12 +22,9 @@ const useSettingsSocket = () => {
     });
 
     socket.on('updateConfig', (message) => {
-      const data = JSON.parse(message);
-      queryClient.setQueryData('config', (oldConfig) => {
-        // const update = (entity) => entity.id === data.id ? { ...entity, ...data.payload } : entity;
-        // return Array.isArray(oldConfig) ? oldConfig.map(update) : update(oldConfig);
-        return message;
-      });
+      queryClient.setQueryData('config', () => message);
+      // const update = (entity) => entity.id === data.id ? { ...entity, ...data.payload } : entity;
+      // return Array.isArray(oldConfig) ? oldConfig.map(update) : update(oldConfig);
     });
 
     return () => {

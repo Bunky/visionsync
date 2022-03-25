@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 import {
-  Group, Paper, Title, AspectRatio, Switch, Overlay, Loader, Select
+  Group, Paper, Title, Switch, Overlay, Select
 } from '@mantine/core';
 import useConfig from '../../../../../hooks/useConfig';
 import useSettingsSocket from '../../../../../hooks/useSettingsSocket';
@@ -27,7 +27,7 @@ const Preview = () => {
             <Group direction="row">
               <Switch
                 checked={config.preview.follow}
-                onChange={(v) => updateConfig.mutate({ preview: { follow: v.target.checked }})}
+                onChange={(v) => updateConfig.mutate({ preview: { follow: v.target.checked } })}
                 sx={{ zIndex: 7 }}
                 label="Follow"
               />
@@ -48,13 +48,13 @@ const Preview = () => {
               />
               <Switch
                 checked={config.preview.enabled}
-                onChange={(v) => updateConfig.mutate({ preview: { enabled: v.target.checked }})}
+                onChange={(v) => updateConfig.mutate({ preview: { enabled: v.target.checked } })}
                 sx={{ zIndex: 7 }}
               />
             </Group>
           </Group>
           {/* <AspectRatio ratio={16/9}> */}
-            <PreviewWindow id="preview" width="640" height="360" />
+          <PreviewWindow id="preview" width="640" height="360" />
           {/* </AspectRatio> */}
         </Group>
       </Paper>
@@ -62,7 +62,7 @@ const Preview = () => {
         <Group direction="column" spacing="xs">
           <Title order={5}>Result</Title>
           {/* <AspectRatio ratio={16/9}> */}
-            <PreviewWindow id="result" width="640" height="360" />
+          <PreviewWindow id="result" width="640" height="360" />
           {/* </AspectRatio> */}
         </Group>
       </Paper>
@@ -74,14 +74,6 @@ const PreviewWindow = styled.img`
   border-radius: .25rem;
   width: 100%;
   height: 100%;
-`;
-
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 export default Preview;

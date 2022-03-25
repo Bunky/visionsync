@@ -43,8 +43,10 @@ const Minimap = ({ overlay }: MinimapProps) => {
         alt="Football pitch"
       />
       <PlayerContainer>
-        {tempDetections.map((player, index) => <Player id={`playerIcon-${index}`} color={index % 2 ? 'red' : 'blue'} playerId={index} player={player} />)}
-        <Ball id="football" position={tempBall} />
+        {tempDetections.map((player, index) => (
+          <Player id={`playerIcon-${index}`} color={index % 2 ? 'red' : 'blue'} playerId={index} player={player} />
+        ))}
+        <Ball position={tempBall} />
       </PlayerContainer>
     </Container>
   );

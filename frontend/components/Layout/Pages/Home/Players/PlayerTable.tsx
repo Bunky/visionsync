@@ -1,5 +1,3 @@
-import { useState } from 'react';
-import styled from 'styled-components';
 import {
   ScrollArea, Table, Button, Group, createStyles
 } from '@mantine/core';
@@ -31,19 +29,23 @@ const useStyles = createStyles((theme) => ({
 
 const PlayerTable = () => {
   const [tempDetections] = useTempDetections();
-  const [state, setState] = usePlayerStatModal();
+  const [, setState] = usePlayerStatModal();
   const { classes, cx } = useStyles();
-  
+
   const rows = tempDetections.map((player, index) => (
     <tr key={player.name}>
       <td>{player.name}</td>
       <td>{player.position}</td>
       <td>
         <Group position="right">
-          <Button leftIcon={<IoVideocam />} compact onClick={() => setState({
-            open: true,
-            playerId: index
-          })}>
+          <Button
+            leftIcon={<IoVideocam />}
+            compact
+            onClick={() => setState({
+              open: true,
+              playerId: index
+            })}
+          >
             View
           </Button>
           <PlayerMenu />

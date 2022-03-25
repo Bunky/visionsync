@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
 interface BallProps {
-  id: string;
   position: Array<number>;
 }
 
@@ -31,7 +30,7 @@ const Ball = ({ position }: BallProps) => {
 
 const Container = styled(motion.div).attrs(({ position }) => ({
   transition: {
-    type: "tween",
+    type: 'tween',
     duration: 1
   },
   animate: {
@@ -67,6 +66,5 @@ const Football = styled(motion.div).attrs(() => ({
   width: 100%;
   cursor: pointer;
 `;
-
 
 export default Ball;

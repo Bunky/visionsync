@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Modal } from '@mantine/core';
 import usePlayerStatModal from '../../../../hooks/usePlayerStatModal';
 
@@ -14,7 +13,7 @@ const PlayerStatsModal = () => {
       })}
       title="Player Statistics!"
     >
-      Hello there - {state.playerId}
+      {state.playerId}
     </Modal>
   );
 };

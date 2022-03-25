@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import {
-  Group, Slider, Title, Switch, RadioGroup, Radio, RangeSlider, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Loader, Overlay
+  Group, Slider, Title, Switch, RadioGroup, Radio, RangeSlider, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Overlay
 } from '@mantine/core';
-import useConfig from '../../../../../hooks/useConfig';
 import { IoHelp } from 'react-icons/io5';
+import useConfig from '../../../../../hooks/useConfig';
 import useUpdateConfig from '../../../../../hooks/useUpdateConfig';
 
 const PlayerMaskSettings = () => {
@@ -107,7 +105,7 @@ const PlayerMaskSettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.playerMask.erosion.enabled}
-                  onChange={(v) => updateConfig.mutate({ playerMask: { erosion: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ playerMask: { erosion: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -115,7 +113,7 @@ const PlayerMaskSettings = () => {
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
               defaultValue={config.playerMask.erosion.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ playerMask: { erosion: { shape: parseInt(v) }}})}
+              onChange={(v) => updateConfig.mutate({ playerMask: { erosion: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -129,7 +127,7 @@ const PlayerMaskSettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.playerMask.erosion.size}
-              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { erosion: { size: v } }})}
+              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { erosion: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -153,7 +151,7 @@ const PlayerMaskSettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.playerMask.dilation.enabled}
-                  onChange={(v) => updateConfig.mutate({ playerMask: { dilation: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ playerMask: { dilation: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -161,7 +159,7 @@ const PlayerMaskSettings = () => {
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
               defaultValue={config.playerMask.dilation.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ playerMask: { dilation: { shape: parseInt(v) }}})}
+              onChange={(v) => updateConfig.mutate({ playerMask: { dilation: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -175,7 +173,7 @@ const PlayerMaskSettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.playerMask.dilation.size}
-              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { dilation: { size: v }}})}
+              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { dilation: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -199,7 +197,7 @@ const PlayerMaskSettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.playerMask.closing.enabled}
-                  onChange={(v) => updateConfig.mutate({ playerMask: { closing: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ playerMask: { closing: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -207,7 +205,7 @@ const PlayerMaskSettings = () => {
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
               defaultValue={config.playerMask.closing.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ playerMask: { closing: { shape: parseInt(v) }}})}
+              onChange={(v) => updateConfig.mutate({ playerMask: { closing: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -221,7 +219,7 @@ const PlayerMaskSettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.playerMask.closing.size}
-              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { closing: { size: v }}})}
+              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { closing: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -245,7 +243,7 @@ const PlayerMaskSettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.playerMask.opening.enabled}
-                  onChange={(v) => updateConfig.mutate({ playerMask: { opening: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ playerMask: { opening: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -253,7 +251,7 @@ const PlayerMaskSettings = () => {
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
               defaultValue={config.playerMask.opening.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ playerMask: { opening: { shape: parseInt(v) }}})}
+              onChange={(v) => updateConfig.mutate({ playerMask: { opening: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -267,7 +265,7 @@ const PlayerMaskSettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.playerMask.opening.size}
-              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { opening: { size: v }}})}
+              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { opening: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -278,7 +276,7 @@ const PlayerMaskSettings = () => {
               <Switch
                 label="Invert mask"
                 checked={config.playerMask.invert}
-                onChange={(v) => updateConfig.mutate({ playerMask: { invert: v.target.checked }})}
+                onChange={(v) => updateConfig.mutate({ playerMask: { invert: v.target.checked } })}
               />
               <Tooltip
                 label="Invert the generated mask"
@@ -296,7 +294,7 @@ const PlayerMaskSettings = () => {
               <Switch
                 label="Overlap footage"
                 checked={config.playerMask.overlap}
-                onChange={(v) => updateConfig.mutate({ playerMask: { overlap: v.target.checked }})}
+                onChange={(v) => updateConfig.mutate({ playerMask: { overlap: v.target.checked } })}
               />
               <Tooltip
                 label="Applies to preview only - Overlaps original frame to help define mask parameters"
@@ -316,13 +314,5 @@ const PlayerMaskSettings = () => {
     </ScrollArea>
   );
 };
-
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
 export default PlayerMaskSettings;

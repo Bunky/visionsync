@@ -1,9 +1,5 @@
-import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import {
-  Tabs, Image
-} from '@mantine/core';
-import Webcam from "react-webcam";
+import Webcam from 'react-webcam';
 import Minimap from '../Minimap/Minimap';
 
 const Livefeed = () => (
@@ -13,7 +9,7 @@ const Livefeed = () => (
       videoConstraints={{
         width: 1280,
         height: 720,
-        facingMode: "user"
+        facingMode: 'user'
       }}
     />
     <MinimapOverlay>

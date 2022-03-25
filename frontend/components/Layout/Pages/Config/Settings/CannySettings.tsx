@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import {
-  Group, Slider, Title, Switch, RadioGroup, Radio, RangeSlider, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Loader, Overlay
+  Group, Slider, Title, Switch, RadioGroup, Radio, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Overlay
 } from '@mantine/core';
-import useConfig from '../../../../../hooks/useConfig';
 import { IoHelp } from 'react-icons/io5';
+import useConfig from '../../../../../hooks/useConfig';
 import useUpdateConfig from '../../../../../hooks/useUpdateConfig';
 
 const CannySettings = () => {
@@ -44,7 +42,7 @@ const CannySettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.canny.thresholdOne}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { thresholdOne: v }})}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { thresholdOne: v } })}
             />
             <Text size="sm" color="dimmed" weight={700}>Threshold Two</Text>
             <Slider
@@ -53,7 +51,7 @@ const CannySettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.canny.thresholdTwo}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { thresholdTwo: v }})}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { thresholdTwo: v } })}
             />
           </Group>
         </Paper>
@@ -77,7 +75,7 @@ const CannySettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.canny.blur.enabled}
-                  onChange={(v) => updateConfig.mutate({ canny: { blur: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ canny: { blur: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -89,7 +87,7 @@ const CannySettings = () => {
               min={1}
               sx={{ width: '100%' }}
               defaultValue={config.canny.blur.size}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { blur: { size: v } }})}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { blur: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -113,7 +111,7 @@ const CannySettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.canny.closing.enabled}
-                  onChange={(v) => updateConfig.mutate({ canny: { closing: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ canny: { closing: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -121,7 +119,7 @@ const CannySettings = () => {
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
               defaultValue={config.canny.closing.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ canny: { closing: { shape: parseInt(v) }}})}
+              onChange={(v) => updateConfig.mutate({ canny: { closing: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -135,7 +133,7 @@ const CannySettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.canny.closing.size}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { closing: { size: v }}})}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { closing: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -159,7 +157,7 @@ const CannySettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.canny.opening.enabled}
-                  onChange={(v) => updateConfig.mutate({ canny: { opening: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ canny: { opening: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -167,7 +165,7 @@ const CannySettings = () => {
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
               defaultValue={config.canny.opening.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ canny: { opening: { shape: parseInt(v) }}})}
+              onChange={(v) => updateConfig.mutate({ canny: { opening: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -181,7 +179,7 @@ const CannySettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.canny.opening.size}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { opening: { size: v }}})}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { opening: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -205,7 +203,7 @@ const CannySettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.canny.erosion.enabled}
-                  onChange={(v) => updateConfig.mutate({ canny: { erosion: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ canny: { erosion: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -213,7 +211,7 @@ const CannySettings = () => {
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
               defaultValue={config.canny.erosion.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ canny: { erosion: { shape: parseInt(v) }}})}
+              onChange={(v) => updateConfig.mutate({ canny: { erosion: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -227,7 +225,7 @@ const CannySettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.canny.erosion.size}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { erosion: { size: v } }})}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { erosion: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -251,7 +249,7 @@ const CannySettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.canny.dilation.enabled}
-                  onChange={(v) => updateConfig.mutate({ canny: { dilation: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ canny: { dilation: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -259,7 +257,7 @@ const CannySettings = () => {
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
               defaultValue={config.canny.dilation.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ canny: { dilation: { shape: parseInt(v) }}})}
+              onChange={(v) => updateConfig.mutate({ canny: { dilation: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -273,7 +271,7 @@ const CannySettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.canny.dilation.size}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { dilation: { size: v }}})}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { dilation: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -284,7 +282,7 @@ const CannySettings = () => {
               <Switch
                 label="Mask preview"
                 checked={config.canny.masked}
-                onChange={(v) => updateConfig.mutate({ canny: { masked: v.target.checked }})}
+                onChange={(v) => updateConfig.mutate({ canny: { masked: v.target.checked } })}
               />
               <Tooltip
                 label="Applies to preview only - Applies the masks to the preview"
@@ -302,7 +300,7 @@ const CannySettings = () => {
               <Switch
                 label="Overlap footage"
                 checked={config.canny.overlap}
-                onChange={(v) => updateConfig.mutate({ canny: { overlap: v.target.checked }})}
+                onChange={(v) => updateConfig.mutate({ canny: { overlap: v.target.checked } })}
               />
               <Tooltip
                 label="Applies to preview only - Overlaps original frame to help define canny parameters"
@@ -322,13 +320,5 @@ const CannySettings = () => {
     </ScrollArea>
   );
 };
-
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
 export default CannySettings;

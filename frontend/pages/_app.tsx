@@ -6,11 +6,11 @@ import { createWebStoragePersistor } from 'react-query/createWebStoragePersistor
 import { ReactQueryDevtools } from 'react-query/devtools';
 import Head from 'next/head';
 import { MantineProvider } from '@mantine/core';
+import { RecoilRoot } from 'recoil';
+import { NotificationsProvider } from '@mantine/notifications';
 import GlobalStyles from '../styles/globalStyles';
 import Layout from '../components/Layout/Layout';
 import { theme } from '../styles/theme';
-import { RecoilRoot } from 'recoil';
-import { NotificationsProvider } from '@mantine/notifications';
 
 const App = (props: AppProps) => {
   const { Component, pageProps } = props;

@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   Tabs, Grid, Loader, Group, Center
 } from '@mantine/core';
 import {
   IoCodeSlashSharp,
-  IoEye,
   IoLinkOutline,
   IoMan,
   IoPeople, IoTv
@@ -13,6 +11,7 @@ import {
 import {
   useQueryClient, useMutation,
 } from 'react-query';
+import _ from 'lodash';
 import CrowdMaskSettings from '../components/Layout/Pages/Config/Settings/CrowdMaskSettings';
 import Preview from '../components/Layout/Pages/Config/Preview/Preview';
 import PlayerMaskSettings from '../components/Layout/Pages/Config/Settings/PlayerMaskSettings';
@@ -20,7 +19,6 @@ import CannySettings from '../components/Layout/Pages/Config/Settings/CannySetti
 import HoughSettings from '../components/Layout/Pages/Config/Settings/HoughSettings';
 import useConfig from '../hooks/useConfig';
 import updateConfig from '../mutations/updateConfig';
-import _ from 'lodash';
 
 const Config = () => {
   const queryClient = useQueryClient();
@@ -32,19 +30,21 @@ const Config = () => {
       switch (index) {
         case 0:
           stage = 'crowdMask';
-        break;
+          break;
         case 1:
           stage = 'playerMask';
-        break;
+          break;
         case 2:
           stage = 'canny';
-        break;
+          break;
         case 3:
           stage = 'lines';
           break;
+        default:
+          break;
       }
       if (stage) {
-        mutateConfig.mutate({ preview: { stage }});
+        mutateConfig.mutate({ preview: { stage } });
       }
     }
   };

@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -167,8 +168,8 @@ const Signup = () => {
             />
             <Popover
               opened={popoverOpened}
+              trapFocus={false}
               withArrow
-              noFocusTrap
               radius="md"
               onFocusCapture={() => setPopoverOpened(true)}
               onBlurCapture={() => setPopoverOpened(false)}

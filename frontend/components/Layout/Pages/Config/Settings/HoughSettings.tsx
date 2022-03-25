@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import {
-  Group, Slider, Title, Switch, RadioGroup, Radio, RangeSlider, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Loader, Overlay
+  Group, Slider, Title, Switch, ThemeIcon, Tooltip, ScrollArea, Paper, Text
 } from '@mantine/core';
-import useConfig from '../../../../../hooks/useConfig';
 import { IoHelp } from 'react-icons/io5';
+import useConfig from '../../../../../hooks/useConfig';
 import useUpdateConfig from '../../../../../hooks/useUpdateConfig';
 
 const HoughSettings = () => {
@@ -44,7 +42,7 @@ const HoughSettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.lines.threshold}
-              onChangeEnd={(v) => updateConfig.mutate({ lines: { threshold: v }})}
+              onChangeEnd={(v) => updateConfig.mutate({ lines: { threshold: v } })}
             />
             <Text size="sm" color="dimmed" weight={700}>Minimum Line Length</Text>
             <Slider
@@ -53,7 +51,7 @@ const HoughSettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.lines.minLineLength}
-              onChangeEnd={(v) => updateConfig.mutate({ lines: { minLineLength: v }})}
+              onChangeEnd={(v) => updateConfig.mutate({ lines: { minLineLength: v } })}
             />
             <Text size="sm" color="dimmed" weight={700}>Maximum Line Gap</Text>
             <Slider
@@ -62,7 +60,7 @@ const HoughSettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.lines.maxLineGap}
-              onChangeEnd={(v) => updateConfig.mutate({ lines: { maxLineGap: v }})}
+              onChangeEnd={(v) => updateConfig.mutate({ lines: { maxLineGap: v } })}
             />
           </Group>
         </Paper>
@@ -73,7 +71,7 @@ const HoughSettings = () => {
               <Switch
                 label="Prune lines"
                 checked={config.lines.prune}
-                onChange={(v) => updateConfig.mutate({ lines: { prune: v.target.checked }})}
+                onChange={(v) => updateConfig.mutate({ lines: { prune: v.target.checked } })}
               />
               <Tooltip
                 label="Automatically filter and merge similar lines"
@@ -93,13 +91,5 @@ const HoughSettings = () => {
     </ScrollArea>
   );
 };
-
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
 export default HoughSettings;

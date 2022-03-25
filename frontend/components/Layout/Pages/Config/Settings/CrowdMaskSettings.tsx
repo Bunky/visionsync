@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import {
-  Group, Slider, Title, Switch, RadioGroup, Radio, RangeSlider, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Loader, Overlay
+  Group, Slider, Title, Switch, RadioGroup, Radio, RangeSlider, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Overlay
 } from '@mantine/core';
-import useConfig from '../../../../../hooks/useConfig';
 import { IoHelp } from 'react-icons/io5';
+import useConfig from '../../../../../hooks/useConfig';
 import useUpdateConfig from '../../../../../hooks/useUpdateConfig';
 
 const CrowdMaskSettings = () => {
@@ -107,7 +105,7 @@ const CrowdMaskSettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.crowdMask.erosion.enabled}
-                  onChange={(v) => updateConfig.mutate({ crowdMask: { erosion: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ crowdMask: { erosion: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -115,7 +113,7 @@ const CrowdMaskSettings = () => {
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
               defaultValue={config.crowdMask.erosion.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ crowdMask: { erosion: { shape: parseInt(v) }}})}
+              onChange={(v) => updateConfig.mutate({ crowdMask: { erosion: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -129,7 +127,7 @@ const CrowdMaskSettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.crowdMask.erosion.size}
-              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { erosion: { size: v } }})}
+              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { erosion: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -153,7 +151,7 @@ const CrowdMaskSettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.crowdMask.dilation.enabled}
-                  onChange={(v) => updateConfig.mutate({ crowdMask: { dilation: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ crowdMask: { dilation: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -161,7 +159,7 @@ const CrowdMaskSettings = () => {
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
               defaultValue={config.crowdMask.dilation.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ crowdMask: { dilation: { shape: parseInt(v) }}})}
+              onChange={(v) => updateConfig.mutate({ crowdMask: { dilation: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -175,7 +173,7 @@ const CrowdMaskSettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.crowdMask.dilation.size}
-              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { dilation: { size: v }}})}
+              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { dilation: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -199,7 +197,7 @@ const CrowdMaskSettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.crowdMask.closing.enabled}
-                  onChange={(v) => updateConfig.mutate({ crowdMask: { closing: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ crowdMask: { closing: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -207,7 +205,7 @@ const CrowdMaskSettings = () => {
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
               defaultValue={config.crowdMask.closing.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ crowdMask: { closing: { shape: parseInt(v) }}})}
+              onChange={(v) => updateConfig.mutate({ crowdMask: { closing: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -221,7 +219,7 @@ const CrowdMaskSettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.crowdMask.closing.size}
-              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { closing: { size: v }}})}
+              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { closing: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -245,7 +243,7 @@ const CrowdMaskSettings = () => {
                 </Tooltip>
                 <Switch
                   checked={config.crowdMask.opening.enabled}
-                  onChange={(v) => updateConfig.mutate({ crowdMask: { opening: { enabled: v.target.checked }}})}
+                  onChange={(v) => updateConfig.mutate({ crowdMask: { opening: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
@@ -253,7 +251,7 @@ const CrowdMaskSettings = () => {
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
               defaultValue={config.crowdMask.opening.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ crowdMask: { opening: { shape: parseInt(v) }}})}
+              onChange={(v) => updateConfig.mutate({ crowdMask: { opening: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -267,7 +265,7 @@ const CrowdMaskSettings = () => {
               min={0}
               sx={{ width: '100%' }}
               defaultValue={config.crowdMask.opening.size}
-              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { opening: { size: v }}})}
+              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { opening: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -278,7 +276,7 @@ const CrowdMaskSettings = () => {
               <Switch
                 label="Invert mask"
                 checked={config.crowdMask.invert}
-                onChange={(v) => updateConfig.mutate({ crowdMask: { invert: v.target.checked }})}
+                onChange={(v) => updateConfig.mutate({ crowdMask: { invert: v.target.checked } })}
               />
               <Tooltip
                 label="Invert the generated mask"
@@ -296,7 +294,7 @@ const CrowdMaskSettings = () => {
               <Switch
                 label="Overlap footage"
                 checked={config.crowdMask.overlap}
-                onChange={(v) => updateConfig.mutate({ crowdMask: { overlap: v.target.checked }})}
+                onChange={(v) => updateConfig.mutate({ crowdMask: { overlap: v.target.checked } })}
               />
               <Tooltip
                 label="Applies to preview only - Overlaps original frame to help define mask parameters"
@@ -316,13 +314,5 @@ const CrowdMaskSettings = () => {
     </ScrollArea>
   );
 };
-
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
 export default CrowdMaskSettings;
