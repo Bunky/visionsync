@@ -7,8 +7,7 @@ const MongoSessionStore = require('connect-mongo');
 require('dotenv').config();
 const { Server } = require("socket.io");
 const { socketConnection } = require("./utils/socket-io");
-
-const { temp } = require("./processor/lineDetection");
+const { redisConnection } = require('./utils/redis');
 
 // =================================================================================================
 //                                       Web Server Configuration
@@ -43,6 +42,12 @@ app.use(session({
 }));
 
 // =================================================================================================
+//                                                Redis
+// =================================================================================================
+
+redisConnection();
+
+// =================================================================================================
 //                                               SocketIO
 // =================================================================================================
 
@@ -69,6 +74,7 @@ passport.deserializeUser((user, done) => {
 
 app.use('/user', require('./routes/user'));
 app.use('/config', require('./routes/config'));
+app.use('/analysis', require('./routes/analysis'));
 
 // =================================================================================================
 //                                           MongoAtlas Config
@@ -89,6 +95,4 @@ connection.once('open', () => {
 server.listen(process.env.PORT, (err) => {
   if (err) throw err;
   console.info(`> Ready on http://localhost:${process.env.PORT}`);
-
-  temp();
 });

@@ -1,45 +1,75 @@
 const cv = require('opencv4nodejs');
-const { sendMessage } = require('../utils/socket-io');
-const { morphShape } = require('./utils');;
+const { sendMessage, isConnected } = require('../utils/socket-io');
+const { morphShape } = require('./utils');
+const User = require('../models/user.model');
+const { setJsonValue, getJsonValue, delJsonValue } = require('../utils/redis');
 
-exports.temp = () => {
+let activeAnalysis = []; // Change this so it uses redis instead of a variable!
+
+exports.isActive = (room) => activeAnalysis.filter(analysis => analysis.room === room.toString()).length > 0;
+
+exports.startAnalysis = async (room) => {
+  const user = await User.findById(room);
+  await setJsonValue(room, user.settings);
+
+  const intervalId = initiateAnalysis(room.toString());
+  activeAnalysis.push({
+    room: room.toString(),
+    intervalId
+  });
+};
+
+exports.stopAnalysis = async (room) => {
+  const analysis = activeAnalysis.filter(analysis => analysis.room === room.toString())[0];
+  clearInterval(analysis.intervalId);
+  activeAnalysis = activeAnalysis.filter(analysis => analysis.room !== room.toString());
+
+  let user = await User.findById(room);   
+  user.settings = await getJsonValue(room);
+  await user.save();
+  await delJsonValue(room);
+};
+
+const initiateAnalysis = (room) => {
   const FPS = 15;
 
   const video = new cv.VideoCapture(0);
   video.set(cv.CAP_PROP_FRAME_WIDTH, 640);
   video.set(cv.CAP_PROP_FRAME_HEIGHT, 360);
   
-  setInterval(() => {
-    const frame = video.read();
-    const [crowdMask, crowdMaskFrame] = generateCrowdMask(frame);
-    const [playerMask, playerMaskFrame] = generatePlayerMask(frame);
-    const [canny, cannyFrame] = generateCanny(frame, crowdMask, playerMask);
-    const [lines, linesFrame] = generateLines(frame, canny);
+  return setInterval(async () => {
+    const settings = await getJsonValue(room);
 
-    if (settings.preview.enabled) {
+    const frame = video.read();
+    const [crowdMask, crowdMaskFrame] = generateCrowdMask(room, settings, frame);
+    const [playerMask, playerMaskFrame] = generatePlayerMask(room, settings, frame);
+    const [canny, cannyFrame] = generateCanny(room, settings, frame, crowdMask, playerMask);
+    const [lines, linesFrame] = generateLines(room, settings, frame, canny);
+
+    if (settings.preview.enabled && isConnected(room)) {
       switch (settings.preview.stage) {
         case 'crowdMask':
-          sendMessage('preview', crowdMaskFrame);
+          sendMessage(room, 'preview', crowdMaskFrame);
           break;
         case 'playerMask':
-          sendMessage('preview', playerMaskFrame);
+          sendMessage(room, 'preview', playerMaskFrame);
           break;
         case 'canny':
-          sendMessage('preview', cannyFrame);
+          sendMessage(room, 'preview', cannyFrame);
           break;
         case 'lines':
-          sendMessage('preview', linesFrame);
+          sendMessage(room, 'preview', linesFrame);
           break;
         default:
           break;
       }
     }
 
-    sendMessage('result', cv.imencode('.jpg', frame).toString('base64'));
+    sendMessage(room, 'result', cv.imencode('.jpg', frame).toString('base64'));
   }, 1000 / FPS);
 };
 
-const generateCrowdMask = (frame) => {
+const generateCrowdMask = (room, settings, frame) => {
   const hsv = frame.cvtColor(cv.COLOR_BGR2HSV);
   let crowdMask = hsv.inRange(new cv.Vec3(...settings.crowdMask.hsv.lower), new cv.Vec3(...settings.crowdMask.hsv.upper));
 
@@ -82,7 +112,7 @@ const generateCrowdMask = (frame) => {
 
   // Overlap
   let preview;
-  if (settings.preview.enabled && settings.preview.stage === 'crowdMask') {
+  if (settings.preview.enabled && settings.preview.stage === 'crowdMask' && isConnected(room)) {
     if (settings.crowdMask.overlap) {
       const frameChannels = frame.splitChannels();
       const maskedChannels = frameChannels.map(c => c.bitwiseAnd(crowdMask));
@@ -98,7 +128,7 @@ const generateCrowdMask = (frame) => {
   return [crowdMask, preview];
 };
 
-const generatePlayerMask = (frame) => {
+const generatePlayerMask = (room, settings, frame) => {
   const hsv = frame.cvtColor(cv.COLOR_BGR2HSV);
   let playerMask = hsv.inRange(new cv.Vec3(...settings.playerMask.hsv.lower), new cv.Vec3(...settings.playerMask.hsv.upper));
 
@@ -141,7 +171,7 @@ const generatePlayerMask = (frame) => {
 
   // Overlap
   let preview;
-  if (settings.preview.enabled && settings.preview.stage === 'playerMask') {
+  if (settings.preview.enabled && settings.preview.stage === 'playerMask' && isConnected(room)) {
     if (settings.playerMask.overlap) {
       const frameChannels = frame.splitChannels();
       const maskedChannels = frameChannels.map(c => c.bitwiseAnd(playerMask));
@@ -157,7 +187,7 @@ const generatePlayerMask = (frame) => {
   return [playerMask, preview];
 };
 
-const generateCanny = (frame, crowdMask, playerMask) => {
+const generateCanny = (room, settings, frame, crowdMask, playerMask) => {
   // Settings
   let blurSize = settings.canny.blur.size;
   const cannyThresholdOne = settings.canny.thresholdOne;
@@ -229,7 +259,7 @@ const generateCanny = (frame, crowdMask, playerMask) => {
 
   // Preview
   let preview;
-  if (settings.preview.enabled && settings.preview.stage === 'canny') {
+  if (settings.preview.enabled && settings.preview.stage === 'canny' && isConnected(room)) {
     if (settings.canny.overlap) {
       const frameChannels = blur.splitChannels();
       const invertedCanny = settings.canny.masked ? maskedCanny.bitwiseNot() : canny.bitwiseNot();
@@ -246,7 +276,7 @@ const generateCanny = (frame, crowdMask, playerMask) => {
   return [maskedCanny, preview];
 };
 
-const generateLines = (frame, canny) => {
+const generateLines = (room, settings, frame, canny) => {
   const threshold = settings.lines.threshold;
   const minLineLength = settings.lines.minLineLength;
   const maxLineGap = settings.lines.maxLineGap;
@@ -259,7 +289,7 @@ const generateLines = (frame, canny) => {
 
   // Preview
   let preview;
-  if (settings.preview.enabled && settings.preview.stage === 'lines') {
+  if (settings.preview.enabled && settings.preview.stage === 'lines' && isConnected(room)) {
     const lineFrame = frame.copy();
     for (let i = 0; i < lines.length; i++) {
       const [x1, y1, x2, y2] = [lines[i].y, lines[i].x, lines[i].w, lines[i].z];

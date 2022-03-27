@@ -8,20 +8,16 @@ import {
   IoMan,
   IoPeople, IoTv
 } from 'react-icons/io5';
-import {
-  useQueryClient, useMutation,
-} from 'react-query';
-import _ from 'lodash';
 import CrowdMaskSettings from '../components/Layout/Pages/Config/Settings/CrowdMaskSettings';
 import Preview from '../components/Layout/Pages/Config/Preview/Preview';
 import PlayerMaskSettings from '../components/Layout/Pages/Config/Settings/PlayerMaskSettings';
 import CannySettings from '../components/Layout/Pages/Config/Settings/CannySettings';
 import HoughSettings from '../components/Layout/Pages/Config/Settings/HoughSettings';
 import useConfig from '../hooks/useConfig';
-import updateConfig from '../mutations/updateConfig';
+import useUpdateConfig from '../hooks/useUpdateConfig';
 
 const Config = () => {
-  const queryClient = useQueryClient();
+  const updateConfig = useUpdateConfig();
   const { data: config, status: configStatus } = useConfig();
 
   const updatePreview = (index) => {
@@ -44,35 +40,12 @@ const Config = () => {
           break;
       }
       if (stage) {
-        mutateConfig.mutate({ preview: { stage } });
+        updateConfig.mutate({ preview: { stage } });
       }
     }
   };
 
-  const mutateConfig = useMutation(updateConfig, {
-    onMutate: async (updatedSetting) => {
-      await queryClient.cancelQueries('config');
-      const previousConfig = queryClient.getQueryData('config');
-
-      queryClient.setQueryData('config', _.merge(previousConfig, updatedSetting));
-      return { previousConfig };
-    },
-    onError: (err, updatedSetting, context: any) => {
-      // notif.basic('error', t('errors:ftup'), err.toString());
-      queryClient.setQueryData('config', context.previousConfig);
-    },
-    onSuccess: (res, updatedSetting, context: any) => {
-      if (res.status === 429) {
-        // notif.basic('error', t('errors:ftup'), t('errors:tmr'));
-        queryClient.setQueryData('config', context.previousConfig);
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries('config');
-    }
-  });
-
-  if (configStatus === 'loading' && config === undefined) {
+  if (configStatus === 'loading' || config === undefined) {
     return (<Center sx={{ height: '100%' }}><Loader /></Center>);
   }
 

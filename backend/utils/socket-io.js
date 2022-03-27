@@ -1,21 +1,24 @@
 let io;
+let conectedClient = [];
+
 exports.socketConnection = (server) => {
   io = require('socket.io')(server);
   io.on('connection', (socket) => {
-
-
-    console.info(`Client connected [id=${socket.id}]`);
-    socket.join(socket.request._query.id);
-    socket.on('disconnect', () => {
-      console.info(`Client disconnected [id=${socket.id}]`);
+    let connectionId;
+    socket.on('create', (id) => {
+      connectionId = id;
+      conectedClient.push(id);
+      socket.join(id);
+      console.info(`Client connected [${id}]`);
     });
 
-
-
+    socket.on('disconnect', () => {
+      conectedClient = conectedClient.filter(client => client !== connectionId);
+      console.info(`Client disconnected [${connectionId}]`);
+    });
   });
 };
 
-// exports.sendMessage = (roomId, key, message) => io.to(roomId).emit(key, message);
-exports.sendMessage = (key, message) => io.emit(key, message);
+exports.sendMessage = (room, key, message) => io.in(room).emit(key, message);
 
-exports.getRooms = () => io.sockets.adapter.rooms;
+exports.isConnected = (room) => conectedClient.indexOf(room) > -1;

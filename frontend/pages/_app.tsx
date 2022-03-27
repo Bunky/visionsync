@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { persistQueryClient } from 'react-query/persistQueryClient-experimental';
-import { createWebStoragePersistor } from 'react-query/createWebStoragePersistor-experimental';
+// import { persistQueryClient } from 'react-query/persistQueryClient-experimental';
+// import { createWebStoragePersistor } from 'react-query/createWebStoragePersistor-experimental';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import Head from 'next/head';
 import { MantineProvider } from '@mantine/core';
@@ -24,16 +24,16 @@ const App = (props: AppProps) => {
   });
 
   useEffect(() => {
-    const localStoragePersistor = createWebStoragePersistor({
-      storage: window.localStorage,
-      key: 'visionSync_Cache',
-      throttleTime: 0
-    });
+    // const localStoragePersistor = createWebStoragePersistor({
+    //   storage: window.localStorage,
+    //   key: 'visionSync_Cache',
+    //   throttleTime: 0
+    // });
 
-    persistQueryClient({
-      queryClient,
-      persistor: localStoragePersistor,
-    });
+    // persistQueryClient({
+    //   queryClient,
+    //   persistor: localStoragePersistor,
+    // });
   });
 
   return (

@@ -5,6 +5,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const User = require('../models/user.model');
+const defaultSettings = require('../processor/defaultSettings.json');
 
 // =================================================================================================
 //                                               Login
@@ -90,7 +91,8 @@ passport.use('signup', new LocalStrategy({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(12)),
-        termsOfService: req.body.termsOfService
+        termsOfService: req.body.termsOfService,
+        settings: defaultSettings
       });
 
       await newUser.save();
@@ -178,7 +180,7 @@ router.route('/').get(async (req, res) => {
   if (req.isAuthenticated()) {
     try {
       const user = await User.findById(req.user._id, {
-        _id: 0, password: 0, __v: 0
+        password: 0, __v: 0, settings: 0
       });
       if (user) {
         return res.status(200).send(user);

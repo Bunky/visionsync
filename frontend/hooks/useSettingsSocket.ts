@@ -1,36 +1,43 @@
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import io from 'socket.io-client';
+import useUser from './useUser';
 
 const useSettingsSocket = () => {
   const queryClient = useQueryClient();
+  const { data: user, status: userStatus } = useUser();
   const [preview, setPreview] = useState(null);
   const [result, setResult] = useState(null);
 
   useEffect(() => {
-    const socket = io('http://localhost:3001');
-    socket.on('connect', () => {
-      console.log('connected');
-    });
+    if (userStatus === 'success' && user && !user.unauthorised) {
+      const socket = io('http://localhost:3001', { transports: ['websocket'] });
 
-    socket.on('preview', (frame) => {
-      setPreview(frame);
-    });
+      socket.emit('create', user._id);
 
-    socket.on('result', (frame) => {
-      setResult(frame);
-    });
+      socket.on('connect', () => {
+        console.log('connected');
+      });
 
-    socket.on('updateConfig', (message) => {
-      queryClient.setQueryData('config', () => message);
-      // const update = (entity) => entity.id === data.id ? { ...entity, ...data.payload } : entity;
-      // return Array.isArray(oldConfig) ? oldConfig.map(update) : update(oldConfig);
-    });
+      socket.on('preview', (frame) => {
+        setPreview(frame);
+      });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, [queryClient]);
+      socket.on('result', (frame) => {
+        setResult(frame);
+      });
+
+      socket.on('updateConfig', (message) => {
+        queryClient.setQueryData('config', () => message);
+        // const update = (entity) => entity.id === data.id ? { ...entity, ...data.payload } : entity;
+        // return Array.isArray(oldConfig) ? oldConfig.map(update) : update(oldConfig);
+      });
+
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [queryClient, user, userStatus]);
 
   return {
     preview,

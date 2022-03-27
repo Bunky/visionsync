@@ -28,6 +28,7 @@ const userSchema = new Schema({
     type: Boolean,
     required: true
   },
+  settings: { }
 }, {
   timestamps: true
 });
