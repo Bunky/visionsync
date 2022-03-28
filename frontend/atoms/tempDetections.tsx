@@ -2,92 +2,92 @@ export default {
   key: 'tempDetections',
   default: [{
     coordinates: [0, 0],
-    name: "Rashford",
-    position: "LW"
+    name: 'Rashford',
+    position: 'LW'
   }, {
     coordinates: [0, 0],
-    name: "Cavani",
-    position: "ST"
+    name: 'Cavani',
+    position: 'ST'
   }, {
     coordinates: [0, 0],
-    name: "Ronaldo",
-    position: "ST"
+    name: 'Ronaldo',
+    position: 'ST'
   }, {
     coordinates: [0, 0],
-    name: "Bruno",
-    position: "CAM"
+    name: 'Bruno',
+    position: 'CAM'
   }, {
     coordinates: [0, 0],
-    name: "Zaha",
-    position: "LW"
+    name: 'Zaha',
+    position: 'LW'
   }, {
     coordinates: [0, 0],
-    name: "Fred",
-    position: "CM"
+    name: 'Fred',
+    position: 'CM'
   }, {
     coordinates: [0, 0],
-    name: "Wan Bissaka",
-    position: "RB"
+    name: 'Wan Bissaka',
+    position: 'RB'
   }, {
     coordinates: [0, 0],
-    name: "GK",
-    position: "Guaita"
+    name: 'GK',
+    position: 'Guaita'
   }, {
     coordinates: [0, 0],
-    name: "Mike Dean",
-    position: "CB"
+    name: 'Mike Dean',
+    position: 'CB'
   }, {
     coordinates: [0, 0],
-    name: "Pepe",
-    position: "RW"
+    name: 'Pepe',
+    position: 'RW'
   }, {
     coordinates: [0, 0],
-    name: "Messi",
-    position: "Smells"
+    name: 'Messi',
+    position: 'Smells'
   }, {
     coordinates: [0, 0],
-    name: "T71",
-    position: "LT"
+    name: 'T71',
+    position: 'LT'
   }, {
     coordinates: [0, 0],
-    name: "Carvana",
-    position: "LT"
+    name: 'Carvana',
+    position: 'LT'
   }, {
     coordinates: [0, 0],
-    name: "Siuuu",
-    position: "Suey"
+    name: 'Siuuu',
+    position: 'Suey'
   }, {
     coordinates: [0, 0],
-    name: "Bruno Mars",
-    position: "LM"
+    name: 'Bruno Mars',
+    position: 'LM'
   }, {
     coordinates: [0, 0],
-    name: "Haha",
-    position: "LW"
+    name: 'Haha',
+    position: 'LW'
   }, {
     coordinates: [0, 0],
-    name: "Madison",
-    position: "CM"
+    name: 'Madison',
+    position: 'CM'
   }, {
     coordinates: [0, 0],
-    name: "Henry Matilda",
-    position: "ST"
+    name: 'Henry Matilda',
+    position: 'ST'
   }, {
     coordinates: [0, 0],
-    name: "De Gea",
-    position: "GK"
+    name: 'De Gea',
+    position: 'GK'
   }, {
     coordinates: [0, 0],
-    name: "Ferdinand",
-    position: "CB"
+    name: 'Ferdinand',
+    position: 'CB'
   }, {
     coordinates: [0, 0],
-    name: "JJ Okocha",
-    position: "LW"
+    name: 'JJ Okocha',
+    position: 'LW'
   }, {
     coordinates: [0, 0],
-    name: "Shawly not",
-    position: "LB"
+    name: 'Shawly not',
+    position: 'LB'
   }] as {
     coordinates: Array<number>;
     name: string;

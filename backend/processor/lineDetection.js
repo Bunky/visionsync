@@ -37,7 +37,7 @@ const initiateAnalysis = (room) => {
   video.set(cv.CAP_PROP_FRAME_WIDTH, 640);
   video.set(cv.CAP_PROP_FRAME_HEIGHT, 360);
   
-  return setInterval(async () => {
+  const intervalId = setInterval(async () => {
     const settings = await getJsonValue(room);
 
     const frame = video.read();
@@ -67,6 +67,8 @@ const initiateAnalysis = (room) => {
 
     sendMessage(room, 'result', cv.imencode('.jpg', frame).toString('base64'));
   }, 1000 / FPS);
+
+  return intervalId;
 };
 
 const generateCrowdMask = (room, settings, frame) => {

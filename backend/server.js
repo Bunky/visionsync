@@ -8,6 +8,7 @@ require('dotenv').config();
 const { Server } = require("socket.io");
 const { socketConnection } = require("./utils/socket-io");
 const { redisConnection } = require('./utils/redis');
+const fileUpload = require('express-fileupload');
 
 // =================================================================================================
 //                                       Web Server Configuration
@@ -17,6 +18,7 @@ const app = module.exports.app = express();
 const server = http.createServer(app);
 app.use(express.json());
 app.use(express.urlencoded());
+app.use(fileUpload());
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', req.headers.origin);
@@ -75,6 +77,7 @@ passport.deserializeUser((user, done) => {
 app.use('/user', require('./routes/user'));
 app.use('/config', require('./routes/config'));
 app.use('/analysis', require('./routes/analysis'));
+app.use('/matches', require('./routes/matches'));
 
 // =================================================================================================
 //                                           MongoAtlas Config
