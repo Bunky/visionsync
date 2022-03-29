@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Table, ScrollArea, Group, Button, Image, AspectRatio, Center, Loader, LoadingOverlay
 } from '@mantine/core';
@@ -7,9 +8,11 @@ import {
 } from 'react-icons/io5';
 import VideoMenu from './VideoMenu';
 import useMatches from '../../../../hooks/useMatches';
+import useViewMatchModal from '../../../../hooks/Matches/useViewMatchModal';
 
 const VideoTable = () => {
   const { data: matches, status: matchesStatus } = useMatches();
+  const [, setState] = useViewMatchModal();
 
   if (matchesStatus === 'loading' || matches === undefined) {
     return (<Center sx={{ height: '100%' }}><Loader /></Center>);
@@ -49,6 +52,10 @@ const VideoTable = () => {
                 {!match.loading && (
                   <Group position="right">
                     <Button
+                      onClick={() => setState({
+                        open: true,
+                        matchId: match.matchId
+                      })}
                       leftIcon={<IoVideocam />}
                       compact
                     >

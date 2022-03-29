@@ -5,9 +5,11 @@ import {
 import useAnalysis from '../hooks/useAnalysis';
 import VideoTable from '../components/Layout/Pages/Matches/VideoTable';
 import NewMatchModal from '../components/Layout/Pages/Matches/NewMatchModal';
+import ViewMatchModal from '../components/Layout/Pages/Matches/ViewMatchModal';
 
 const Home = () => {
   const { data: analysis, status: analysisStatus } = useAnalysis();
+
   if (analysisStatus === 'loading' || analysis === undefined) {
     return (<Center sx={{ height: '100%' }}><Loader /></Center>);
   }
@@ -20,6 +22,7 @@ const Home = () => {
     <Container>
       <NewMatchModal />
       <VideoTable />
+      <ViewMatchModal />
     </Container>
   );
 };
