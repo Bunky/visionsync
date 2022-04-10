@@ -1,10 +1,11 @@
+import torch
 import sys
 import redis
 import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks, peak_widths
-import torch
+# import tensorflow_hub as hub
 import json
 
 import tensorflow as tf
@@ -12,7 +13,7 @@ from matplotlib import pyplot as plt
 from matplotlib.collections import LineCollection
 import matplotlib.patches as patches
 
-import utils
+import utilties as utils
 import stages
 
 # resolution = (1920, 1080)
@@ -23,8 +24,9 @@ def main():
   matchId = sys.argv[1]
   
   # Load models
-  # model = torch.hub.load('ultralytics/yolov5', 'custom', path='N:/Uni/Disertation/Development/visionsync/backend/processor/python/model/model.pt')
-  
+  model = torch.hub.load('ultralytics/yolov5', 'custom', path='processor/python/model/best.pt')
+  # module = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
+
   # Connect to redis
   r = redis.Redis(host='localhost', port=6379, db=0)
 
@@ -47,9 +49,15 @@ def main():
       # start_time = time.time()
       frame = threaded_camera.get_frame()
       
+      message = []
+      message.append({
+        "type": "live",
+        "data": utils.get_base64_from_frame(frame)
+      })
+      
       # Player detection with YOLOv5 custom model
-      # detections, detections_frame = stages.detect_players(settings, frame, model)
-      detections = []
+      detections, detections_frame = stages.detect_players(settings, frame, model)
+      # detections = []
 
       # Auto colour Processing
       # h, s, v = get_histogram(frame)
@@ -68,14 +76,12 @@ def main():
       #   "type": "info",
       #   "data": lines
       # }))
-      
-      message = []
-      
+           
       if settings["preview"]["enabled"]:
         if settings["preview"]["stage"] == "detections":
           message.append({
             "type": "preview",
-            "data": '' # utils.get_base64_from_frame(detections_frame)
+            "data": utils.get_base64_from_frame(detections_frame)
           })
         elif settings["preview"]["stage"] == "crowdMask":
           message.append({
@@ -107,11 +113,6 @@ def main():
             "type": "preview",
             "data": utils.get_base64_from_frame(homography_frame)
           })
-          
-      message.append({
-        "type": "live",
-        "data": utils.get_base64_from_frame(frame)
-      })
 
       sys.stdout.write(json.dumps(message))
       sys.stdout.flush()

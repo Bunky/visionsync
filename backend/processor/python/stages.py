@@ -1,13 +1,13 @@
 import numpy as np
 import cv2 as cv
 from bounding_box import bounding_box as bb
-import utils
+import utilties as utils
 # from main import resolution
 resolution = (640, 360)
 
 def detect_players(settings, frame, model):
   detections = model(frame)
-  detections = detections.pandas().xyxy[0]    
+  detections = detections.pandas().xyxy[0]
   detections = utils.classify_players(settings, frame, detections)
   
   # Preview 

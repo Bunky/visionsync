@@ -34,6 +34,10 @@ exports.startAnalysis = async (room, matchId) => {
   });
   pythonProcess.stderr.on('data', (data) => {
     console.log(data.toString());
+    // exports.stopAnalysis(matchId);
+  });
+  pythonProcess.on('exit', (code) => {
+    console.log(`Process exited with code ${code}`);
     exports.stopAnalysis(matchId);
   });
 

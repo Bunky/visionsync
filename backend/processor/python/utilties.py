@@ -10,8 +10,8 @@ resolution = (640, 360)
 def classify_players(settings, frame, detections):
   classified_detections = []
   
-  for detection in detections.iterrows():
-    if detection['class'] == 0:
+  for index, detection in detections.iterrows():
+    if detection["class"] == 0:
       # # Crop the frame to bounding box
       # cropped_frame = frame[int(detection['ymin']):int(detection['ymax']), int(detection['xmin']):int(detection['xmax'])]
       
@@ -384,7 +384,7 @@ class ThreadedCamera(object):
     while True:
       if self.capture.isOpened():
         (self.status, self.frame) = self.capture.read()
-      time.sleep(self.FPS)
+        time.sleep(self.FPS)
     
   def get_frame(self):
     return self.frame
