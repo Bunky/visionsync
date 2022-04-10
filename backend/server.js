@@ -5,16 +5,16 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const MongoSessionStore = require('connect-mongo');
 require('dotenv').config();
-const { Server } = require("socket.io");
-const { socketConnection } = require("./utils/socket-io");
-const { redisConnection } = require('./utils/redis');
 const fileUpload = require('express-fileupload');
+const { socketConnection } = require('./utils/socket-io');
+const { redisConnection } = require('./utils/redis');
 
 // =================================================================================================
 //                                       Web Server Configuration
 // =================================================================================================
 
-const app = module.exports.app = express();
+// const app = module.exports.app = express();
+const app = express();
 const server = http.createServer(app);
 app.use(express.json());
 app.use(express.urlencoded());
@@ -34,7 +34,7 @@ app.use(session({
   secure: process.env.NODE_ENV !== 'development',
   proxy: process.env.NODE_ENV !== 'development',
   cookie: {
-    maxAge: 60000 * 60 * 6
+    maxAge: 60000 * 60 * 6,
   },
   store: MongoSessionStore.create({
     mongoUrl: process.env.MONGOURL,
@@ -84,7 +84,7 @@ app.use('/matches', require('./routes/matches'));
 // =================================================================================================
 
 mongoose.connect(process.env.MONGOURL, {
-  useNewUrlParser: true, useUnifiedTopology: true
+  useNewUrlParser: true, useUnifiedTopology: true,
 });
 const { connection } = mongoose;
 connection.once('open', () => {

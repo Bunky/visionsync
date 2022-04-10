@@ -43,7 +43,10 @@ const Preview = () => {
                   { value: 'crowdMask', label: 'Crowd Mask' },
                   { value: 'playerMask', label: 'Player Mask' },
                   { value: 'canny', label: 'Canny' },
-                  { value: 'lines', label: 'Hough Transform' }
+                  { value: 'lines', label: 'Hough Transform' },
+                  { value: 'intersections', label: 'Intersections' },
+                  { value: 'homography', label: 'Homography' },
+                  { value: 'detections', label: 'Players' }
                 ]}
               />
               <Switch

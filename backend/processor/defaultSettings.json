@@ -96,6 +96,13 @@
     "maxLineGap": 57,
     "resolution": 1,
     "rho": 1,
-    "prune": false
+    "prune": {
+      "enabled": true,
+      "minDistance": 10,
+      "minAngle": 5
+    }
+  },
+  "intersections": {
+
   }
 }

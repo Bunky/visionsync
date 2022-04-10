@@ -14,11 +14,6 @@ const matchSchema = new Schema({
     trim: true,
     required: true
   },
-  thumbnail: {
-    type: String,
-    trim: true,
-    required: true
-  },
   title: {
     type: String,
     trim: true,

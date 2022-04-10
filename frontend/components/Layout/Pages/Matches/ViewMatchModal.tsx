@@ -20,7 +20,8 @@ const ViewMatchModal = () => {
     >
       <AspectRatio ratio={16 / 9}>
         <ReactPlayer
-          url={`https://s3.us-east-2.amazonaws.com/videos.visionsync.io/${state.matchId}.mp4`}
+          // url={`https://s3.us-east-2.amazonaws.com/videos.visionsync.io/${state.matchId}.mp4`}
+          url={`http://d1pu8bxuwsqdvz.cloudfront.net/${state.matchId}.mp4`}
           width="100%"
           height="100%"
           controls

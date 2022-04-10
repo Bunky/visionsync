@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   Button, Group, Modal, TextInput, Text
 } from '@mantine/core';
-import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
+import { Dropzone } from '@mantine/dropzone';
 import { useForm } from '@mantine/hooks';
 import { IoCloudUpload, IoStop } from 'react-icons/io5';
 import useUploadFile from '../../../../hooks/useUploadFile';
@@ -34,10 +34,19 @@ const NewMatchModal = () => {
       formData.append('title', form.values.title);
       uploadFile.mutate(formData);
 
-      setOpened(false);
+      handleClose();
     } else {
       setError('Please select a file to upload!');
     }
+  };
+
+  const handleClose = () => {
+    setOpened(false);
+    setTimeout(() => {
+      form.reset();
+      setFiles(null);
+      setError(null);
+    }, 250);
   };
 
   return (
@@ -47,7 +56,7 @@ const NewMatchModal = () => {
       </Button>
       <Modal
         opened={opened}
-        onClose={() => setOpened(false)}
+        onClose={handleClose}
         title="New Match"
       >
         <Group grow direction="column" spacing="sm">
@@ -63,20 +72,18 @@ const NewMatchModal = () => {
               onReject={(file) => console.log('rejected files', file)}
               maxSize={300 * 1024 ** 2}
               multiple={false}
-              accept={[MIME_TYPES.mp4]}
+              accept={['video/x-matroska']}
             >
               {(status) => (
                 <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
-                  {/* {status.accepted && <IoCloudUpload />} */}
                   {status.rejected && <IoStop />}
                   <IoCloudUpload />
-
                   <div>
-                    <Text size="xl" inline>
-                      Drag images here or click to select files
+                    <Text inline>
+                      Drag videos here or click to select
                     </Text>
-                    <Text size="sm" color="dimmed" inline mt={7}>
-                      Attach as many files as you like, each file should not exceed 5mb
+                    <Text size="xs" color="dimmed" inline mt={7}>
+                      The video should not exceed 500mb
                     </Text>
                   </div>
                 </Group>

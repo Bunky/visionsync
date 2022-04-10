@@ -33,6 +33,7 @@ passport.use('login', new LocalStrategy({
 }));
 
 // ==========================================Login Endpoint============================================
+
 router.route('/login').post((req, res, next) => {
   const createSubscriptionSchema = Joi.object({
     email: Joi.string()
@@ -76,7 +77,7 @@ router.route('/login').post((req, res, next) => {
 passport.use('signup', new LocalStrategy({
   passReqToCallback: true,
   usernameField: 'email',
-  passwordField: 'password'
+  passwordField: 'password',
 }, async (req, username, password, done) => {
   try {
     const user = await User.findOne({ email: req.body.email });
@@ -92,7 +93,7 @@ passport.use('signup', new LocalStrategy({
         lastName: req.body.lastName,
         password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(12)),
         termsOfService: req.body.termsOfService,
-        settings: defaultSettings
+        settings: defaultSettings,
       });
 
       await newUser.save();
@@ -147,7 +148,7 @@ router.route('/signup').post((req, res, next) => {
         if (loginError) {
           return res.status(200).send({
             authenticated: false,
-            message: 'Signed up successfully, but failed to automatically log in. Please try logging in.'
+            message: 'Signed up successfully, but failed to automatically log in. Please try logging in.',
           });
         }
         console.log(`User ${user.email} logged in after signing up.`); // Report event
@@ -180,7 +181,7 @@ router.route('/').get(async (req, res) => {
   if (req.isAuthenticated()) {
     try {
       const user = await User.findById(req.user._id, {
-        password: 0, __v: 0, settings: 0
+        password: 0, __v: 0, settings: 0,
       });
       if (user) {
         return res.status(200).send(user);
@@ -202,7 +203,7 @@ router.route('/email').post(async (req, res) => {
   const emailSchema = Joi.object({
     email: Joi.string()
       .email()
-      .required()
+      .required(),
   });
   const { error } = emailSchema.validate(req.body);
 

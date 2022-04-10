@@ -16,13 +16,13 @@ const Minimap = ({ overlay }: MinimapProps) => {
   const [tempBall, setTempBall] = useState([]);
   const [tempTimeout, setTemptimeout] = useState(null);
 
-  useEffect(() => {
-    updatePositions();
+  // useEffect(() => {
+  //   // updatePositions();
 
-    return () => {
-      clearTimeout(tempTimeout);
-    };
-  }, []);
+  //   return () => {
+  //     clearTimeout(tempTimeout);
+  //   };
+  // }, []);
 
   const updatePositions = () => {
     setTempDetections(tempDetections.map((detection) => ({

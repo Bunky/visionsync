@@ -6,15 +6,18 @@ import {
   IoBarChart,
   IoVideocam
 } from 'react-icons/io5';
+import { format } from 'date-fns';
 import VideoMenu from './VideoMenu';
 import useMatches from '../../../../hooks/useMatches';
 import useViewMatchModal from '../../../../hooks/Matches/useViewMatchModal';
+import useStartAnalysis from '../../../../hooks/useStartAnalysis';
 
 const VideoTable = () => {
   const { data: matches, status: matchesStatus } = useMatches();
   const [, setState] = useViewMatchModal();
+  const useStart = useStartAnalysis();
 
-  if (matchesStatus === 'loading' || matches === undefined) {
+  if (matchesStatus === 'loading') {
     return (<Center sx={{ height: '100%' }}><Loader /></Center>);
   }
 
@@ -35,19 +38,17 @@ const VideoTable = () => {
           </tr>
         </thead>
         <tbody>
-          {matches.map((match) => (
+          {matches && matches.map((match) => (
             <tr key={match.matchId} style={{ position: 'relative' }}>
               <LoadingOverlay visible={match.loading} />
               <td>
-                {match.thumbnail && (
-                  <AspectRatio ratio={16 / 9} sx={{ width: 100 }}>
-                    <Image src={match.thumbnail} radius="md" />
-                  </AspectRatio>
-                )}
+                <AspectRatio ratio={16 / 9} sx={{ width: 100 }}>
+                  <Image src={`http://d1pu8bxuwsqdvz.cloudfront.net/thumbnails/${match.matchId}.png`} radius="md" />
+                </AspectRatio>
               </td>
               <td>{match.title}</td>
               {/* <td>{match.length}</td> */}
-              <td>{match.createdAt}</td>
+              <td>{format(new Date(match.createdAt), 'dd/MM/yyyy HH:mm')}</td>
               <td>
                 {!match.loading && (
                   <Group position="right">
@@ -62,6 +63,7 @@ const VideoTable = () => {
                       Watch
                     </Button>
                     <Button
+                      onClick={() => useStart.mutate(match.matchId)}
                       leftIcon={<IoBarChart />}
                       compact
                     >

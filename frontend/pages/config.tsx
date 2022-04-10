@@ -6,8 +6,10 @@ import {
   IoCodeSlashSharp,
   IoLinkOutline,
   IoMan,
-  IoPeople, IoTv
+  IoPeople, IoSyncCircle, IoTv
 } from 'react-icons/io5';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import CrowdMaskSettings from '../components/Layout/Pages/Config/Settings/CrowdMaskSettings';
 import Preview from '../components/Layout/Pages/Config/Preview/Preview';
 import PlayerMaskSettings from '../components/Layout/Pages/Config/Settings/PlayerMaskSettings';
@@ -15,10 +17,19 @@ import CannySettings from '../components/Layout/Pages/Config/Settings/CannySetti
 import HoughSettings from '../components/Layout/Pages/Config/Settings/HoughSettings';
 import useConfig from '../hooks/useConfig';
 import useUpdateConfig from '../hooks/useUpdateConfig';
+import useAnalysis from '../hooks/useAnalysis';
 
 const Config = () => {
-  const updateConfig = useUpdateConfig();
+  const { data: analysis, status: analysisStatus } = useAnalysis();
   const { data: config, status: configStatus } = useConfig();
+  const updateConfig = useUpdateConfig();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (analysisStatus === 'success' && !analysis.active) {
+      router.push('/');
+    }
+  }, [analysis, analysisStatus, router]);
 
   const updatePreview = (index) => {
     if (config.preview.follow) {
@@ -36,6 +47,15 @@ const Config = () => {
         case 3:
           stage = 'lines';
           break;
+        case 4:
+          stage = 'intersections';
+          break;
+        case 5:
+          stage = 'homography';
+          break;
+        case 6:
+          stage = 'detections';
+          break;
         default:
           break;
       }
@@ -45,12 +65,16 @@ const Config = () => {
     }
   };
 
-  if (configStatus === 'loading' || config === undefined) {
+  if (configStatus === 'loading' || analysisStatus === 'loading') {
     return (<Center sx={{ height: '100%' }}><Loader /></Center>);
   }
 
-  if (configStatus === 'error') {
+  if (configStatus === 'error' || analysisStatus === 'error') {
     return (<Center sx={{ height: '100%' }}>Error</Center>);
+  }
+
+  if (!analysis.active) {
+    return (<Center sx={{ height: '100%' }}>No active analysis</Center>);
   }
 
   return (
@@ -79,6 +103,7 @@ const Config = () => {
               <Tabs.Tab label="Canny" icon={<IoLinkOutline />}><CannySettings /></Tabs.Tab>
               <Tabs.Tab label="Hough Transform" icon={<IoTv />}><HoughSettings /></Tabs.Tab>
               <Tabs.Tab label="Line Classification" icon={<IoCodeSlashSharp />}>Sliders to define lines etc</Tabs.Tab>
+              <Tabs.Tab label="Intersections" icon={<IoSyncCircle />}>Intersections</Tabs.Tab>
             </Tabs>
             {/* <Divider orientation='vertical' /> */}
           </Group>

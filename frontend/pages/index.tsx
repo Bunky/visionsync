@@ -8,9 +8,9 @@ import NewMatchModal from '../components/Layout/Pages/Matches/NewMatchModal';
 import ViewMatchModal from '../components/Layout/Pages/Matches/ViewMatchModal';
 
 const Home = () => {
-  const { data: analysis, status: analysisStatus } = useAnalysis();
+  const { status: analysisStatus } = useAnalysis();
 
-  if (analysisStatus === 'loading' || analysis === undefined) {
+  if (analysisStatus === 'loading') {
     return (<Center sx={{ height: '100%' }}><Loader /></Center>);
   }
 

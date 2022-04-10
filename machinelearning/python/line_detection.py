@@ -35,6 +35,8 @@ def main():
   while True:
     start_time = time.time()
     ret, frame = video.read()
+    
+    frame = cv.resize(frame, resolution, interpolation=cv.INTER_CUBIC)
    
     # Processing
     # if cv.waitKey(1) == ord("w"):
@@ -256,16 +258,16 @@ def apply_homography(frame, matrix, transformed_detections, src_pts):
     elif detection["class"] == 2:
       cv.circle(biv_frame, (int(detection["x"]), int(detection["y"])), 3, detection['colour'], 4, cv.LINE_AA)
 
-  frame_compare = cv.hconcat([frame, warped_frame, biv_frame])
-  for i in range(len(src_pts)):
-    pt1 = np.array([src_pts[i][0], src_pts[i][1], 1])
-    pt1 = pt1.reshape(3, 1)
-    pt2 = np.dot(matrix, pt1)
-    pt2 = pt2/pt2[2]
-    end = (int(frame.shape[1] + pt2[0]), int(pt2[1]))
-    cv.line(frame_compare, tuple([int(j) for j in src_pts[i]]), end, (255, 255, 255), 2, cv.LINE_AA)
+  # frame_compare = cv.hconcat([frame, warped_frame, biv_frame])
+  # for i in range(len(src_pts)):
+  #   pt1 = np.array([src_pts[i][0], src_pts[i][1], 1])
+  #   pt1 = pt1.reshape(3, 1)
+  #   pt2 = np.dot(matrix, pt1)
+  #   pt2 = pt2/pt2[2]
+  #   end = (int(frame.shape[1] + pt2[0]), int(pt2[1]))
+  #   cv.line(frame_compare, tuple([int(j) for j in src_pts[i]]), end, (255, 255, 255), 2, cv.LINE_AA)
   
-  cv.imshow("Homography", frame_compare)
+  # cv.imshow("Homography", frame_compare)
 
 def transform_detections(detections, matrix):
   transformed_detection = []
@@ -1148,11 +1150,11 @@ def create_windows():
   add_inputs()
 
 def get_source():
-  cap = cv.VideoCapture(0)
+  cap = cv.VideoCapture('N:/Uni/Disertation/Data/videos/manutd.mp4')
   if not cap.isOpened():
     print("Cannot open camera")
     exit()
-      
+  
   cap.set(cv.CAP_PROP_FRAME_WIDTH, resolution[0])
   cap.set(cv.CAP_PROP_FRAME_HEIGHT, resolution[1])
       

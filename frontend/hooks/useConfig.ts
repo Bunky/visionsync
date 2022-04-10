@@ -99,7 +99,11 @@ type Config = {
     maxLineGap: number;
     resolution: number;
     rho: number;
-    prune: boolean;
+    prune: {
+      enabled: boolean;
+      minDistance: number;
+      minAngle: number;
+    }
   }
 };
 

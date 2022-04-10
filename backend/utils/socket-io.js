@@ -13,7 +13,7 @@ exports.socketConnection = (server) => {
     });
 
     socket.on('disconnect', () => {
-      conectedClient = conectedClient.filter(client => client !== connectionId);
+      conectedClient = conectedClient.filter((client) => client !== connectionId);
       console.info(`Client disconnected [${connectionId}]`);
     });
   });
