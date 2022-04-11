@@ -1,37 +1,35 @@
 import { useEffect } from 'react';
 import styled from 'styled-components';
-// import Webcam from 'react-webcam';
 import Minimap from '../Minimap/Minimap';
 import useLiveSocket from '../../../../../hooks/useLiveSocket';
 import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
-import { parseRelativeUrl } from 'next/dist/shared/lib/router/utils/parse-relative-url';
 
 const Livefeed = () => {
   const live = useLiveSocket();
-  const detections = useDetectionSocket();
+  // const { detections } = useDetectionSocket();
 
   useEffect(() => {
     document.getElementById('live').setAttribute('src', `data:image/jpeg;base64,${live}`);
   }, [live]);
 
-  // useEffect(() => {
-  //   console.log(detections);
-  // }, [detections]);
-
   return (
     <Container>
-      {/* <Webcam
-        width="100%"
-        videoConstraints={{
-          width: 1280,
-          height: 720,
-          facingMode: 'user'
-        }}
-      /> */}
       <Live id="live" width="640" height="360" />
-      <DetectionsOverlay>
-        {detections.map((detection) => <DetectionBox id={`${detection.class}+${detection.score}`} klass={detection.class} score={detection.score} position={detection.boundingBox} />)}
-      </DetectionsOverlay>
+      {/* <DetectionsOverlay>
+        {detections.map((detection) => (
+          <DetectionBox
+            id={`${detection.name}+${detection.score}`}
+            klass={detection.name}
+            score={detection.confidence}
+            position={[
+              detection.xmin / 640,
+              detection.ymin / 360,
+              detection.xmax / 640,
+              detection.ymax / 360
+            ]}
+          />
+        ))}
+      </DetectionsOverlay> */}
       <MinimapOverlay>
         <Minimap overlay />
       </MinimapOverlay>

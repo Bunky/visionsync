@@ -30,6 +30,30 @@ exports.startAnalysis = async (room, matchId) => {
       if (message.type === 'info') {
         console.log(message.data);
       }
+      if (message.type === 'detections') {
+        const detections = JSON.parse(`[${message.data}]`);
+        // {
+        //   xmin: 51.7733421326,
+        //   ymin: 117.6339874268,
+        //   xmax: 62.0035743713,
+        //   ymax: 138.821395874,
+        //   confidence: 0.7156005502,
+        //   class: 0,
+        //   name: 'player',
+        //   colour: [ 0, 0, 255 ]
+        // },
+        sendMessage(room, 'detections', detections);
+      }
+      if (message.type === 'positions') {
+        const positions = JSON.parse(message.data);
+        // {
+        //   class
+        //   colour
+        //   x
+        //   y
+        // }
+        sendMessage(room, 'positions', positions);
+      }
     });
   });
   pythonProcess.stderr.on('data', (data) => {

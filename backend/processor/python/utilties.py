@@ -254,8 +254,8 @@ def transform_detections(matrix, detections):
     transformed_detections.append({
       "class": detection['class'],
       "colour": detection['colour'],
-      "x": feet_converted[0][0][0],
-      "y": feet_converted[0][0][1]
+      "x": float(feet_converted[0][0][0]),
+      "y": float(feet_converted[0][0][1])
     })
     
   return transformed_detections
@@ -381,7 +381,7 @@ class HoughBundler:
 class ThreadedCamera(object):
   def __init__(self, src=0):
     self.capture = cv.VideoCapture(src)
-    self.capture.set(cv.CAP_PROP_BUFFERSIZE, 2)
+    # self.capture.set(cv.CAP_PROP_BUFFERSIZE, 2)
 
     # FPS = 1/desired FPS
     self.FPS = 1/30
@@ -395,7 +395,7 @@ class ThreadedCamera(object):
     while True:
       if self.capture.isOpened():
         (self.status, self.frame) = self.capture.read()
-        time.sleep(self.FPS)
+      time.sleep(self.FPS)
     
   def get_frame(self):
     return self.frame

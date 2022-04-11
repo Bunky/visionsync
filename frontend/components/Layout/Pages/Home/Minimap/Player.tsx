@@ -6,10 +6,12 @@ import { motion } from 'framer-motion';
 import usePlayerStatModal from '../../../../../hooks/usePlayerStatModal';
 
 interface PlayerProps {
+  id: string;
   player: {
-    coordinates: Array<number>;
-    name: string;
-    position: string;
+    class: string;
+    colour: Array<number>;
+    x: number;
+    y: number;
   };
   playerId: number;
   color: string;
@@ -19,9 +21,10 @@ const Player = ({ playerId, color, player }: PlayerProps) => {
   const [state, setState] = usePlayerStatModal();
 
   return (
-    <Container position={player.coordinates}>
+    <Container position={[player.x / 640, player.y / 360]}>
       <Tooltip
-        label={(player.name).toUpperCase()}
+        label={(player.class)}
+        // .toUpperCase()
         transition="pop"
         color={color}
         transitionDuration={100}
@@ -52,8 +55,8 @@ const Container = styled(motion.div).attrs(({ position }) => ({
     duration: 1
   },
   animate: {
-    left: `${position[0]}%`,
-    top: `${position[1]}%`,
+    left: `${position[0] * 100}%`,
+    top: `${position[1] * 100}%`,
     x: '-1rem',
     y: '-1rem'
   }

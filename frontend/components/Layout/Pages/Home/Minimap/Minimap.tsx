@@ -1,20 +1,22 @@
-import { useEffect, useState } from 'react';
+// import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   Image
 } from '@mantine/core';
 import Player from './Player';
-import Ball from './Ball';
-import useTempDetections from '../../../../../hooks/useTempDetections';
+// import Ball from './Ball';
+// import useTempDetections from '../../../../../hooks/useTempDetections';
+import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
 
 interface MinimapProps {
   overlay?: boolean;
 }
 
 const Minimap = ({ overlay }: MinimapProps) => {
-  const [tempDetections, setTempDetections] = useTempDetections();
-  const [tempBall, setTempBall] = useState([]);
-  const [tempTimeout, setTemptimeout] = useState(null);
+  // const [tempDetections, setTempDetections] = useTempDetections();
+  // const [tempBall, setTempBall] = useState([]);
+  // const [tempTimeout, setTemptimeout] = useState(null);
+  const { positions } = useDetectionSocket();
 
   // useEffect(() => {
   //   // updatePositions();
@@ -24,16 +26,16 @@ const Minimap = ({ overlay }: MinimapProps) => {
   //   };
   // }, []);
 
-  const updatePositions = () => {
-    setTempDetections(tempDetections.map((detection) => ({
-      coordinates: [Math.random() * 100, Math.random() * 100],
-      name: detection.name,
-      position: detection.position
-    })));
-    setTempBall([Math.random() * 100, Math.random() * 100]);
+  // const updatePositions = () => {
+  //   setTempDetections(tempDetections.map((detection) => ({
+  //     coordinates: [Math.random() * 100, Math.random() * 100],
+  //     name: detection.name,
+  //     position: detection.position
+  //   })));
+  //   setTempBall([Math.random() * 100, Math.random() * 100]);
 
-    setTemptimeout(setTimeout(() => updatePositions(), 2500));
-  };
+  //   setTemptimeout(setTimeout(() => updatePositions(), 2500));
+  // };
 
   return (
     <Container overlay={overlay}>
@@ -43,10 +45,15 @@ const Minimap = ({ overlay }: MinimapProps) => {
         alt="Football pitch"
       />
       <PlayerContainer>
-        {tempDetections.map((player, index) => (
-          <Player id={`playerIcon-${index}`} color={index % 2 ? 'red' : 'blue'} playerId={index} player={player} />
+        {positions.map((player, index) => (
+          <Player
+            id={`playerIcon-${index}`}
+            color={index % 2 ? 'red' : 'blue'}
+            playerId={index}
+            player={player}
+          />
         ))}
-        <Ball position={tempBall} />
+        {/* <Ball position={tempBall} /> */}
       </PlayerContainer>
     </Container>
   );

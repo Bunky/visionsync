@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import find_peaks, peak_widths
 # import tensorflow_hub as hub
 import json
+import time
 
 import tensorflow as tf
 from matplotlib import pyplot as plt
@@ -41,12 +42,14 @@ def main():
   # Stores last detected homography matrix
   last_matrix = False
 
+  detections_limit_time = int(round(time.time() * 1000))
+  positions_limit_time = int(round(time.time() * 1000))
   while True:
     try:
       # Get latest settings
       settings = r.json().get(f"{matchId}:jsondata")
-      
-      # start_time = time.time()
+
+      # Get latest frame     
       frame = threaded_camera.get_frame()
       
       message = []
@@ -57,7 +60,6 @@ def main():
       
       # Player detection with YOLOv5 custom model
       detections, detections_frame = stages.detect_players(settings, frame, model)
-      # detections = []
 
       # Auto colour Processing
       # h, s, v = get_histogram(frame)
@@ -72,12 +74,7 @@ def main():
       biv_detections, homography_frame, matrix = stages.apply_homography(settings, frame, intersections, detections, last_matrix)
       
       last_matrix = matrix
-        
-      # sys.stdout.write(json.dumps({
-      #   "type": "info",
-      #   "data": lines
-      # }))
-           
+          
       if settings["preview"]["enabled"]:
         if settings["preview"]["stage"] == "detections":
           message.append({
@@ -119,17 +116,34 @@ def main():
             "type": "preview",
             "data": utils.get_base64_from_frame(homography_frame)
           })
+          
+      current_ms = int(round(time.time() * 1000))
+      # message.append({
+      #   "type": "info",
+      #   "data": current_ms # f"FPS: {str(1.0 / (time.time() - start_time))}"
+      # })
+
+      if detections_limit_time + 1000 < current_ms:
+        detections_message = []
+        for detection in detections:
+          detections_message.append(detection.to_json())
+
+        message.append({
+          "type": "detections",
+          "data": detections_message
+        })
+        detections_limit_time = current_ms
+
+      if positions_limit_time + 200 < current_ms:
+        message.append({
+          "type": "positions",
+          "data": json.dumps(biv_detections)
+        })
+        positions_limit_time = current_ms
 
       sys.stdout.write(json.dumps(message))
       sys.stdout.flush()
-           
-      #   if len(src_pts) > 0:
-      #     transformed_detections = transform_detections(detections, matrix)
-      #     apply_homography(frame, matrix, transformed_detections, src_pts)
-      #     last_matrix = matrix
-      #   elif type(last_matrix) != bool:
-      #     transformed_detections = transform_detections(detections, last_matrix)
-      #     apply_homography(frame, last_matrix, transformed_detections, src_pts)
+
     except AttributeError:
       pass
 

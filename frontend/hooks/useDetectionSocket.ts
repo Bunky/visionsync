@@ -7,6 +7,7 @@ const useDetectionSocket = () => {
   const queryClient = useQueryClient();
   const { data: user, status: userStatus } = useUser();
   const [detections, setDetections] = useState([]);
+  const [positions, setPositions] = useState([]);
 
   useEffect(() => {
     if (userStatus === 'success' && user && !user.unauthorised) {
@@ -22,13 +23,18 @@ const useDetectionSocket = () => {
         setDetections(data);
       });
 
+      socket.on('positions', (data) => {
+        console.log(data);
+        setPositions(data);
+      });
+
       return () => {
         socket.disconnect();
       };
     }
   }, [queryClient, user, userStatus]);
 
-  return detections;
+  return { detections, positions };
 };
 
 export default useDetectionSocket;

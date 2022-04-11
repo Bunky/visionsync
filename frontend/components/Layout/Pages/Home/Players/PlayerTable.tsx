@@ -4,7 +4,8 @@ import {
 import { IoVideocam } from 'react-icons/io5';
 import PlayerMenu from './PlayerMenu';
 import usePlayerStatModal from '../../../../../hooks/usePlayerStatModal';
-import useTempDetections from '../../../../../hooks/useTempDetections';
+// import useTempDetections from '../../../../../hooks/useTempDetections';
+import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -28,14 +29,15 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const PlayerTable = () => {
-  const [tempDetections] = useTempDetections();
+  // const [tempDetections] = useTempDetections();
+  const { detections } = useDetectionSocket();
   const [, setState] = usePlayerStatModal();
   const { classes, cx } = useStyles();
 
-  const rows = tempDetections.map((player, index) => (
-    <tr key={player.name}>
+  const rows = detections.map((player, index) => (
+    <tr key={`${player.name}-${player.confidence}`}>
       <td>{player.name}</td>
-      <td>{player.position}</td>
+      <td>{player.confidence}</td>
       <td>
         <Group position="right">
           <Button
@@ -60,7 +62,7 @@ const PlayerTable = () => {
         <thead className={cx(classes.header)}>
           <tr>
             <th>Player</th>
-            <th>Position</th>
+            <th>Confidence</th>
             <th>
               <Group position="right">
                 Actions
