@@ -67,6 +67,7 @@ def main():
       player_mask, player_mask_frame = stages.generate_player_mask(settings, frame)
       canny, canny_frame = stages.generate_canny(settings, frame, crowd_mask, player_mask)
       lines, lines_frame = stages.generate_lines(settings, frame, canny)
+      # circles, circles_frame = stages.generate_circles(settings, frame, canny)
       intersections, intersections_frame = stages.generate_intersections(settings, frame, lines)
       biv_detections, homography_frame, matrix = stages.apply_homography(settings, frame, intersections, detections, last_matrix)
       
@@ -103,6 +104,11 @@ def main():
             "type": "preview",
             "data": utils.get_base64_from_frame(lines_frame)
           })
+        # elif settings["preview"]["stage"] == "circles":
+        #   message.append({
+        #     "type": "preview",
+        #     "data": utils.get_base64_from_frame(circles_frame)
+        #   })
         elif settings["preview"]["stage"] == "intersections":
           message.append({
             "type": "preview",

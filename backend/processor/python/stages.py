@@ -12,7 +12,7 @@ def detect_players(settings, frame, model):
   
   # Preview 
   if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'detections'):
-    preview = frame
+    preview = frame.copy()
     for detection in detections:
       bb.add(preview, detection['xmin'], detection['ymin'], detection['xmax'], detection['ymax'], detection['name'], "purple")
       cv.circle(preview, (int(detection['xmin'] + ((detection['xmax'] - detection['xmin']) / 2)), int(detection["ymax"])), 2, detection['colour'], 2, cv.LINE_AA)
@@ -64,7 +64,8 @@ def generate_crowd_mask(settings, frame):
   # Preview 
   if settings["preview"]["enabled"] and settings["preview"]["stage"] == 'crowdMask':
     if settings["crowdMask"]["overlap"]:
-      preview = cv.bitwise_and(frame, frame, mask=crowd_mask)
+      preview = frame.copy()
+      preview = cv.bitwise_and(preview, preview, mask=crowd_mask)
     else:
       preview = crowd_mask
   else:
@@ -115,7 +116,8 @@ def generate_player_mask(settings, frame):
   # Preview 
   if settings["preview"]["enabled"] and settings["preview"]["stage"] == 'playerMask':
     if settings["playerMask"]["overlap"]:
-      preview = cv.bitwise_and(frame, frame, mask=player_mask)
+      preview = frame.copy()
+      preview = cv.bitwise_and(preview, preview, mask=player_mask)
     else:
       preview = player_mask
   else:
@@ -191,7 +193,8 @@ def generate_canny(settings, frame, crowd_mask, player_mask):
       else:
         inverted_canny = 255 - canny
 
-      preview = cv.bitwise_and(frame, frame, mask=inverted_canny)
+      preview = frame.copy()
+      preview = cv.bitwise_and(preview, preview, mask=inverted_canny)
     else:
       if settings["canny"]["masked"]:
         preview = masked_canny
@@ -227,7 +230,8 @@ def generate_lines(settings, frame, canny):
   
   # Preview 
   if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'lines'):
-    preview = utils.draw_lines(classified_lines, frame)
+    preview = frame.copy()
+    preview = utils.draw_lines(classified_lines, preview)
   else:
     preview = False
     
@@ -287,7 +291,8 @@ def generate_intersections(settings, frame, lines):
             
   # Preview 
   if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'intersections'):
-    preview = utils.draw_intersections(intersections, frame)
+    preview = frame.copy()
+    preview = utils.draw_intersections(intersections, preview)
   else:
     preview = False
   return intersections, preview
@@ -354,7 +359,8 @@ def apply_homography(settings, frame, intersections, detections, last_matrix):
   
   # Preview 
   if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'homography'):
-    preview = cv.warpPerspective(frame, H, dsize=resolution, flags=cv.INTER_NEAREST, borderMode=cv.BORDER_CONSTANT, borderValue=0)
+    preview = frame.copy()
+    preview = cv.warpPerspective(preview, H, dsize=resolution, flags=cv.INTER_NEAREST, borderMode=cv.BORDER_CONSTANT, borderValue=0)
 
     # Draw destination intersections
     for intersection in utils.intersection_dict:

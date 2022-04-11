@@ -201,6 +201,17 @@ def draw_lines(lines, frame):
       
   return frame
 
+def draw_circles(circles, frame):
+  if circles is not None:
+    for i in circles[0, :]:
+      center = (i[0], i[1])
+      # circle center
+      cv.circle(frame, center, 1, (0, 100, 100), 3)
+      # circle outline
+      radius = i[2]
+      cv.circle(frame, center, radius, (255, 0, 255), 3)
+  return frame
+
 def get_intersection(line1, line2):
   line1 = [line1["point1"], line1["point2"]]
   line2 = [line2["point1"], line2["point2"]]
