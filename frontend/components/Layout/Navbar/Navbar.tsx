@@ -1,5 +1,6 @@
 import { Navbar as NavbarContainer, Group } from '@mantine/core';
 import {
+  IoBarChartOutline,
   IoHomeOutline, IoSettingsOutline
 } from 'react-icons/io5';
 import Route from './Route';
@@ -10,6 +11,7 @@ const Navbar = ({ open }) => (
       <Route to="/" icon={<IoHomeOutline />}>Matches</Route>
       {/* <Route to="/analysis" icon={<IoBarChartOutline />}>Analysis</Route>
       <Route to="/config" icon={<IoMagnetOutline />}>Config</Route> */}
+      <Route to="/analyses" icon={<IoBarChartOutline />}>Analyses</Route>
       <Route to="/settings" icon={<IoSettingsOutline />}>Settings</Route>
     </Group>
   </NavbarContainer>

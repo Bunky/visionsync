@@ -48,12 +48,15 @@ const Config = () => {
           stage = 'lines';
           break;
         case 4:
-          stage = 'intersections';
+          stage = 'circles';
           break;
         case 5:
-          stage = 'homography';
+          stage = 'intersections';
           break;
         case 6:
+          stage = 'homography';
+          break;
+        case 7:
           stage = 'detections';
           break;
         default:

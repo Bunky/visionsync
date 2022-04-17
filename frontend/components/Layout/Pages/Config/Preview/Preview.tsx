@@ -44,6 +44,7 @@ const Preview = () => {
                   { value: 'playerMask', label: 'Player Mask' },
                   { value: 'canny', label: 'Canny' },
                   { value: 'lines', label: 'Hough Transform' },
+                  { value: 'circles', label: 'Hough Circles' },
                   { value: 'intersections', label: 'Intersections' },
                   { value: 'homography', label: 'Homography' },
                   { value: 'detections', label: 'Players' }

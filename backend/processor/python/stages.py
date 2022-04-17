@@ -237,6 +237,39 @@ def generate_lines(settings, frame, canny):
     
   return classified_lines, preview
 
+def generate_circles(settings, frame, canny):
+  # Settings
+  # threshold = settings["lines"]["threshold"]
+  # min_line_length = settings["lines"]["minLineLength"]
+  # max_line_gap = settings["lines"]["maxLineGap"]
+  # resolution = settings["lines"]["resolution"]
+  # rho = settings["lines"]["rho"]
+
+  # min_distance = settings["lines"]["prune"]["minDistance"]
+  # min_angle = settings["lines"]["prune"]["minAngle"]
+
+  # Apply hough
+  circles = cv.HoughCircles(canny, cv.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=0)
+  if circles is not None:
+    circles = np.uint16(np.around(circles))
+  
+  # # Prune lines
+  # if settings["lines"]["prune"]["enabled"]:
+  #   bundler = utils.HoughBundler(min_distance, min_angle)
+  #   lines = bundler.process_lines(lines)
+    
+  # # Classify lines
+  # classified_lines = utils.classify_lines(lines)
+  
+  # Preview 
+  if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'circles'):
+    preview = frame.copy()
+    preview = utils.draw_circles(circles, preview)
+  else:
+    preview = False
+    
+  return circles, preview
+
 def generate_intersections(settings, frame, lines):
   intersections = []
   h_lines = []
@@ -318,7 +351,10 @@ def apply_homography(settings, frame, intersections, detections, last_matrix):
           # break
       
       if len(temp_dest) == 0:
-        return False, [], last_matrix
+        noHomographyPreview = False
+        if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'homography'):
+          cv.putText(noHomographyPreview, "No homography applied", (10, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv.LINE_AA)
+        return [], noHomographyPreview, last_matrix
     destination = np.array(destination)
 
     # Make sure destination points are not all on same axis
@@ -336,7 +372,10 @@ def apply_homography(settings, frame, intersections, detections, last_matrix):
       tmp_y = pnt[1]
       
     if tmp_x_axis_check == False or tmp_y_axis_check == False:
-      return False, [], last_matrix
+      noHomographyPreview = False
+      if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'homography'):
+        cv.putText(noHomographyPreview, "No homography applied", (10, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv.LINE_AA)
+      return [], noHomographyPreview, last_matrix
 
     # Reshape for homography
     src_pts = np.array(source).reshape(-1,1,2)
@@ -345,6 +384,7 @@ def apply_homography(settings, frame, intersections, detections, last_matrix):
     H, _ = cv.findHomography(src_pts, dst_pts)
   
   # Apply homography matrix to detections
+  transformed_detections = []
   if len(src_pts) > 0:
     transformed_detections = utils.transform_detections(H, detections)
     last_matrix = H
