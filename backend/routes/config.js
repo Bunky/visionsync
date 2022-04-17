@@ -14,7 +14,7 @@ router.route('/').get(async (req, res) => {
   if (req.isAuthenticated()) {
     if (isActive(req.user._id)) {
       const active = getActive(req.user._id);
-      return res.status(200).send(await getJsonValue(active.matchId));
+      return res.status(200).send(await getJsonValue(`${active.matchId}-settings`));
     }
     const user = await User.findById(req.user._id);
     return res.status(200).send(user.settings);
@@ -31,10 +31,10 @@ router.route('/').post(async (req, res) => {
     if (isActive(req.user._id)) {
       const active = getActive(req.user._id);
 
-      const currentSettings = await getJsonValue(active.matchId);
+      const currentSettings = await getJsonValue(`${active.matchId}-settings`);
       const newSettings = _.merge(currentSettings, req.body);
 
-      await setJsonValue(active.matchId, newSettings);
+      await setJsonValue(`${active.matchId}-settings`, newSettings);
       return res.status(200).send(newSettings);
     }
     const user = await User.findById(req.user._id);

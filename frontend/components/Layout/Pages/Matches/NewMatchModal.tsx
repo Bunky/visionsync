@@ -1,21 +1,24 @@
 import { useState } from 'react';
 import {
-  Button, Group, Modal, TextInput, Text
+  Button, Group, Modal, TextInput, Text, Select
 } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { useForm } from '@mantine/hooks';
 import { IoCloudUpload, IoStop } from 'react-icons/io5';
 import useUploadFile from '../../../../hooks/useUploadFile';
+import useConfigs from '../../../../hooks/Configs/useConfigs';
 
 const NewMatchModal = () => {
   const uploadFile = useUploadFile();
+  const { data: configs, status: configsStatus } = useConfigs();
 
   const [opened, setOpened] = useState(false);
   const [error, setError] = useState(null);
   const [files, setFiles] = useState(null);
   const form = useForm({
     initialValues: {
-      title: ''
+      title: '',
+      config: ''
     },
     validationRules: {
       title: (value) => /^.{5,35}$/.test(value),
@@ -32,6 +35,7 @@ const NewMatchModal = () => {
       const formData = new FormData();
       formData.append('match', files[0]);
       formData.append('title', form.values.title);
+      formData.append('config', form.values.config);
       uploadFile.mutate(formData);
 
       handleClose();
@@ -65,6 +69,12 @@ const NewMatchModal = () => {
             label="Title"
             placeholder=""
             {...form.getInputProps('title')}
+          />
+          <Select
+            label="Config"
+            placeholder="Select a config"
+            data={configsStatus === 'success' ? configs.map((config) => ({ value: config._id, label: config._id })) : []}
+            {...form.getInputProps('config')}
           />
           {files === null ? (
             <Dropzone

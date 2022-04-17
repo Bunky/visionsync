@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const { Readable, PassThrough } = require('stream');
 const Match = require('../models/match.model');
+const Config = require('../models/config.model');
 const defaultSettings = require('../processor/defaultSettings.json');
 
 // aws stuff
@@ -79,11 +80,16 @@ router.route('/upload').post(async (req, res) => {
         Body: passthroughStream
       }).promise();
 
+      let config = defaultSettings;
+      if (req.body.config) {
+        config = (await Config.findById(req.body.config)).config;
+      }
+
       const newMatch = new Match({
         matchId,
         ownerId: req.user._id,
         title: req.body.title,
-        settings: defaultSettings,
+        settings: config,
       });
 
       await newMatch.save();
