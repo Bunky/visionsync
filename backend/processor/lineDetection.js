@@ -6,6 +6,7 @@ const { sendMessage, isConnected } = require('../utils/socket-io');
 const Match = require('../models/match.model');
 const { setJsonValue, getJsonValue, delJsonValue } = require('../utils/redis');
 const { uploadAnalysis } = require('../utils/analysis');
+const { uploadConfig } = require('../utils/configs');
 
 let activeAnalysis = []; // Change this so it uses redis instead of a variable!
 
@@ -87,6 +88,7 @@ exports.stopAnalysis = async (matchId) => {
   match.settings = await getJsonValue(`${matchId}-settings`);
   const analysis = await getJsonValue(`${matchId}-analysis`);
   await uploadAnalysis(matchId, match.ownerId, analysis, match.settings);
+  await uploadConfig(match.ownerId, match.settings);
   await match.save();
   await delJsonValue(`${matchId}-settings`);
   await delJsonValue(`${matchId}-analysis`);

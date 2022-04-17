@@ -1,7 +1,7 @@
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const AWS = require('aws-sdk');
-const Analysis = require('../models/analysis.model');
+const Config = require('../models/config.model');
 
 // aws stuff
 const s3 = new AWS.S3({
@@ -13,21 +13,20 @@ AWS.config.update({
 });
 
 // =================================================================================================
-//                                           Upload Analysis
+//                                           Upload Config
 // =================================================================================================
 
-exports.uploadAnalysis = (matchId, ownerId, data, settings) => new Promise(async (resolve, reject) => {
-  const newAnalysis = new Analysis({
-    matchId,
+exports.uploadConfig = (ownerId, data) => new Promise(async (resolve, reject) => {
+  const newConfig = new Config({
     ownerId,
-    settings,
+    config: data,
   });
-  const analysis = await newAnalysis.save();
+  const config = await newConfig.save();
 
   try {
     const s3Response = await s3.upload({
       Bucket: 'videos.visionsync.io',
-      Key: `analyses/${analysis._id}.json`,
+      Key: `configs/${config._id}.json`,
       Body: JSON.stringify(data),
       ContentType: 'application/json'
     }).promise();
@@ -35,23 +34,23 @@ exports.uploadAnalysis = (matchId, ownerId, data, settings) => new Promise(async
     resolve(s3Response);
   } catch (err) {
     console.log(err);
-    await Analysis.deleteOne({ _id: analysis._id });
+    await Config.deleteOne({ _id: config._id });
     reject(err);
   }
 });
 
 // =================================================================================================
-//                                           Delete Analysis
+//                                           Delete Config
 // =================================================================================================
 
-exports.deleteAnalysis = (analysisId) => new Promise(async (resolve, reject) => {
-  await Analysis.deleteOne({ analysisId });
+exports.deleteConfig = (configId) => new Promise(async (resolve, reject) => {
+  await Config.deleteOne({ configId });
 
   try {
     // Deleting files from the bucket
     const s3Response = s3.deleteObject({
       Bucket: 'videos.visionsync.io',
-      Key: `analyses/${analysisId}.json`
+      Key: `configs/${configId}.json`
     }).promise();
 
     resolve(s3Response);

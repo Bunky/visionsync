@@ -6,7 +6,7 @@ const {
   startAnalysis, getActive, isActive, stopAnalysis
 } = require('../processor/lineDetection');
 const Analysis = require('../models/analysis.model');
-const { uploadAnalysis } = require('../utils/analysis');
+const { uploadAnalysis, deleteAnalysis } = require('../utils/analysis');
 
 // aws stuff
 const s3 = new AWS.S3({
@@ -29,9 +29,9 @@ router.route('/upload').post(async (req, res) => {
       } = req.body;
       await uploadAnalysis(matchId, ownerId, data, settings);
 
-      res.sendStatus(200);
+      return res.sendStatus(200);
     } catch (err) {
-      res.sendStatus(500);
+      return res.sendStatus(500);
     }
   }
   return res.sendStatus(403);
@@ -57,21 +57,16 @@ router.route('/').get(async (req, res) => {
 
 router.route('/').delete(async (req, res) => {
   if (req.isAuthenticated()) {
-    const { analysisId } = req.body;
-    await Analysis.deleteOne({ analysisId });
-
-    // Deleting files from the bucket
-    const s3Response = s3.deleteObject({
-      Bucket: 'videos.visionsync.io',
-      Key: `analyses/${analysisId}.json`
-    }).promise();
-
-    return res.status(200).send({
-      jsonRes: s3Response
-    });
+    try {
+      await deleteAnalysis(req.body.analysisId);
+      return res.sendStatus(200);
+    } catch (err) {
+      return res.sendStatus(500);
+    }
   }
   return res.sendStatus(403);
 });
+
 // =================================================================================================
 //                                        Analysis Controls
 // =================================================================================================

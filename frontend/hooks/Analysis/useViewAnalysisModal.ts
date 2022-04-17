@@ -1,5 +1,5 @@
 import { useRecoilState, atom } from 'recoil';
-import viewAnalysisModelState from '../../atoms/viewAnalysisModelState';
+import viewAnalysisModelState from '../../atoms/viewAnalysisModalState';
 
 const useViewAnalysisModel = () => useRecoilState(atom(viewAnalysisModelState));
 
