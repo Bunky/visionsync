@@ -2,8 +2,7 @@ import { useQuery } from 'react-query';
 import fetchMatches from '../fetches/fetchMatches';
 
 type Match = {
-  matchId?: string;
-  thumbnail?: string;
+  _id?: string;
   title: string;
   loading?: boolean;
   createdAt: Date;

@@ -34,7 +34,7 @@ exports.uploadConfig = (ownerId, data) => new Promise(async (resolve, reject) =>
     resolve(s3Response);
   } catch (err) {
     console.log(err);
-    await Config.deleteOne({ _id: config._id });
+    await Config.findByIdAndDelete(config._id);
     reject(err);
   }
 });
@@ -44,7 +44,7 @@ exports.uploadConfig = (ownerId, data) => new Promise(async (resolve, reject) =>
 // =================================================================================================
 
 exports.deleteConfig = (configId) => new Promise(async (resolve, reject) => {
-  await Config.deleteOne({ configId });
+  await Config.findByIdAndDelete(configId);
 
   try {
     // Deleting files from the bucket

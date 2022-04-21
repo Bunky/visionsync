@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 import Minimap from '../Minimap/Minimap';
 import useLiveSocket from '../../../../../hooks/useLiveSocket';
-import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
+// import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
 
 const Livefeed = () => {
   const live = useLiveSocket();
@@ -57,23 +57,23 @@ const Live = styled.img`
   height: 100%;
 `;
 
-const DetectionsOverlay = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-`;
+// const DetectionsOverlay = styled.div`
+//   position: absolute;
+//   width: 100%;
+//   height: 100%;
+//   top: 0;
+//   left: 0;
+// `;
 
-const DetectionBox = styled.div`
-  position: absolute;
-  border-radius: 5px;
-  width: ${({ position }) => (position[2] - position[0]) * 100}%;
-  height: ${({ position }) => (position[3] - position[1]) * 100}%;
-  opacity: ${({ score }) => score};
-  border: solid 2px ${({ klass }) => (klass === 'player' ? 'red' : klass === 'ball' ? 'white' : 'green')};
-  left: ${({ position }) => position[0] * 100}%;
-  top: ${({ position }) => position[1] * 100}%;
-`;
+// const DetectionBox = styled.div`
+//   position: absolute;
+//   border-radius: 5px;
+//   width: ${({ position }) => (position[2] - position[0]) * 100}%;
+//   height: ${({ position }) => (position[3] - position[1]) * 100}%;
+//   opacity: ${({ score }) => score};
+//   border: solid 2px ${({ klass }) => (klass === 'player' ? 'red' : klass === 'ball' ? 'white' : 'green')};
+//   left: ${({ position }) => position[0] * 100}%;
+//   top: ${({ position }) => position[1] * 100}%;
+// `;
 
 export default Livefeed;

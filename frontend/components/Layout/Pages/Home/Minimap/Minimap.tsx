@@ -48,7 +48,6 @@ const Minimap = ({ overlay }: MinimapProps) => {
         {positions.map((player, index) => (
           <Player
             id={`playerIcon-${index}`}
-            color={index % 2 ? 'red' : 'blue'}
             playerId={index}
             player={player}
           />

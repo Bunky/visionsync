@@ -3,12 +3,6 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const matchSchema = new Schema({
-  matchId: {
-    type: String,
-    trim: true,
-    unique: true,
-    required: true
-  },
   ownerId: {
     type: String,
     trim: true,
@@ -19,7 +13,7 @@ const matchSchema = new Schema({
     trim: true,
     required: true
   },
-  settings: { }
+  config: { }
 }, {
   timestamps: true
 });

@@ -39,11 +39,11 @@ const VideoTable = () => {
         </thead>
         <tbody>
           {matches && matches.map((match) => (
-            <tr key={match.matchId} style={{ position: 'relative' }}>
+            <tr key={match._id} style={{ position: 'relative' }}>
               <LoadingOverlay visible={match.loading} />
               <td>
                 <AspectRatio ratio={16 / 9} sx={{ width: 100 }}>
-                  <Image src={`http://d1pu8bxuwsqdvz.cloudfront.net/thumbnails/${match.matchId}.png`} radius="md" />
+                  <Image src={`http://d1pu8bxuwsqdvz.cloudfront.net/thumbnails/${match._id}.png`} radius="md" />
                 </AspectRatio>
               </td>
               <td>{match.title}</td>
@@ -55,7 +55,7 @@ const VideoTable = () => {
                     <Button
                       onClick={() => setState({
                         open: true,
-                        matchId: match.matchId
+                        matchId: match._id
                       })}
                       leftIcon={<IoVideocam />}
                       compact
@@ -63,13 +63,13 @@ const VideoTable = () => {
                       Watch
                     </Button>
                     <Button
-                      onClick={() => useStart.mutate(match.matchId)}
+                      onClick={() => useStart.mutate(match._id)}
                       leftIcon={<IoBarChart />}
                       compact
                     >
                       Analyse
                     </Button>
-                    <VideoMenu matchId={match.matchId} />
+                    <VideoMenu matchId={match._id} />
                   </Group>
                 )}
               </td>

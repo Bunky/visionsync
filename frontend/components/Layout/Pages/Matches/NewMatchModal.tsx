@@ -35,7 +35,7 @@ const NewMatchModal = () => {
       const formData = new FormData();
       formData.append('match', files[0]);
       formData.append('title', form.values.title);
-      formData.append('config', form.values.config);
+      formData.append('configId', form.values.config);
       uploadFile.mutate(formData);
 
       handleClose();

@@ -32,7 +32,7 @@ def main():
   r = redis.Redis(host='localhost', port=6379, db=0)
 
   # Setup camera  
-  threaded_camera = utils.ThreadedCamera(f"http://d1pu8bxuwsqdvz.cloudfront.net/{matchId}.mp4")
+  threaded_camera = utils.ThreadedCamera(f"http://d1pu8bxuwsqdvz.cloudfront.net/matches/{matchId}.mp4")
 
   # module = None
   # if poses == True:

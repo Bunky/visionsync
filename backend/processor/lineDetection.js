@@ -14,8 +14,8 @@ exports.isActive = (room) => activeAnalysis.filter((analysis) => analysis.room =
 exports.getActive = (room) => activeAnalysis.filter((analysis) => analysis.room === room.toString())[0];
 
 exports.startAnalysis = async (room, matchId) => {
-  const match = await Match.findOne({ matchId });
-  await setJsonValue(`${matchId}-settings`, match.settings);
+  const match = await Match.findById(matchId);
+  await setJsonValue(`${matchId}-settings`, match.config);
   await setJsonValue(`${matchId}-analysis`, []);
 
   const pythonProcess = spawn('python', ['./processor/python/main.py', matchId]);
@@ -36,10 +36,10 @@ exports.startAnalysis = async (room, matchId) => {
       if (message.type === 'detections') {
         const detections = JSON.parse(`[${message.data}]`);
         // {
-        //   xmin: 51.7733421326,
-        //   ymin: 117.6339874268,
-        //   xmax: 62.0035743713,
-        //   ymax: 138.821395874,
+        //   xmin: 51.88,
+        //   ymin: 98.45,
+        //   xmax: 62.52,
+        //   ymax: 24.25,
         //   confidence: 0.7156005502,
         //   class: 0,
         //   name: 'player',

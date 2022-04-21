@@ -32,7 +32,7 @@ const AnalysesTable = () => {
         </thead>
         <tbody>
           {analyses && analyses.map((analysis) => (
-            <tr key={analysis.matchId} style={{ position: 'relative' }}>
+            <tr key={analysis._id} style={{ position: 'relative' }}>
               <td>{analysis.matchId}</td>
               <td>{analysis._id}</td>
               {/* <td>{analysis.length}</td> */}

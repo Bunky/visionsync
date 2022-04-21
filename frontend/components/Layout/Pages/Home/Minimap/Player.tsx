@@ -14,19 +14,17 @@ interface PlayerProps {
     y: number;
   };
   playerId: number;
-  color: string;
 }
 
-const Player = ({ playerId, color, player }: PlayerProps) => {
+const Player = ({ playerId, player }: PlayerProps) => {
   const [state, setState] = usePlayerStatModal();
 
   return (
-    <Container position={[player.x / 640, player.y / 360]}>
+    <Container player={player}>
       <Tooltip
         label={(player.class)}
         // .toUpperCase()
         transition="pop"
-        color={color}
         transitionDuration={100}
         gutter={16}
         styles={{
@@ -37,7 +35,7 @@ const Player = ({ playerId, color, player }: PlayerProps) => {
         <AspectRatio ratio={1}>
           <Dot
             open={state.open && state.playerId === playerId}
-            color={color}
+            colour={player.colour}
             onClick={() => setState({
               open: true,
               playerId
@@ -49,14 +47,14 @@ const Player = ({ playerId, color, player }: PlayerProps) => {
   );
 };
 
-const Container = styled(motion.div).attrs(({ position }) => ({
+const Container = styled(motion.div).attrs(({ player }) => ({
   transition: {
     type: 'tween',
     duration: 1
   },
   animate: {
-    left: `${position[0] * 100}%`,
-    top: `${position[1] * 100}%`,
+    left: `${player.x}%`,
+    top: `${player.y}%`,
     x: '-1rem',
     y: '-1rem'
   }
@@ -94,7 +92,7 @@ const Dot = styled(motion.div).attrs(({ open }) => ({
     }
   }
 }))`
-  background: ${({ color }) => color};
+  background: ${({ colour }) => `rgb(${colour[0]} ${colour[1]} ${colour[2]})`};
   border: 1px solid rgba(0,0,0,0);
   border-radius: 50%;
   overflow: hidden;
