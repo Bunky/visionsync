@@ -34,7 +34,7 @@ const ViewAnalysisModal = () => {
         <Tabs>
           <Tabs.Tab label="Heatmap" icon={<IoMap />}>
             <Heatmap
-              data={[].concat(...json).map((d) => ([d.x, d.y, Math.random() * 100]))}
+              data={[].concat(...json).map((d) => ([d.x, d.y, 1]))}
             />
           </Tabs.Tab>
           <Tabs.Tab label="Data" icon={<IoCode />}>

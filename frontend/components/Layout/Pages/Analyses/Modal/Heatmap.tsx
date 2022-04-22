@@ -1,34 +1,28 @@
-import { useRef } from 'react';
 import styled from 'styled-components';
 import {
   Image
 } from '@mantine/core';
 import Canvas from './HeatmapCanvas';
 
-const Heatmap = ({ data }) => {
-  const ref = useRef();
-
-  return (
-    <Container>
-      <Image
-        radius="md"
-        src="/images/pitch.svg"
-        alt="Football pitch"
+const Heatmap = ({ data }) => (
+  <Container>
+    <Image
+      radius="md"
+      src="/images/pitch.svg"
+      alt="Football pitch"
+    />
+    <StyledHeatmap>
+      <Canvas
+        data={data}
+        width={998}
+        height={625}
+        maxOccurances={1}
+        blur={25}
+        radius={10}
       />
-      <StyledHeatmap>
-        <Canvas
-          ref={ref}
-          data={data}
-          width={900}
-          height={400}
-          maxOccurances={100}
-          blur={25}
-          radius={10}
-        />
-      </StyledHeatmap>
-    </Container>
-  );
-};
+    </StyledHeatmap>
+  </Container>
+);
 
 const Container = styled.div`
   width: 100%;
