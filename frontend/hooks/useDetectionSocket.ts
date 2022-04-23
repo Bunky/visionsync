@@ -24,7 +24,6 @@ const useDetectionSocket = () => {
       });
 
       socket.on('positions', (data) => {
-        console.log(data);
         setPositions(data);
       });
 

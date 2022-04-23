@@ -1,9 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
 
 const Heatmap = ({
-  radius, blur, width, height, data, maxOccurances
+  radius, blur, data, maxOccurances
 }) => {
   const ref = useRef();
+  const [width, setWidth] = useState(100);
+  const [height, setHeight] = useState(100);
 
   let circleCanvas = null;
   let gradientCanvas = null;
@@ -20,8 +23,19 @@ const Heatmap = ({
   useEffect(() => {
     if (ref.current) {
       draw();
+      console.log('Drawn!');
     }
-  }, [data]);
+  }, [data, width, height]);
+
+  useEffect(() => {
+    if (ref.current) {
+      if (ref.current.offsetWidth > 0 && ref.current.offsetHeight > 0) {
+        setWidth(ref.current.offsetWidth);
+        setHeight(ref.current.offsetHeight);
+        console.log('Updated size!');
+      }
+    }
+  }, [ref.current]);
 
   const draw = () => {
     const opacity = 0.05;
@@ -45,7 +59,6 @@ const Heatmap = ({
 
     // colorize the heatmap, using opacity value of each pixel to get the right color from our gradient
     const colored = ctx.getImageData(0, 0, width, height);
-
     colorize(colored.data, gradient);
     ctx.putImageData(colored, 0, 0);
   };
@@ -110,7 +123,12 @@ const Heatmap = ({
     return c;
   };
 
-  return (<canvas ref={ref} width={width} height={height} />);
+  return (<Canvas ref={ref} width={width} height={height} />);
 };
+
+const Canvas = styled.canvas`
+  width: 100%;
+  height: 100%;
+`;
 
 export default Heatmap;
