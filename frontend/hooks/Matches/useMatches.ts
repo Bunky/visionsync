@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import fetchMatches from '../fetches/fetchMatches';
+import fetchMatches from '../../fetches/fetchMatches';
 
 type Match = {
   _id?: string;

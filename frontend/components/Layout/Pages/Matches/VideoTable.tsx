@@ -8,9 +8,9 @@ import {
 } from 'react-icons/io5';
 import { format } from 'date-fns';
 import VideoMenu from './VideoMenu';
-import useMatches from '../../../../hooks/useMatches';
+import useMatches from '../../../../hooks/Matches/useMatches';
 import useViewMatchModal from '../../../../hooks/Matches/useViewMatchModal';
-import useStartAnalysis from '../../../../hooks/useStartAnalysis';
+import useStartAnalysis from '../../../../hooks/Analysis/useStartAnalysis';
 
 const VideoTable = () => {
   const { data: matches, status: matchesStatus } = useMatches();

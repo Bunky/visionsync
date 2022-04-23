@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useMutation, useQueryClient } from 'react-query';
 import { useNotifications } from '@mantine/notifications';
 import { IoAlert } from 'react-icons/io5';
-import stopAnalysis from '../mutations/stopAnalysis';
+import stopAnalysis from '../../mutations/stopAnalysis';
 
 const useStopAnalysis = () => {
   const queryClient = useQueryClient();

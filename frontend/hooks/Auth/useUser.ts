@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import fetchUser from '../fetches/fetchUser';
+import fetchUser from '../../fetches/fetchUser';
 
 type User = {
   _id: string;

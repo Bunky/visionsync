@@ -7,8 +7,8 @@ import {
 import { useForm } from '@mantine/hooks';
 import { IoLockClosedOutline, IoMailOutline } from 'react-icons/io5';
 import styled from 'styled-components';
-import useUser from '../hooks/useUser';
-import useLogin from '../hooks/useLogin';
+import useUser from '../hooks/Auth/useUser';
+import useLogin from '../hooks/Auth/useLogin';
 
 const Login = () => {
   const router = useRouter();

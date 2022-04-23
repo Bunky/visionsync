@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import fetchConfig from '../fetches/fetchConfig';
+import fetchConfig from '../../fetches/fetchConfig';
 
 type Config = {
   preview: {

@@ -4,7 +4,6 @@ import {
 import { IoVideocam } from 'react-icons/io5';
 import PlayerMenu from './PlayerMenu';
 import usePlayerStatModal from '../../../../../hooks/usePlayerStatModal';
-// import useTempDetections from '../../../../../hooks/useTempDetections';
 import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
 
 const useStyles = createStyles((theme) => ({
@@ -29,7 +28,6 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const PlayerTable = () => {
-  // const [tempDetections] = useTempDetections();
   const { detections } = useDetectionSocket();
   const [, setState] = usePlayerStatModal();
   const { classes, cx } = useStyles();

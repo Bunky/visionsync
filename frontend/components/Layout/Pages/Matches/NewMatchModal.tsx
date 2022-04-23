@@ -5,7 +5,7 @@ import {
 import { Dropzone } from '@mantine/dropzone';
 import { useForm } from '@mantine/hooks';
 import { IoCloudUpload, IoStop } from 'react-icons/io5';
-import useUploadFile from '../../../../hooks/useUploadFile';
+import useUploadFile from '../../../../hooks/Matches/useUploadFile';
 import useConfigs from '../../../../hooks/Configs/useConfigs';
 
 const NewMatchModal = () => {

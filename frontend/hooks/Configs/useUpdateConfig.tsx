@@ -2,7 +2,7 @@ import { useQueryClient, useMutation } from 'react-query';
 import { useNotifications } from '@mantine/notifications';
 import { IoAlert } from 'react-icons/io5';
 // import _ from 'lodash';
-import updateConfig from '../mutations/updateConfig';
+import updateConfig from '../../mutations/updateConfig';
 
 const useUpdateConfig = () => {
   const queryClient = useQueryClient();

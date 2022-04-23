@@ -7,8 +7,8 @@ import {
 import {
   IoSettingsOutline, IoLogOutOutline
 } from 'react-icons/io5';
-import useUser from '../../../hooks/useUser';
-import useLogout from '../../../hooks/useLogout';
+import useUser from '../../../hooks/Auth/useUser';
+import useLogout from '../../../hooks/Auth/useLogout';
 import User from './User';
 
 const Menu = () => {

@@ -12,7 +12,7 @@ const useDeleteAnalyses = () => {
       await queryClient.cancelQueries('analyses');
 
       const previousAnalyses = queryClient.getQueryData('analyses');
-      queryClient.setQueryData('analyses', previousAnalyses.filter((analysis) => analysis._id !== delAnalyses._id));
+      queryClient.setQueryData('analyses', previousAnalyses.filter((analysis) => analysis._id !== delAnalyses.analysisId));
       return { previousAnalyses };
     },
     onError: (err, newMatch, context: any) => {

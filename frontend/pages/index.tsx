@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import {
   Center, Loader
 } from '@mantine/core';
-import useAnalysis from '../hooks/useAnalysis';
+import useAnalysis from '../hooks/Analysis/useAnalysis';
 import VideoTable from '../components/Layout/Pages/Matches/VideoTable';
 import NewMatchModal from '../components/Layout/Pages/Matches/NewMatchModal';
 import ViewMatchModal from '../components/Layout/Pages/Matches/ViewMatchModal';

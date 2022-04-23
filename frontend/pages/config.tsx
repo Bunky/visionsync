@@ -15,9 +15,9 @@ import Preview from '../components/Layout/Pages/Config/Preview/Preview';
 import PlayerMaskSettings from '../components/Layout/Pages/Config/Settings/PlayerMaskSettings';
 import CannySettings from '../components/Layout/Pages/Config/Settings/CannySettings';
 import HoughSettings from '../components/Layout/Pages/Config/Settings/HoughSettings';
-import useConfig from '../hooks/useConfig';
-import useUpdateConfig from '../hooks/useUpdateConfig';
-import useAnalysis from '../hooks/useAnalysis';
+import useConfig from '../hooks/Configs/useConfig';
+import useUpdateConfig from '../hooks/Configs/useUpdateConfig';
+import useAnalysis from '../hooks/Analysis/useAnalysis';
 
 const Config = () => {
   const { data: analysis, status: analysisStatus } = useAnalysis();

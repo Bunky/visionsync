@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import io from 'socket.io-client';
-import useUser from './useUser';
+import useUser from './Auth/useUser';
 
 const useDetectionSocket = () => {
   const queryClient = useQueryClient();

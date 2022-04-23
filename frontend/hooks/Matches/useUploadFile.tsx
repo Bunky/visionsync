@@ -1,7 +1,7 @@
 import { useQueryClient, useMutation } from 'react-query';
 import { useNotifications } from '@mantine/notifications';
 import { IoAlert } from 'react-icons/io5';
-import uploadFile from '../mutations/uploadFile';
+import uploadFile from '../../mutations/uploadFile';
 
 const useUploadFile = () => {
   const queryClient = useQueryClient();
@@ -15,7 +15,6 @@ const useUploadFile = () => {
       queryClient.setQueryData('matches', [...previousMatches, {
         matchId: 'uploading',
         title: newMatch.get('title'),
-        thumbnail: 'https://images.indianexpress.com/2018/07/football-reuters-m.jpg',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         loading: true

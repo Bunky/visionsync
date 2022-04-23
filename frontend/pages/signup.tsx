@@ -10,9 +10,9 @@ import {
   IoAlertCircleOutline, IoCheckmark, IoLockClosedOutline, IoMailOutline
 } from 'react-icons/io5';
 import styled from 'styled-components';
-import useUser from '../hooks/useUser';
-import useSignup from '../hooks/useSignup';
-import useUniqueEmail from '../hooks/useUniqueEmail';
+import useUser from '../hooks/Auth/useUser';
+import useSignup from '../hooks/Auth/useSignup';
+import useUniqueEmail from '../hooks/Auth/useUniqueEmail';
 
 const requirements = [
   { re: /[0-9]/, label: 'Includes number' },

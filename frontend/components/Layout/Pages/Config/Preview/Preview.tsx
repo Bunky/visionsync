@@ -3,9 +3,9 @@ import styled from 'styled-components';
 import {
   Group, Paper, Title, Switch, Overlay, Select
 } from '@mantine/core';
-import useConfig from '../../../../../hooks/useConfig';
+import useConfig from '../../../../../hooks/Configs/useConfig';
 import useSettingsSocket from '../../../../../hooks/useSettingsSocket';
-import useUpdateConfig from '../../../../../hooks/useUpdateConfig';
+import useUpdateConfig from '../../../../../hooks/Configs/useUpdateConfig';
 
 const Preview = () => {
   const { data: config } = useConfig();

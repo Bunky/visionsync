@@ -12,7 +12,7 @@ const useDeleteConfig = () => {
       await queryClient.cancelQueries('configs');
 
       const previousConfigs = queryClient.getQueryData('configs');
-      queryClient.setQueryData('configs', previousConfigs.filter((config) => config._id !== delConfigs._id));
+      queryClient.setQueryData('configs', previousConfigs.filter((config) => config._id !== delConfigs.configId));
       return { previousConfigs };
     },
     onError: (err, newMatch, context: any) => {

@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import fetchAnalysis from '../fetches/fetchAnalysis';
+import fetchAnalysis from '../../fetches/fetchAnalysis';
 
 type Analysis = {
   active: boolean;

@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import { useNotifications } from '@mantine/notifications';
 import { IoAlert } from 'react-icons/io5';
 import { useEffect, useState } from 'react';
-import startAnalysis from '../mutations/startAnalysis';
+import startAnalysis from '../../mutations/startAnalysis';
 import useAnalysis from './useAnalysis';
 
 const useStartAnalysis = () => {

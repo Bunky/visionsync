@@ -9,8 +9,6 @@ const Heatmap = ({
   let gradientCanvas = null;
   let gradient = null;
   let circleCanvasRadius = 1;
-  const defaultRadius = radius;
-  const defaultBlur = blur;
   const defaultGradient = {
     0.4: 'blue',
     0.6: 'cyan',
@@ -29,7 +27,7 @@ const Heatmap = ({
     const opacity = 0.05;
 
     if (!circleCanvas) {
-      createCircleBrushCanvas(defaultRadius);
+      createCircleBrushCanvas(radius);
     }
     if (!gradientCanvas) {
       createGradientCanvas(defaultGradient);
@@ -42,7 +40,7 @@ const Heatmap = ({
     for (let i = 0, len = data.length, p; i < len; i++) {
       p = data[i];
       ctx.globalAlpha = Math.min(Math.max(p[2] / maxOccurances, opacity), 1);
-      ctx.drawImage(circleCanvas, p[0] - circleCanvasRadius, p[1] - circleCanvasRadius);
+      ctx.drawImage(circleCanvas, (width * (p[0] / 100)) - circleCanvasRadius, (height * (p[1] / 100)) - circleCanvasRadius);
     }
 
     // colorize the heatmap, using opacity value of each pixel to get the right color from our gradient
@@ -68,7 +66,7 @@ const Heatmap = ({
     circleCanvas = createCanvas();
     const circleCanvasContext = circleCanvas.getContext('2d');
 
-    const b = defaultBlur;
+    const b = blur;
     const r2 = r + b;
 
     circleCanvasRadius = r2;
@@ -108,7 +106,6 @@ const Heatmap = ({
   };
 
   const createCanvas = () => {
-    console.log('Heatmap.createCanvas(): creating canvas');
     const c = document.createElement('canvas');
     return c;
   };

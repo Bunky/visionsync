@@ -12,8 +12,8 @@ import Minimap from '../components/Layout/Pages/Home/Minimap/Minimap';
 import PlayerTable from '../components/Layout/Pages/Home/Players/PlayerTable';
 import Stats from '../components/Layout/Pages/Home/Statistics/Stats';
 import PlayerStatsModal from '../components/Layout/Pages/Home/PlayerStatsModal';
-import useAnalysis from '../hooks/useAnalysis';
-import useStopAnalysis from '../hooks/useStopAnalysis';
+import useAnalysis from '../hooks/Analysis/useAnalysis';
+import useStopAnalysis from '../hooks/Analysis/useStopAnalysis';
 
 const Analysis = () => {
   const { data: analysis, status: analysisStatus } = useAnalysis();
