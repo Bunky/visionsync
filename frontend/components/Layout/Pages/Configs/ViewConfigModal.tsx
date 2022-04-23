@@ -1,38 +1,39 @@
 import { Center, Loader, Modal } from '@mantine/core';
 import { Prism } from '@mantine/prism';
 import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
+import viewConfigModalState from '../../../../atoms/viewConfigModalState';
 import fetchConfigJson from '../../../../fetches/fetchConfigJson';
-import useViewConfigModal from '../../../../hooks/Configs/useViewConfigModal';
 
 const ViewConfigModal = () => {
-  const [state, setState] = useViewConfigModal();
+  const [modal, setModal] = useRecoilState(viewConfigModalState);
   const [json, setJson] = useState(null);
 
   useEffect(() => {
-    if (state.open) {
+    if (modal.open) {
       const fetchJson = async () => {
-        setJson(await fetchConfigJson(state.configId));
+        setJson(await fetchConfigJson(modal.configId));
       };
 
       fetchJson();
     }
-  }, [state]);
+  }, [modal]);
 
   return (
     <Modal
-      opened={state.open}
-      onClose={() => setState({
+      opened={modal.open}
+      onClose={() => setModal({
         open: false,
-        configId: state.configId
+        configId: modal.configId
       })}
       title="View Config"
       size="55%"
     >
       <Modal
-        opened={state.open}
-        onClose={() => setState({
+        opened={modal.open}
+        onClose={() => setModal({
           open: false,
-          configId: state.configId
+          configId: modal.configId
         })}
         title="View Analysis"
         size="55%"

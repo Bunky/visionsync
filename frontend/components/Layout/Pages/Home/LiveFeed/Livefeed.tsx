@@ -2,11 +2,12 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 import Minimap from '../Minimap/Minimap';
 import useLiveSocket from '../../../../../hooks/useLiveSocket';
-// import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
+import DetectionCanvas from './DetectionCanvas';
+import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
 
-const Livefeed = () => {
+const Livefeed = ({ showDetections }) => {
   const live = useLiveSocket();
-  // const { detections } = useDetectionSocket();
+  const { detections } = useDetectionSocket();
 
   useEffect(() => {
     document.getElementById('live').setAttribute('src', `data:image/jpeg;base64,${live}`);
@@ -15,24 +16,16 @@ const Livefeed = () => {
   return (
     <Container>
       <Live id="live" width="640" height="360" />
-      {/* <DetectionsOverlay>
-        {detections.map((detection) => (
-          <DetectionBox
-            id={`${detection.name}+${detection.score}`}
-            klass={detection.name}
-            score={detection.confidence}
-            position={[
-              detection.xmin / 640,
-              detection.ymin / 360,
-              detection.xmax / 640,
-              detection.ymax / 360
-            ]}
+      {showDetections && (
+        <DetectionsOverlay>
+          <DetectionCanvas
+            data={detections}
           />
-        ))}
-      </DetectionsOverlay> */}
-      <MinimapOverlay>
+        </DetectionsOverlay>
+      )}
+      {/* <MinimapOverlay>
         <Minimap overlay />
-      </MinimapOverlay>
+      </MinimapOverlay> */}
     </Container>
   );
 };
@@ -57,13 +50,15 @@ const Live = styled.img`
   height: 100%;
 `;
 
-// const DetectionsOverlay = styled.div`
-//   position: absolute;
-//   width: 100%;
-//   height: 100%;
-//   top: 0;
-//   left: 0;
-// `;
+const DetectionsOverlay = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  border-radius: 8px;
+`;
 
 // const DetectionBox = styled.div`
 //   position: absolute;

@@ -1,19 +1,20 @@
 import { Modal } from '@mantine/core';
-import usePlayerStatModal from '../../../../hooks/usePlayerStatModal';
+import { useRecoilState } from 'recoil';
+import playerStatModalState from '../../../../atoms/playerStatModalState';
 
 const PlayerStatsModal = () => {
-  const [state, setState] = usePlayerStatModal();
+  const [modal, setModal] = useRecoilState(playerStatModalState);
 
   return (
     <Modal
-      opened={state.open}
-      onClose={() => setState({
+      opened={modal.open}
+      onClose={() => setModal({
         open: false,
-        playerId: state.playerId
+        playerId: modal.playerId
       })}
       title="Player Statistics!"
     >
-      {state.playerId}
+      {modal.playerId}
     </Modal>
   );
 };

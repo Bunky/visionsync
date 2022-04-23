@@ -3,13 +3,14 @@ import {
 } from '@mantine/core';
 import { IoCode } from 'react-icons/io5';
 import { format } from 'date-fns';
+import { useRecoilState } from 'recoil';
 import useConfigs from '../../../../hooks/Configs/useConfigs';
 import ConfigsMenu from './ConfigsMenu';
-import useViewConfigModal from '../../../../hooks/Configs/useViewConfigModal';
+import viewConfigModalState from '../../../../atoms/viewConfigModalState';
 
 const ConfigsTable = () => {
   const { data: configs, status: configsStatus } = useConfigs();
-  const [, setState] = useViewConfigModal();
+  const [, setModal] = useRecoilState(viewConfigModalState);
 
   if (configsStatus === 'loading') {
     return (<Center sx={{ height: '100%' }}><Loader /></Center>);
@@ -37,7 +38,7 @@ const ConfigsTable = () => {
               <td>
                 <Group position="right">
                   <Button
-                    onClick={() => setState({
+                    onClick={() => setModal({
                       open: true,
                       configId: config._id
                     })}

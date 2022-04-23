@@ -2,9 +2,10 @@ import {
   ScrollArea, Table, Button, Group, createStyles
 } from '@mantine/core';
 import { IoVideocam } from 'react-icons/io5';
+import { useRecoilState } from 'recoil';
 import PlayerMenu from './PlayerMenu';
-import usePlayerStatModal from '../../../../../hooks/usePlayerStatModal';
 import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
+import playerStatModalState from '../../../../../atoms/playerStatModalState';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -29,7 +30,7 @@ const useStyles = createStyles((theme) => ({
 
 const PlayerTable = () => {
   const { detections } = useDetectionSocket();
-  const [, setState] = usePlayerStatModal();
+  const [, setModal] = useRecoilState(playerStatModalState);
   const { classes, cx } = useStyles();
 
   const rows = detections.map((player, index) => (
@@ -41,7 +42,7 @@ const PlayerTable = () => {
           <Button
             leftIcon={<IoVideocam />}
             compact
-            onClick={() => setState({
+            onClick={() => setModal({
               open: true,
               playerId: index
             })}
@@ -68,7 +69,7 @@ const PlayerTable = () => {
             </th>
           </tr>
         </thead>
-        <tbody>{rows}</tbody>
+        {/* <tbody>{rows}</tbody> */}
       </Table>
     </ScrollArea>
   );

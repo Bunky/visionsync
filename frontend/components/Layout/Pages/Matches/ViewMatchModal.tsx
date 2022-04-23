@@ -3,24 +3,25 @@ import {
   Modal
 } from '@mantine/core';
 import ReactPlayer from 'react-player';
-import useViewMatchModal from '../../../../hooks/Matches/useViewMatchModal';
+import { useRecoilState } from 'recoil';
+import viewMatchModalState from '../../../../atoms/viewMatchModalState';
 
 const ViewMatchModal = () => {
-  const [state, setState] = useViewMatchModal();
+  const [modal, setModal] = useRecoilState(viewMatchModalState);
 
   return (
     <Modal
-      opened={state.open}
-      onClose={() => setState({
+      opened={modal.open}
+      onClose={() => setModal({
         open: false,
-        matchId: state.matchId
+        matchId: modal.matchId
       })}
       title="Watch Match"
       size="55%"
     >
       <AspectRatio ratio={16 / 9}>
         <ReactPlayer
-          url={`http://d1pu8bxuwsqdvz.cloudfront.net/matches/${state.matchId}.mp4`}
+          url={`http://d1pu8bxuwsqdvz.cloudfront.net/matches/${modal.matchId}.mp4`}
           width="100%"
           height="100%"
           controls

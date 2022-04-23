@@ -1,12 +1,12 @@
 import styled from 'styled-components';
 import {
-  Tabs, Grid, Center, Loader, Button
+  Tabs, Grid, Center, Loader, Button, Switch, Group
 } from '@mantine/core';
 import {
   IoMap, IoPerson, IoStatsChart, IoTv
 } from 'react-icons/io5';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Livefeed from '../components/Layout/Pages/Home/LiveFeed/Livefeed';
 import Minimap from '../components/Layout/Pages/Home/Minimap/Minimap';
 import PlayerTable from '../components/Layout/Pages/Home/Players/PlayerTable';
@@ -19,6 +19,7 @@ const Analysis = () => {
   const { data: analysis, status: analysisStatus } = useAnalysis();
   const useStop = useStopAnalysis();
   const router = useRouter();
+  const [showDetections, setShowDetections] = useState(false);
 
   useEffect(() => {
     if (analysisStatus === 'success' && !analysis.active) {
@@ -43,7 +44,7 @@ const Analysis = () => {
       <Grid grow>
         <Grid.Col span={8}>
           <Tabs>
-            <Tabs.Tab label="Live Feed" icon={<IoTv />}><Livefeed /></Tabs.Tab>
+            <Tabs.Tab label="Live Feed" icon={<IoTv />}><Livefeed showDetections={showDetections} /></Tabs.Tab>
             <Tabs.Tab label="Minimap" icon={<IoMap />}><Minimap /></Tabs.Tab>
           </Tabs>
         </Grid.Col>
@@ -54,17 +55,23 @@ const Analysis = () => {
           </Tabs>
         </Grid.Col>
         <Grid.Col span={12}>
-          <Button
-            onClick={() => useStop.mutate(analysis.matchId)}
-          >
-            Stop analysis
-          </Button>
-          <Button
-            onClick={() => router.push('/config')}
-            ml="sm"
-          >
-            Config
-          </Button>
+          <Group dir="row">
+            <Button
+              onClick={() => useStop.mutate(analysis.matchId)}
+            >
+              Stop analysis
+            </Button>
+            <Button
+              onClick={() => router.push('/config')}
+            >
+              Config
+            </Button>
+            <Switch
+              checked={showDetections}
+              onChange={(v) => setShowDetections(v.target.checked)}
+              label="Show detections"
+            />
+          </Group>
         </Grid.Col>
       </Grid>
       <PlayerStatsModal />

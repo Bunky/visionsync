@@ -123,7 +123,7 @@ def main():
       #   "data": current_ms # f"FPS: {str(1.0 / (time.time() - start_time))}"
       # })
 
-      if detections_limit_time + 1000 < current_ms:
+      if detections_limit_time + 10 < current_ms:
         detections_message = []
         for detection in detections:
           detections_message.append(detection.to_json())

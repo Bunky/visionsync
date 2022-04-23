@@ -7,14 +7,15 @@ import {
   IoVideocam
 } from 'react-icons/io5';
 import { format } from 'date-fns';
+import { useRecoilState } from 'recoil';
 import VideoMenu from './VideoMenu';
 import useMatches from '../../../../hooks/Matches/useMatches';
-import useViewMatchModal from '../../../../hooks/Matches/useViewMatchModal';
+import viewMatchModalState from '../../../../atoms/viewMatchModalState';
 import useStartAnalysis from '../../../../hooks/Analysis/useStartAnalysis';
 
 const VideoTable = () => {
   const { data: matches, status: matchesStatus } = useMatches();
-  const [, setState] = useViewMatchModal();
+  const [, setModal] = useRecoilState(viewMatchModalState);
   const useStart = useStartAnalysis();
 
   if (matchesStatus === 'loading') {
@@ -53,7 +54,7 @@ const VideoTable = () => {
                 {!match.loading && (
                   <Group position="right">
                     <Button
-                      onClick={() => setState({
+                      onClick={() => setModal({
                         open: true,
                         matchId: match._id
                       })}

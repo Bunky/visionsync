@@ -21,7 +21,7 @@ const Heatmap = ({
   };
 
   useEffect(() => {
-    if (ref.current) {
+    if (ref.current && width !== 100 && height !== 100) {
       draw();
       console.log('Drawn!');
     }

@@ -3,7 +3,8 @@ import {
 } from '@mantine/core';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import usePlayerStatModal from '../../../../../hooks/usePlayerStatModal';
+import { useRecoilState } from 'recoil';
+import playerStatModalState from '../../../../../atoms/playerStatModalState';
 
 interface PlayerProps {
   id: string;
@@ -17,7 +18,7 @@ interface PlayerProps {
 }
 
 const Player = ({ playerId, player }: PlayerProps) => {
-  const [state, setState] = usePlayerStatModal();
+  const [modal, setModal] = useRecoilState(playerStatModalState);
 
   return (
     <Container player={player}>
@@ -34,9 +35,9 @@ const Player = ({ playerId, player }: PlayerProps) => {
       >
         <AspectRatio ratio={1}>
           <Dot
-            open={state.open && state.playerId === playerId}
+            open={modal.open && modal.playerId === playerId}
             colour={player.colour}
-            onClick={() => setState({
+            onClick={() => setModal({
               open: true,
               playerId
             })}

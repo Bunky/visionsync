@@ -1,31 +1,35 @@
-import { Center, Loader, Modal, Tabs } from '@mantine/core';
+import {
+  Center, Loader, Modal, Tabs
+} from '@mantine/core';
 import { Prism } from '@mantine/prism';
 import { useEffect, useState } from 'react';
-import useViewAnalysisModel from '../../../../hooks/Analysis/useViewAnalysisModal';
+import { IoCode, IoMap } from 'react-icons/io5';
+import { useRecoilState } from 'recoil';
 import fetchAnalysisJson from '../../../../fetches/fetchAnalysisJson';
 import Heatmap from './Modal/Heatmap';
-import { IoCode, IoMap } from 'react-icons/io5';
+import viewAnalysisModalState from '../../../../atoms/viewAnalysisModalState';
 
 const ViewAnalysisModal = () => {
-  const [state, setState] = useViewAnalysisModel();
+  const [modal, setModal] = useRecoilState(viewAnalysisModalState);
+
   const [json, setJson] = useState(null);
 
   useEffect(() => {
-    if (state.open) {
+    if (modal.open) {
       const fetchJson = async () => {
-        setJson(await fetchAnalysisJson(state.analysisId));
+        setJson(await fetchAnalysisJson(modal.analysisId));
       };
 
       fetchJson();
     }
-  }, [state]);
+  }, [modal]);
 
   return (
     <Modal
-      opened={state.open}
-      onClose={() => setState({
+      opened={modal.open}
+      onClose={() => setModal({
         open: false,
-        analysisId: state.analysisId
+        analysisId: modal.analysisId
       })}
       title="View Analysis"
       size="55%"

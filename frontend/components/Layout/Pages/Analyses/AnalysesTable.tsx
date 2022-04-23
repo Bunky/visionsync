@@ -3,13 +3,14 @@ import {
 } from '@mantine/core';
 import { IoCode } from 'react-icons/io5';
 import { format } from 'date-fns';
+import { useRecoilState } from 'recoil';
 import useAnalyses from '../../../../hooks/Analysis/useAnalyses';
-import useViewAnalysisModel from '../../../../hooks/Analysis/useViewAnalysisModal';
 import AnalysesMenu from './AnalysesMenu';
+import viewAnalysisModalState from '../../../../atoms/viewAnalysisModalState';
 
 const AnalysesTable = () => {
   const { data: analyses, status: analysesStatus } = useAnalyses();
-  const [, setState] = useViewAnalysisModel();
+  const [, setModal] = useRecoilState(viewAnalysisModalState);
 
   if (analysesStatus === 'loading') {
     return (<Center sx={{ height: '100%' }}><Loader /></Center>);
@@ -40,7 +41,7 @@ const AnalysesTable = () => {
               <td>
                 <Group position="right">
                   <Button
-                    onClick={() => setState({
+                    onClick={() => setModal({
                       open: true,
                       analysisId: analysis._id
                     })}

@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "atoms/viewMatchModalState.jsx", "atoms/viewConfigModalState.jsx", "atoms/viewAnalysisModalState.jsx"  ],
   "exclude": [
     "node_modules"
   ]
