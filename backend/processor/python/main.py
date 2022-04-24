@@ -71,7 +71,7 @@ def main():
       lines, lines_frame = stages.generate_lines(settings, frame, canny)
       # circles, circles_frame = stages.generate_circles(settings, frame, canny)
       intersections, intersections_frame = stages.generate_intersections(settings, frame, lines)
-      biv_detections, homography_frame, matrix = stages.apply_homography(settings, frame, intersections, detections, last_matrix)
+      biv_detections, corners, homography_frame, matrix = stages.apply_homography(settings, frame, intersections, detections, last_matrix)
       
       last_matrix = matrix
           
@@ -137,7 +137,8 @@ def main():
       if positions_limit_time + 200 < current_ms:
         message.append({
           "type": "positions",
-          "data": json.dumps(biv_detections)
+          "data": json.dumps(biv_detections),
+          "corners": json.dumps(corners)
         })
         positions_limit_time = current_ms
 

@@ -354,7 +354,7 @@ def apply_homography(settings, frame, intersections, detections, last_matrix):
         noHomographyPreview = False
         if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'homography'):
           cv.putText(noHomographyPreview, "No homography applied", (10, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv.LINE_AA)
-        return [], noHomographyPreview, last_matrix
+        return [], {}, noHomographyPreview, last_matrix
     destination = np.array(destination)
 
     # Make sure destination points are not all on same axis
@@ -375,7 +375,7 @@ def apply_homography(settings, frame, intersections, detections, last_matrix):
       noHomographyPreview = False
       if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'homography'):
         cv.putText(noHomographyPreview, "No homography applied", (10, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv.LINE_AA)
-      return [], noHomographyPreview, last_matrix
+      return [], {}, noHomographyPreview, last_matrix
 
     # Reshape for homography
     src_pts = np.array(source).reshape(-1,1,2)
@@ -385,17 +385,20 @@ def apply_homography(settings, frame, intersections, detections, last_matrix):
   
   # Apply homography matrix to detections
   transformed_detections = []
+  corners = {}
   if len(src_pts) > 0:
     transformed_detections = utils.transform_detections(H, detections)
+    corners = utils.transform_frame_boundary(H)
     last_matrix = H
   elif type(last_matrix) != bool:
     transformed_detections = utils.transform_detections(last_matrix, detections)
+    corners = utils.transform_frame_boundary(last_matrix)
     H = last_matrix
   else:
     noHomographyPreview = False
     if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'homography'):
       cv.putText(noHomographyPreview, "No homography applied", (10, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv.LINE_AA)
-    return [], noHomographyPreview, last_matrix
+    return [], {}, noHomographyPreview, last_matrix
   
   # Preview 
   if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'homography'):
@@ -412,4 +415,4 @@ def apply_homography(settings, frame, intersections, detections, last_matrix):
     
   else:
     preview = False
-  return transformed_detections, preview, last_matrix
+  return transformed_detections, corners, preview, last_matrix

@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import {
   Image
 } from '@mantine/core';
+import { useEffect } from 'react';
 import Player from './Player';
 // import Ball from './Ball';
 import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
@@ -12,7 +13,11 @@ interface MinimapProps {
 }
 
 const Minimap = ({ overlay }: MinimapProps) => {
-  const { positions } = useDetectionSocket();
+  const { positions, corners } = useDetectionSocket();
+
+  useEffect(() => {
+    console.log(corners);
+  }, [corners]);
 
   return (
     <Container overlay={overlay}>
@@ -39,6 +44,9 @@ const Minimap = ({ overlay }: MinimapProps) => {
         ))}
         {/* <Ball position={tempBall} /> */}
       </OverlayContainer>
+      <OverlayContainer>
+        <FieldOfView corners={corners} />
+      </OverlayContainer>
     </Container>
   );
 };
@@ -56,6 +64,15 @@ const OverlayContainer = styled.div`
   height: 100%;
   overflow: hidden;
   border-radius: 8px;
+`;
+
+const FieldOfView = styled.div`
+  background-color: rgba(255, 255, 255, 0.5);
+  width: 100%;
+  height: 100%;
+  ${({ corners }) => corners.tl && `
+    clip-path: polygon(${corners.tl.x}% ${corners.tl.y}%, ${corners.tr.x}% ${corners.tr.y}%, ${corners.br.x}% ${corners.br.y}%, ${corners.bl.x}% ${corners.bl.y}%);
+  `}
 `;
 
 export default Minimap;

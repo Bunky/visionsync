@@ -64,6 +64,11 @@ def classify_players(settings, frame, detections):
       detection["colour"] = (255, 255, 255)
     elif detection['class'] == 2: # goal
       detection["colour"] = (0, 255, 0)
+      
+    detection["xmin"] = round(detection["xmin"] / resolution[0] * 100, 2)
+    detection["ymin"] = round(detection["ymin"] / resolution[1] * 100, 2)
+    detection["xmax"] = round(detection["xmax"] / resolution[0] * 100, 2)
+    detection["ymax"] = round(detection["ymax"] / resolution[1] * 100, 2)
     
     classified_detections.append(detection)
   return classified_detections  
@@ -254,11 +259,31 @@ def transform_detections(matrix, detections):
     transformed_detections.append({
       "class": detection['class'],
       "colour": detection['colour'],
-      "x": float(feet_converted[0][0][0]),
-      "y": float(feet_converted[0][0][1])
+      "x": round(float(feet_converted[0][0][0] / resolution[0]) * 100, 2),
+      "y": round(float(feet_converted[0][0][1] / resolution[1]) * 100, 2)
     })
     
   return transformed_detections
+
+def transform_frame_boundary(matrix):
+  transformed_corners = {}
+  corners = {
+    "tl": [0, 0],
+    "tr": [resolution[0], 0],
+    "bl": [0, resolution[1]],
+    "br": [resolution[0], resolution[1]]
+  }
+  for corner in corners:
+    # Use ymax and xcentre as the point at the players feet
+    coords = np.array([[corners[corner]]], dtype=np.float32)
+    coords_converted = cv.perspectiveTransform(coords, matrix)
+
+    transformed_corners[corner] = {
+      "x": round(float(coords_converted[0][0][0] / resolution[0]) * 100, 2),
+      "y": round(float(coords_converted[0][0][1] / resolution[1]) * 100, 2)
+    }
+    
+  return transformed_corners
 
 class HoughBundler:
   def __init__(self,min_distance=5,min_angle=2):

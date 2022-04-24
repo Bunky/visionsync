@@ -49,13 +49,19 @@ exports.startAnalysis = async (room, matchId) => {
       }
       if (message.type === 'positions') {
         const positions = JSON.parse(message.data);
+        const corners = JSON.parse(message.corners);
         // {
         //   class
         //   colour
         //   x
         //   y
         // }
-        sendMessage(room, 'positions', positions);
+
+        // {
+        //   x
+        //   y
+        // }
+        sendMessage(room, 'positions', { positions, corners });
 
         const currentAnalysis = await getJsonValue(`${matchId}-analysis`);
         await setJsonValue(`${matchId}-analysis`, [...currentAnalysis, positions]);

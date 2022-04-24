@@ -19,7 +19,7 @@ const Analysis = () => {
   const { data: analysis, status: analysisStatus } = useAnalysis();
   const useStop = useStopAnalysis();
   const router = useRouter();
-  const [showDetections, setShowDetections] = useState(false);
+  const [showDetections, setShowDetections] = useState(true);
 
   useEffect(() => {
     if (analysisStatus === 'success' && !analysis.active) {

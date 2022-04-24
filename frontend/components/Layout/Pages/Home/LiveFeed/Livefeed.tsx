@@ -23,9 +23,9 @@ const Livefeed = ({ showDetections }) => {
           />
         </DetectionsOverlay>
       )}
-      {/* <MinimapOverlay>
+      <MinimapOverlay>
         <Minimap overlay />
-      </MinimapOverlay> */}
+      </MinimapOverlay>
     </Container>
   );
 };
