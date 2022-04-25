@@ -58,7 +58,7 @@ const EditMatchModal = () => {
     <Modal
       opened={modal.open}
       onClose={handleClose}
-      title="Edit Config"
+      title="Edit Match"
     >
       <Group grow direction="column" spacing="sm">
         <TextInput

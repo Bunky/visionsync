@@ -27,7 +27,7 @@ const ConfigsTable = () => {
         <thead>
           <tr>
             <th>Config</th>
-            <th>Uploaded</th>
+            <th>Date</th>
             <th />
           </tr>
         </thead>

@@ -3,25 +3,8 @@ const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const Config = require('../models/config.model');
 const { uploadConfig, deleteConfig } = require('../utils/configs');
-
-// =================================================================================================
-//                                           Upload Config
-// =================================================================================================
-
-router.route('/upload').post(async (req, res) => {
-  if (req.isAuthenticated()) {
-    try {
-      const {
-        ownerId, title, data
-      } = req.body;
-      await uploadConfig(ownerId, title, data);
-      return res.sendStatus(200);
-    } catch (err) {
-      return res.sendStatus(500);
-    }
-  }
-  return res.sendStatus(403);
-});
+const { getActive } = require('../processor/lineDetection');
+const { getJsonValue } = require('../utils/redis');
 
 // =================================================================================================
 //                                           Get Configs
@@ -33,6 +16,21 @@ router.route('/').get(async (req, res) => {
       ownerId: 0, __v: 0
     });
     return res.status(200).send(configs);
+  }
+  return res.sendStatus(403);
+});
+
+// =================================================================================================
+//                                           New Config
+// =================================================================================================
+
+router.route('/').post(async (req, res) => {
+  if (req.isAuthenticated()) {
+    const { matchId } = getActive(req.user._id);
+    const config = await getJsonValue(`${matchId}-settings`);
+    await uploadConfig(req.user._id, req.body.title, config);
+
+    return res.status(200).send(config);
   }
   return res.sendStatus(403);
 });

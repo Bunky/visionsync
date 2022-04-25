@@ -28,7 +28,7 @@ const AnalysesTable = () => {
         <thead>
           <tr>
             <th>Match</th>
-            <th>Uploaded</th>
+            <th>Date</th>
             <th />
           </tr>
         </thead>

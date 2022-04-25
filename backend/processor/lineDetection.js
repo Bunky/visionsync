@@ -1,8 +1,5 @@
-// const cv = require('opencv4nodejs');
-// const tf = require('@tensorflow/tfjs-node-gpu');
 const { spawn } = require('child_process');
 const { sendMessage, isConnected } = require('../utils/socket-io');
-// const { morphShape } = require('./utils');
 const Match = require('../models/match.model');
 const { setJsonValue, getJsonValue, delJsonValue } = require('../utils/redis');
 const { uploadAnalysis } = require('../utils/analysis');
@@ -21,7 +18,6 @@ exports.startAnalysis = async (room, matchId) => {
   const pythonProcess = spawn('python', ['./processor/python/main.py', matchId]);
   pythonProcess.stdout.on('data', (data) => {
     const messages = JSON.parse(data.toString());
-    // console.log(room, message.type);
 
     messages.forEach(async (message) => {
       if (message.type === 'preview') {
@@ -70,14 +66,12 @@ exports.startAnalysis = async (room, matchId) => {
   });
   pythonProcess.stderr.on('data', (data) => {
     console.log(data.toString());
-    // exports.stopAnalysis(matchId);
   });
   pythonProcess.on('exit', (code) => {
     console.log(`Process exited with code ${code}`);
     exports.stopAnalysis(matchId);
   });
 
-  // const intervalId = initiateAnalysis(matchId.toString(), match);
   activeAnalysis.push({
     room,
     matchId,
@@ -86,15 +80,18 @@ exports.startAnalysis = async (room, matchId) => {
 };
 
 exports.stopAnalysis = async (matchId) => {
-  // clearInterval(activeAnalysis.filter((analysis) => analysis.matchId === matchId.toString())[0].intervalId);
-  process.kill(activeAnalysis.filter((analysis) => analysis.matchId === matchId.toString())[0].pid);
+  try {
+    process.kill(activeAnalysis.filter((analysis) => analysis.matchId === matchId.toString())[0].pid);
+  } catch (err) {
+    console.log('Failed to kill process!');
+  }
   activeAnalysis = activeAnalysis.filter((analysis) => analysis.matchId !== matchId.toString());
 
   const match = await Match.findOne({ matchId });
   match.settings = await getJsonValue(`${matchId}-settings`);
   const analysis = await getJsonValue(`${matchId}-analysis`);
   await uploadAnalysis(matchId, match.ownerId, analysis, match.settings);
-  await uploadConfig(match.ownerId, 'auto-saved', match.settings);
+  // await uploadConfig(match.ownerId, 'auto-saved', match.settings);
   await match.save();
   await delJsonValue(`${matchId}-settings`);
   await delJsonValue(`${matchId}-analysis`);

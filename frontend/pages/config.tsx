@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import {
-  Tabs, Grid, Loader, Group, Center
+  Tabs, Grid, Loader, Group, Center, Button
 } from '@mantine/core';
 import {
   IoCodeSlashSharp,
@@ -8,7 +8,7 @@ import {
   IoMan,
   IoPeople, IoSyncCircle, IoTv
 } from 'react-icons/io5';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import CrowdMaskSettings from '../components/Layout/Pages/Config/Settings/CrowdMaskSettings';
 import Preview from '../components/Layout/Pages/Config/Preview/Preview';
@@ -18,12 +18,14 @@ import HoughSettings from '../components/Layout/Pages/Config/Settings/HoughSetti
 import useConfig from '../hooks/Configs/useConfig';
 import useUpdateConfig from '../hooks/Configs/useUpdateConfig';
 import useAnalysis from '../hooks/Analysis/useAnalysis';
+import NewConfigModal from '../components/Layout/Pages/Config/NewConfigModal';
 
 const Config = () => {
   const { data: analysis, status: analysisStatus } = useAnalysis();
   const { data: config, status: configStatus } = useConfig();
   const updateConfig = useUpdateConfig();
   const router = useRouter();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (analysisStatus === 'success' && !analysis.active) {
@@ -84,6 +86,11 @@ const Config = () => {
     <Container>
       <Grid sx={{ height: '100%', margin: 0 }}>
         <Grid.Col span={7} sx={{ height: '100%' }}>
+          <Button
+            onClick={() => setOpen(true)}
+          >
+            Save new config
+          </Button>
           <Group direction="row" sx={{ height: '100%' }} noWrap>
             <Tabs
               orientation="vertical"
@@ -115,6 +122,7 @@ const Config = () => {
           <Preview />
         </Grid.Col>
       </Grid>
+      <NewConfigModal open={open} setOpen={setOpen} />
     </Container>
   );
 };
