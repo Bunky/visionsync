@@ -3,9 +3,11 @@ import {
 } from '@mantine/core';
 import { IoVideocam } from 'react-icons/io5';
 import { useRecoilState } from 'recoil';
+import { useEffect, useState } from 'react';
 import PlayerMenu from './PlayerMenu';
 import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
 import playerStatModalState from '../../../../../atoms/playerStatModalState';
+import { useInterval } from '@mantine/hooks';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -32,8 +34,20 @@ const PlayerTable = () => {
   const { detections } = useDetectionSocket();
   const [, setModal] = useRecoilState(playerStatModalState);
   const { classes, cx } = useStyles();
+  const [debouncedDetections, setDebouncedDetections] = useState([]);
+  const [counter, setCounter] = useState(0);
+  const interval = useInterval(() => setCounter((s) => s + 1), 1000);
 
-  const rows = detections.map((player, index) => (
+  useEffect(() => {
+    interval.start();
+    return interval.stop;
+  }, []);
+
+  useEffect(() => {
+    setDebouncedDetections(detections);
+  }, [counter]);
+
+  const rows = debouncedDetections.map((player, index) => (
     <tr key={`${player.name}-${player.confidence}`}>
       <td>{player.name}</td>
       <td>{player.confidence}</td>
@@ -60,7 +74,7 @@ const PlayerTable = () => {
       <Table verticalSpacing="xs">
         <thead className={cx(classes.header)}>
           <tr>
-            <th>Player</th>
+            <th>Detection</th>
             <th>Confidence</th>
             <th>
               <Group position="right">
@@ -69,7 +83,7 @@ const PlayerTable = () => {
             </th>
           </tr>
         </thead>
-        {/* <tbody>{rows}</tbody> */}
+        <tbody>{rows}</tbody>
       </Table>
     </ScrollArea>
   );

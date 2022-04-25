@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import {
   Image
 } from '@mantine/core';
-import { useEffect } from 'react';
 import Player from './Player';
 // import Ball from './Ball';
 import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
@@ -14,10 +13,6 @@ interface MinimapProps {
 
 const Minimap = ({ overlay }: MinimapProps) => {
   const { positions, corners } = useDetectionSocket();
-
-  useEffect(() => {
-    console.log(corners);
-  }, [corners]);
 
   return (
     <Container overlay={overlay}>

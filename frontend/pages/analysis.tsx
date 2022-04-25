@@ -3,7 +3,8 @@ import {
   Tabs, Grid, Center, Loader, Button, Switch, Group
 } from '@mantine/core';
 import {
-  IoMap, IoPerson, IoStatsChart, IoTv
+  IoCode,
+  IoMap, IoPerson, IoStatsChart, IoStop, IoTv
 } from 'react-icons/io5';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -58,11 +59,13 @@ const Analysis = () => {
           <Group dir="row">
             <Button
               onClick={() => useStop.mutate(analysis.matchId)}
+              leftIcon={<IoStop />}
             >
-              Stop analysis
+              Stop
             </Button>
             <Button
               onClick={() => router.push('/config')}
+              leftIcon={<IoCode />}
             >
               Config
             </Button>

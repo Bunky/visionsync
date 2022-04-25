@@ -14,8 +14,12 @@ def detect_players(settings, frame, model):
   if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'detections'):
     preview = frame.copy()
     for detection in detections:
-      bb.add(preview, detection['xmin'], detection['ymin'], detection['xmax'], detection['ymax'], detection['name'], "purple")
-      cv.circle(preview, (int(detection['xmin'] + ((detection['xmax'] - detection['xmin']) / 2)), int(detection["ymax"])), 2, detection['colour'], 2, cv.LINE_AA)
+      xmin = int(detection["xmin"] / 100 * resolution[0])
+      xmax = int(detection["xmax"] / 100 * resolution[0])
+      ymin = int(detection["ymin"] / 100 * resolution[1])
+      ymax = int(detection["ymax"] / 100 * resolution[1])
+      bb.add(preview, xmin, ymin, xmax, ymax, detection['name'], "purple")
+      cv.circle(preview, (int(xmin + ((xmax - xmin) / 2)), int(ymax)), 2, detection['colour'], 2, cv.LINE_AA)
   else:
     preview = False
   return detections, preview

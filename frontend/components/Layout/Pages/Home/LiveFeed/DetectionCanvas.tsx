@@ -9,7 +9,6 @@ const DetectionCanvas = ({ data }) => {
   useEffect(() => {
     if (ref.current && width !== 100 && height !== 100) {
       draw();
-      console.log('Drawn!');
     }
   }, [data, width, height]);
 
@@ -18,7 +17,6 @@ const DetectionCanvas = ({ data }) => {
       if (ref.current.offsetWidth > 0 && ref.current.offsetHeight > 0) {
         setWidth(ref.current.offsetWidth);
         setHeight(ref.current.offsetHeight);
-        console.log('Updated size!');
       }
     }
   }, [ref.current]);
@@ -35,7 +33,7 @@ const DetectionCanvas = ({ data }) => {
       const w = ((detection.xmax - detection.xmin) / 100) * width;
       const h = ((detection.ymax - detection.ymin) / 100) * height;
 
-      ctx.fillStyle = '#ff00f27f';
+      ctx.fillStyle = detection.name === 'player' ? '#ff00f27f' : detection.name === 'ball' ? '#ffffff7f' : '#00ff007f';
       ctx.fillRect(x, y, w, h);
     }
   };

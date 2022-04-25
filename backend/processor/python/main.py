@@ -52,6 +52,9 @@ def main():
       # Get latest frame     
       frame = threaded_camera.get_frame()
       
+      if np.shape(frame) == ():
+        break;
+      
       message = []
       message.append({
         "type": "live",
