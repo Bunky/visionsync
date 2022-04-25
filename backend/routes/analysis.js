@@ -1,21 +1,11 @@
 const router = require('express').Router();
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
-const AWS = require('aws-sdk');
 const {
   startAnalysis, getActive, isActive, stopAnalysis
 } = require('../processor/lineDetection');
 const Analysis = require('../models/analysis.model');
 const { uploadAnalysis, deleteAnalysis } = require('../utils/analysis');
-
-// aws stuff
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_KEY,
-  secretAccessKey: process.env.AWS_SECRET,
-});
-AWS.config.update({
-  region: 'us-east-2',
-});
 
 // =================================================================================================
 //                                           Upload Analysis

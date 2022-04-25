@@ -7,6 +7,7 @@ import { useRecoilState } from 'recoil';
 import useConfigs from '../../../../hooks/Configs/useConfigs';
 import ConfigsMenu from './ConfigsMenu';
 import viewConfigModalState from '../../../../atoms/viewConfigModalState';
+import EditConfigModal from './EditConfigModal';
 
 const ConfigsTable = () => {
   const { data: configs, status: configsStatus } = useConfigs();
@@ -54,6 +55,7 @@ const ConfigsTable = () => {
           ))}
         </tbody>
       </Table>
+      <EditConfigModal />
     </ScrollArea>
   );
 };

@@ -11,7 +11,7 @@ import useMatches from '../../../../hooks/Matches/useMatches';
 
 const AnalysesTable = () => {
   const { data: analyses, status: analysesStatus } = useAnalyses();
-  const { data: matches, status: matchesStatus} = useMatches();
+  const { data: matches, status: matchesStatus } = useMatches();
   const [, setModal] = useRecoilState(viewAnalysisModalState);
 
   if (analysesStatus === 'loading') {
@@ -27,7 +27,6 @@ const AnalysesTable = () => {
       <Table verticalSpacing="xs">
         <thead>
           <tr>
-            <th>Analysis</th>
             <th>Match</th>
             <th>Uploaded</th>
             <th />
@@ -36,7 +35,6 @@ const AnalysesTable = () => {
         <tbody>
           {analyses && analyses.map((analysis) => (
             <tr key={analysis._id} style={{ position: 'relative' }}>
-              <td>{analysis.title}</td>
               <td>{matches && matches.filter((match) => match._id === analysis.matchId)[0].title}</td>
               <td>{format(new Date(analysis.createdAt), 'dd/MM/yyyy HH:mm')}</td>
               <td>

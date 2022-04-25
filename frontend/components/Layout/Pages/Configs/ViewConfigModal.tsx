@@ -29,28 +29,18 @@ const ViewConfigModal = () => {
       title="View Config"
       size="55%"
     >
-      <Modal
-        opened={modal.open}
-        onClose={() => setModal({
-          open: false,
-          configId: modal.configId
-        })}
-        title="View Analysis"
-        size="55%"
-      >
-        {json ? (
-          <Prism
-            withLineNumbers
-            language="json"
-          >
-            {JSON.stringify(json, null, 2)}
-          </Prism>
-        ) : (
-          <Center>
-            <Loader />
-          </Center>
-        )}
-      </Modal>
+      {json ? (
+        <Prism
+          withLineNumbers
+          language="json"
+        >
+          {JSON.stringify(json, null, 2)}
+        </Prism>
+      ) : (
+        <Center>
+          <Loader />
+        </Center>
+      )}
     </Modal>
   );
 };

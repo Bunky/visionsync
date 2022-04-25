@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Table, ScrollArea, Group, Button, Image, AspectRatio, Center, Loader, LoadingOverlay
 } from '@mantine/core';
@@ -12,6 +11,7 @@ import VideoMenu from './VideoMenu';
 import useMatches from '../../../../hooks/Matches/useMatches';
 import viewMatchModalState from '../../../../atoms/viewMatchModalState';
 import useStartAnalysis from '../../../../hooks/Analysis/useStartAnalysis';
+import EditMatchModal from './EditMatchModal';
 
 const VideoTable = () => {
   const { data: matches, status: matchesStatus } = useMatches();
@@ -33,7 +33,6 @@ const VideoTable = () => {
           <tr>
             <th />
             <th>Title</th>
-            {/* <th>Length</th> */}
             <th>Uploaded</th>
             <th />
           </tr>
@@ -48,7 +47,6 @@ const VideoTable = () => {
                 </AspectRatio>
               </td>
               <td>{match.title}</td>
-              {/* <td>{match.length}</td> */}
               <td>{format(new Date(match.createdAt), 'dd/MM/yyyy HH:mm')}</td>
               <td>
                 {!match.loading && (
@@ -78,6 +76,7 @@ const VideoTable = () => {
           ))}
         </tbody>
       </Table>
+      <EditMatchModal />
     </ScrollArea>
   );
 };

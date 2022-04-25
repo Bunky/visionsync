@@ -8,7 +8,7 @@ import { IoCloudUpload, IoStop } from 'react-icons/io5';
 import useUploadFile from '../../../../hooks/Matches/useUploadFile';
 import useConfigs from '../../../../hooks/Configs/useConfigs';
 
-const NewMatchModal = () => {
+const NewMatchModal = ({ edit }) => {
   const uploadFile = useUploadFile();
   const { data: configs, status: configsStatus } = useConfigs();
 
@@ -75,6 +75,7 @@ const NewMatchModal = () => {
             placeholder="Select a config"
             data={configsStatus === 'success' ? configs.map((config) => ({ value: config._id, label: config.title })) : []}
             {...form.getInputProps('config')}
+            searchable
           />
           {files === null ? (
             <Dropzone
