@@ -25,7 +25,7 @@ const ConfigsTable = () => {
       <Table verticalSpacing="xs">
         <thead>
           <tr>
-            <th>Config ID</th>
+            <th>Config</th>
             <th>Uploaded</th>
             <th />
           </tr>
@@ -33,7 +33,7 @@ const ConfigsTable = () => {
         <tbody>
           {configs && configs.map((config) => (
             <tr key={config._id} style={{ position: 'relative' }}>
-              <td>{config._id}</td>
+              <td>{config.title}</td>
               <td>{format(new Date(config.createdAt), 'dd/MM/yyyy HH:mm')}</td>
               <td>
                 <Group position="right">

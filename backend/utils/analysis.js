@@ -2,6 +2,7 @@ const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const AWS = require('aws-sdk');
 const Analysis = require('../models/analysis.model');
+const Match = require('../models/match.model');
 
 // aws stuff
 const s3 = new AWS.S3({
@@ -17,9 +18,11 @@ AWS.config.update({
 // =================================================================================================
 
 exports.uploadAnalysis = (matchId, ownerId, data, settings) => new Promise(async (resolve, reject) => {
+  const match = await Match.findById(matchId);
   const newAnalysis = new Analysis({
     matchId,
     ownerId,
+    title: `${match.title} - Analysis`,
     settings,
   });
   const analysis = await newAnalysis.save();

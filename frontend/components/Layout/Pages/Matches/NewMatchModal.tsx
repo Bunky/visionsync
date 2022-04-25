@@ -73,7 +73,7 @@ const NewMatchModal = () => {
           <Select
             label="Config"
             placeholder="Select a config"
-            data={configsStatus === 'success' ? configs.map((config) => ({ value: config._id, label: config._id })) : []}
+            data={configsStatus === 'success' ? configs.map((config) => ({ value: config._id, label: config.title })) : []}
             {...form.getInputProps('config')}
           />
           {files === null ? (

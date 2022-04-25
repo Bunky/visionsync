@@ -94,7 +94,7 @@ exports.stopAnalysis = async (matchId) => {
   match.settings = await getJsonValue(`${matchId}-settings`);
   const analysis = await getJsonValue(`${matchId}-analysis`);
   await uploadAnalysis(matchId, match.ownerId, analysis, match.settings);
-  await uploadConfig(match.ownerId, match.settings);
+  await uploadConfig(match.ownerId, 'auto-saved', match.settings);
   await match.save();
   await delJsonValue(`${matchId}-settings`);
   await delJsonValue(`${matchId}-analysis`);

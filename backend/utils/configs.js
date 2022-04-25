@@ -16,9 +16,10 @@ AWS.config.update({
 //                                           Upload Config
 // =================================================================================================
 
-exports.uploadConfig = (ownerId, data) => new Promise(async (resolve, reject) => {
+exports.uploadConfig = (ownerId, title, data) => new Promise(async (resolve, reject) => {
   const newConfig = new Config({
     ownerId,
+    title,
     config: data,
   });
   const config = await newConfig.save();

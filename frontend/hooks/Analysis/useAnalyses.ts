@@ -3,6 +3,7 @@ import fetchAnalyses from '../../fetches/fetchAnalyses';
 
 type Analysis = {
   matchId: string;
+  title: string;
   createdAt: string;
   _id: string;
 };

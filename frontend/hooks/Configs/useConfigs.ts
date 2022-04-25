@@ -3,6 +3,7 @@ import fetchConfigs from '../../fetches/fetchConfigs';
 
 type Config = {
   _id: string;
+  title: string;
   ownerId: string;
   config: any;
   createdAt: Date;

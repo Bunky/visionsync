@@ -12,9 +12,9 @@ router.route('/upload').post(async (req, res) => {
   if (req.isAuthenticated()) {
     try {
       const {
-        ownerId, data
+        ownerId, title, data
       } = req.body;
-      await uploadConfig(ownerId, data);
+      await uploadConfig(ownerId, title, data);
       return res.sendStatus(200);
     } catch (err) {
       return res.sendStatus(500);

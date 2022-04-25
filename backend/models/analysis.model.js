@@ -13,6 +13,11 @@ const analysisSchema = new Schema({
     trim: true,
     required: true
   },
+  title: {
+    type: String,
+    trim: true,
+    required: true
+  },
   settings: {}
 }, {
   timestamps: true

@@ -303,6 +303,11 @@ const configSchema = new Schema({
     trim: true,
     required: true
   },
+  title: {
+    type: String,
+    trim: true,
+    required: true
+  },
   config
 }, {
   timestamps: true
