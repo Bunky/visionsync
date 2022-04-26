@@ -7,8 +7,7 @@ const { uploadConfig } = require('../utils/configs');
 
 let activeAnalysis = []; // Change this so it uses redis instead of a variable!
 
-exports.isActive = (room) => activeAnalysis.filter((analysis) => analysis.room === room.toString()).length > 0;
-exports.getActive = (room) => activeAnalysis.filter((analysis) => analysis.room === room.toString())[0];
+exports.getActive = (room) => activeAnalysis.find((analysis) => analysis.room === room.toString());
 
 exports.startAnalysis = async (room, matchId) => {
   const match = await Match.findById(matchId);

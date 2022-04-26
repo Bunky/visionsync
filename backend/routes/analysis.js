@@ -2,7 +2,7 @@ const router = require('express').Router();
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const {
-  startAnalysis, getActive, isActive, stopAnalysis
+  startAnalysis, getActive, stopAnalysis
 } = require('../processor/lineDetection');
 const Analysis = require('../models/analysis.model');
 const { uploadAnalysis, deleteAnalysis } = require('../utils/analysis');
@@ -83,8 +83,8 @@ router.route('/stop').post(async (req, res) => {
 // Check if running
 router.route('/current').get(async (req, res) => {
   if (req.isAuthenticated()) {
-    if (isActive(req.user._id)) {
-      const active = getActive(req.user._id);
+    const active = getActive(req.user._id);
+    if (active) {
       return res.status(200).send({ active: true, matchId: active.matchId });
     }
     return res.status(200).send({ active: false });

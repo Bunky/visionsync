@@ -3,7 +3,6 @@ import fetchAnalysis from '../../fetches/fetchAnalysis';
 
 type Analysis = {
   active: boolean;
-  room: string;
   matchId?: string;
 };
 

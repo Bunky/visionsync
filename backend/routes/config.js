@@ -3,7 +3,7 @@ const _ = require('lodash');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const User = require('../models/user.model');
-const { isActive, getActive } = require('../processor/lineDetection');
+const { getActive } = require('../processor/lineDetection');
 const { setJsonValue, getJsonValue } = require('../utils/redis');
 
 // =================================================================================================
@@ -12,8 +12,8 @@ const { setJsonValue, getJsonValue } = require('../utils/redis');
 
 router.route('/').get(async (req, res) => {
   if (req.isAuthenticated()) {
-    if (isActive(req.user._id)) {
-      const active = getActive(req.user._id);
+    const active = getActive(req.user._id);
+    if (active) {
       return res.status(200).send(await getJsonValue(`${active.matchId}-settings`));
     }
     const user = await User.findById(req.user._id);
@@ -28,9 +28,8 @@ router.route('/').get(async (req, res) => {
 
 router.route('/').post(async (req, res) => {
   if (req.isAuthenticated()) {
-    if (isActive(req.user._id)) {
-      const active = getActive(req.user._id);
-
+    const active = getActive(req.user._id);
+    if (active) {
       const currentSettings = await getJsonValue(`${active.matchId}-settings`);
       const newSettings = _.merge(currentSettings, req.body);
 
