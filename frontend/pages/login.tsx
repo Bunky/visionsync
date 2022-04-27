@@ -62,7 +62,7 @@ const Login = () => {
   return (
     <Center>
       <StyledPaper
-        padding="md"
+        p="md"
         shadow="sm"
         radius="md"
       >

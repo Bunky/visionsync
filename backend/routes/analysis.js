@@ -62,7 +62,7 @@ router.route('/').delete(async (req, res) => {
 // =================================================================================================
 
 // Start analysis
-router.route('/start').post(async (req, res) => {
+router.route('/start').post((req, res) => {
   if (req.isAuthenticated()) {
     // Check user has access to match
     startAnalysis(req.user._id.toString(), req.body.matchId);
@@ -72,7 +72,7 @@ router.route('/start').post(async (req, res) => {
 });
 
 // Stop analysis
-router.route('/stop').post(async (req, res) => {
+router.route('/stop').post((req, res) => {
   if (req.isAuthenticated()) {
     stopAnalysis(req.body.matchId);
     return res.status(200).send({ active: false });
@@ -81,7 +81,7 @@ router.route('/stop').post(async (req, res) => {
 });
 
 // Check if running
-router.route('/current').get(async (req, res) => {
+router.route('/current').get((req, res) => {
   if (req.isAuthenticated()) {
     const active = getActive(req.user._id);
     if (active) {
