@@ -24,7 +24,7 @@ const VideoTable = () => {
 
   // eslint-disable-next-line max-len
   const toggleRow = (analysisId) => setSelection((current) => (current.includes(analysisId) ? current.filter((item) => item !== analysisId) : [...current, analysisId]));
-  const toggleAll = () => setSelection((current) => (current.length === configs.length ? [] : configs.map((item) => item._id)));
+  const toggleAll = () => setSelection((current) => (current.length === matches.length ? [] : matches.map((item) => item._id)));
 
   if (matchesStatus === 'loading') {
     return (<Center sx={{ height: '100%' }}><Loader /></Center>);
