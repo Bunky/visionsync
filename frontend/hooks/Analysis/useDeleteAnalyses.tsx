@@ -1,30 +1,30 @@
 import { useQueryClient, useMutation } from 'react-query';
 import { useNotifications } from '@mantine/notifications';
 import { IoAlert } from 'react-icons/io5';
-import deleteAnalysis from '../../mutations/Analyses/deleteAnalysis';
+import deleteAnalyses from '../../mutations/Analyses/deleteAnalyses';
 
-const useDeleteAnalysis = () => {
+const useDeleteAnalyses = () => {
   const queryClient = useQueryClient();
   const notifications = useNotifications();
 
-  return useMutation(deleteAnalysis, {
-    onMutate: async (analysisId) => {
+  return useMutation(deleteAnalyses, {
+    onMutate: async (analysisIds) => {
       await queryClient.cancelQueries('analyses');
 
       const previousAnalyses = queryClient.getQueryData('analyses');
-      queryClient.setQueryData('analyses', previousAnalyses.filter((analysis) => analysis._id !== analysisId));
+      queryClient.setQueryData('analyses', previousAnalyses.filter((analysis) => analysisIds.indexOf(analysis._id) === -1));
       return { previousAnalyses };
     },
-    onError: (err, analysisId, context: any) => {
+    onError: (err, analysisIds, context: any) => {
       notifications.showNotification({
-        title: 'Error', message: 'Failed to delete analysis!', color: 'red', icon: <IoAlert />
+        title: 'Error', message: 'Failed to delete analyses!', color: 'red', icon: <IoAlert />
       });
       queryClient.setQueryData('analyses', context.previousAnalyses);
     },
-    onSuccess: (res, analysisId, context: any) => {
+    onSuccess: (res, analysisIds, context: any) => {
       if (res.status === 429 || res.status === 500) {
         notifications.showNotification({
-          title: 'Error', message: 'Failed to delete analysis!', color: 'red', icon: <IoAlert />
+          title: 'Error', message: 'Failed to delete analyses!', color: 'red', icon: <IoAlert />
         });
         queryClient.setQueryData('analyses', context.previousAnalyses);
       }
@@ -35,4 +35,4 @@ const useDeleteAnalysis = () => {
   });
 };
 
-export default useDeleteAnalysis;
+export default useDeleteAnalyses;

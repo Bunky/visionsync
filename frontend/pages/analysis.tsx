@@ -15,9 +15,11 @@ import Stats from '../components/Layout/Pages/Home/Statistics/Stats';
 import PlayerStatsModal from '../components/Layout/Pages/Home/PlayerStatsModal';
 import useAnalysis from '../hooks/Analysis/useAnalysis';
 import useStopAnalysis from '../hooks/Analysis/useStopAnalysis';
+import useLiveSocket from '../hooks/useLiveSocket';
 
 const Analysis = () => {
   const { data: analysis, status: analysisStatus } = useAnalysis();
+  const live = useLiveSocket();
   const useStop = useStopAnalysis();
   const router = useRouter();
   const [showDetections, setShowDetections] = useState(true);
@@ -28,7 +30,7 @@ const Analysis = () => {
     }
   }, [analysis, analysisStatus, router]);
 
-  if (analysisStatus === 'loading') {
+  if (analysisStatus === 'loading' || live === null) {
     return (<Center sx={{ height: '100%' }}><Loader /></Center>);
   }
 

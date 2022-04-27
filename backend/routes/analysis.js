@@ -5,7 +5,7 @@ const {
   startAnalysis, getActive, stopAnalysis
 } = require('../processor/lineDetection');
 const Analysis = require('../models/analysis.model');
-const { uploadAnalysis, deleteAnalysis } = require('../utils/analysis');
+const { uploadAnalysis, deleteAnalysis, deleteAnalyses } = require('../utils/analysis');
 
 // =================================================================================================
 //                                           Upload Analysis
@@ -48,7 +48,19 @@ router.route('/').get(async (req, res) => {
 router.route('/').delete(async (req, res) => {
   if (req.isAuthenticated()) {
     try {
-      await deleteAnalysis(req.body.analysisId);
+      await deleteAnalyses(req.body.analysisIds);
+      return res.sendStatus(200);
+    } catch (err) {
+      return res.sendStatus(500);
+    }
+  }
+  return res.sendStatus(403);
+});
+
+router.route('/:analysisId').delete(async (req, res) => {
+  if (req.isAuthenticated()) {
+    try {
+      await deleteAnalysis(req.params.analysisId);
       return res.sendStatus(200);
     } catch (err) {
       return res.sendStatus(500);

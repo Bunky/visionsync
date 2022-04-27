@@ -28,7 +28,7 @@ const VideoMenu = ({ matchId }) => {
       <Menu.Item
         color="red"
         icon={<IoTrash size={14} />}
-        onClick={() => deleteMatch.mutate({ matchId })}
+        onClick={() => deleteMatch.mutate(matchId)}
       >
         Delete Video
       </Menu.Item>

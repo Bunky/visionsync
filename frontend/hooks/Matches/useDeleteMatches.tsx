@@ -1,30 +1,30 @@
 import { useQueryClient, useMutation } from 'react-query';
 import { useNotifications } from '@mantine/notifications';
 import { IoAlert } from 'react-icons/io5';
-import deleteMatch from '../../mutations/Matches/deleteMatch';
+import deleteMatches from '../../mutations/Matches/deleteMatches';
 
-const useDeleteMatch = () => {
+const useDeleteMatches = () => {
   const queryClient = useQueryClient();
   const notifications = useNotifications();
 
-  return useMutation(deleteMatch, {
-    onMutate: async (matchId) => {
+  return useMutation(deleteMatches, {
+    onMutate: async (matchIds) => {
       await queryClient.cancelQueries('matches');
 
       const previousMatches = queryClient.getQueryData('matches');
-      queryClient.setQueryData('matches', previousMatches.filter((match) => match._id !== matchId));
+      queryClient.setQueryData('matches', previousMatches.filter((match) => matchIds.indexOf(match._id) === -1));
       return { previousMatches };
     },
-    onError: (err, matchId, context: any) => {
+    onError: (err, matchIds, context: any) => {
       notifications.showNotification({
-        title: 'Error', message: 'Failed to delete match!', color: 'red', icon: <IoAlert />
+        title: 'Error', message: 'Failed to delete matches!', color: 'red', icon: <IoAlert />
       });
       queryClient.setQueryData('matches', context.previousMatches);
     },
-    onSuccess: (res, matchId, context: any) => {
+    onSuccess: (res, matchIds, context: any) => {
       if (res.status === 429 || res.status === 500) {
         notifications.showNotification({
-          title: 'Error', message: 'Failed to delete match!', color: 'red', icon: <IoAlert />
+          title: 'Error', message: 'Failed to delete matches!', color: 'red', icon: <IoAlert />
         });
         queryClient.setQueryData('matches', context.previousMatches);
       }
@@ -35,4 +35,4 @@ const useDeleteMatch = () => {
   });
 };
 
-export default useDeleteMatch;
+export default useDeleteMatches;

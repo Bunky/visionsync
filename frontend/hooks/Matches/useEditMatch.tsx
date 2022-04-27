@@ -29,7 +29,7 @@ const useEditMatch = () => {
       queryClient.setQueryData('matches', context.previousMatches);
     },
     onSuccess: (res, newMatch, context: any) => {
-      if (res.status === 429) {
+      if (res.status === 429 || res.status === 500) {
         notifications.showNotification({
           title: 'Error', message: 'Failed to edit match!', color: 'red', icon: <IoAlert />
         });

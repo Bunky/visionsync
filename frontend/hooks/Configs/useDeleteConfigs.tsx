@@ -1,30 +1,30 @@
 import { useQueryClient, useMutation } from 'react-query';
 import { useNotifications } from '@mantine/notifications';
 import { IoAlert } from 'react-icons/io5';
-import deleteConfig from '../../mutations/Configs/deleteConfig';
+import deleteConfigs from '../../mutations/Configs/deleteConfigs';
 
-const useDeleteConfig = () => {
+const useDeleteConfigs = () => {
   const queryClient = useQueryClient();
   const notifications = useNotifications();
 
-  return useMutation(deleteConfig, {
-    onMutate: async (configId) => {
+  return useMutation(deleteConfigs, {
+    onMutate: async (configIds) => {
       await queryClient.cancelQueries('configs');
 
       const previousConfigs = queryClient.getQueryData('configs');
-      queryClient.setQueryData('configs', previousConfigs.filter((config) => config._id !== configId));
+      queryClient.setQueryData('configs', previousConfigs.filter((config) => configIds.indexOf(config._id) === -1));
       return { previousConfigs };
     },
-    onError: (err, configId, context: any) => {
+    onError: (err, configIds, context: any) => {
       notifications.showNotification({
-        title: 'Error', message: 'Failed to delete config!', color: 'red', icon: <IoAlert />
+        title: 'Error', message: 'Failed to delete configs!', color: 'red', icon: <IoAlert />
       });
       queryClient.setQueryData('configs', context.previousConfigs);
     },
-    onSuccess: (res, configId, context: any) => {
+    onSuccess: (res, configIds, context: any) => {
       if (res.status === 429 || res.status === 500) {
         notifications.showNotification({
-          title: 'Error', message: 'Failed to delete config!', color: 'red', icon: <IoAlert />
+          title: 'Error', message: 'Failed to delete configs!', color: 'red', icon: <IoAlert />
         });
         queryClient.setQueryData('configs', context.previousConfigs);
       }
@@ -35,4 +35,4 @@ const useDeleteConfig = () => {
   });
 };
 
-export default useDeleteConfig;
+export default useDeleteConfigs;

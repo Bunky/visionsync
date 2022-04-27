@@ -71,25 +71,23 @@ exports.uploadMatch = (ownerId, title, configId, matchData) => new Promise(async
   }).on('error', (err) => {
     console.log(`Error: ${err.message}`);
   }).on('progress', (p) => {
-    // console.log(p);
+    // console.log('progress', p);
   }).pipe(passthroughStream);
 
   try {
-    // const s3ThumbnailResponse = await s3.upload({
-    //   Bucket: 'videos.visionsync.io',
-    //   Key: `thumbnails/${match._id}.png`,
-    //   // Body: await generateThumbnail(matchData, match._id)
-    //   Body: await generateThumbnail(matchData, match._id)
-    // }).promise();
-    const s3Response = await s3.upload({
-      Bucket: 'videos.visionsync.io',
+    await s3.upload({
+      Bucket: process.env.AWS_BUCKET,
+      Key: `thumbnails/${match._id}.png`,
+      Body: await generateThumbnail(matchData, match._id.toString())
+    }).promise();
+    await s3.upload({
+      Bucket: process.env.AWS_BUCKET,
       Key: `matches/${match._id}.mp4`,
       Body: passthroughStream
     }).promise();
 
-    resolve({ s3Response }); // s3ThumbnailResponse
+    resolve();
   } catch (err) {
-    console.log(err);
     await Match.findByIdAndDelete(match._id);
     reject(err);
   }
@@ -104,16 +102,46 @@ exports.deleteMatch = (matchId) => new Promise(async (resolve, reject) => {
 
   try {
     // Deleting files from the bucket
-    const s3Response = s3.deleteObject({
-      Bucket: 'videos.visionsync.io',
+    await s3.deleteObject({
+      Bucket: process.env.AWS_BUCKET,
       Key: `thumbnails/${matchId}.png`
     }).promise();
-    const s3ThumbnailResponse = s3.deleteObject({
-      Bucket: 'videos.visionsync.io',
+    await s3.deleteObject({
+      Bucket: process.env.AWS_BUCKET,
       Key: `matches/${matchId}.mp4`
     }).promise();
 
-    resolve({ s3ThumbnailResponse, s3Response });
+    resolve();
+  } catch (err) {
+    reject(err);
+  }
+});
+
+exports.deleteMatches = (matchIds) => new Promise(async (resolve, reject) => {
+  await Match.deleteMany({
+    _id: {
+      $in: matchIds
+    }
+  });
+
+  try {
+    // Deleting files from the bucket
+    await s3.deleteObjects({
+      Bucket: process.env.AWS_BUCKET,
+      Delete: {
+        Objects: matchIds.map((matchId) => ({ Key: `thumbnails/${matchId}.png` })),
+        Quiet: false
+      }
+    }).promise();
+    await s3.deleteObjects({
+      Bucket: process.env.AWS_BUCKET,
+      Delete: {
+        Objects: matchIds.map((matchId) => ({ Key: `matches/${matchId}.mp4` })),
+        Quiet: false
+      }
+    }).promise();
+
+    resolve();
   } catch (err) {
     reject(err);
   }

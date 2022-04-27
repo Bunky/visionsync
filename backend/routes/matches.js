@@ -2,7 +2,7 @@ const router = require('express').Router();
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const Match = require('../models/match.model');
-const { uploadMatch, deleteMatch } = require('../utils/matches');
+const { uploadMatch, deleteMatch, deleteMatches } = require('../utils/matches');
 
 // =================================================================================================
 //                                           Upload Match
@@ -41,9 +41,9 @@ router.route('/').get(async (req, res) => {
 //                                           Edit Match
 // =================================================================================================
 
-router.route('/:id').post(async (req, res) => {
+router.route('/:matchId').post(async (req, res) => {
   if (req.isAuthenticated()) {
-    const match = await Match.findByIdAndUpdate(req.params.id, req.body);
+    const match = await Match.findByIdAndUpdate(req.params.matchId, req.body);
     return res.status(200).send(match);
   }
   return res.sendStatus(403);
@@ -56,7 +56,19 @@ router.route('/:id').post(async (req, res) => {
 router.route('/').delete(async (req, res) => {
   if (req.isAuthenticated()) {
     try {
-      await deleteMatch(req.body.matchId);
+      await deleteMatches(req.body.matchIds);
+      return res.sendStatus(200);
+    } catch (err) {
+      return res.sendStatus(500);
+    }
+  }
+  return res.sendStatus(403);
+});
+
+router.route('/:matchId').delete(async (req, res) => {
+  if (req.isAuthenticated()) {
+    try {
+      await deleteMatch(req.params.matchId);
       return res.sendStatus(200);
     } catch (err) {
       return res.sendStatus(500);

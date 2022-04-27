@@ -28,7 +28,7 @@ const useUploadFile = () => {
       queryClient.setQueryData('matches', context.previousMatches);
     },
     onSuccess: (res, newMatch, context: any) => {
-      if (res.status === 429) {
+      if (res.status === 429 || res.status === 500) {
         notifications.showNotification({
           title: 'Error', message: 'Failed to upload match!', color: 'red', icon: <IoAlert />
         });

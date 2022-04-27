@@ -29,7 +29,7 @@ const useEditConfig = () => {
       queryClient.setQueryData('configs', context.previousConfigs);
     },
     onSuccess: (res, newConfig, context: any) => {
-      if (res.status === 429) {
+      if (res.status === 429 || res.status === 500) {
         notifications.showNotification({
           title: 'Error', message: 'Failed to edit config!', color: 'red', icon: <IoAlert />
         });

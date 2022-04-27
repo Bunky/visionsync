@@ -26,7 +26,7 @@ exports.uploadAnalysis = (matchId, ownerId, data, settings) => new Promise(async
 
   try {
     const s3Response = await s3.upload({
-      Bucket: 'videos.visionsync.io',
+      Bucket: process.env.AWS_BUCKET,
       Key: `analyses/${analysis._id}.json`,
       Body: JSON.stringify(data),
       ContentType: 'application/json'
@@ -50,11 +50,34 @@ exports.deleteAnalysis = (analysisId) => new Promise(async (resolve, reject) => 
   try {
     // Deleting files from the bucket
     const s3Response = s3.deleteObject({
-      Bucket: 'videos.visionsync.io',
+      Bucket: process.env.AWS_BUCKET,
       Key: `analyses/${analysisId}.json`
     }).promise();
 
     resolve(s3Response);
+  } catch (err) {
+    reject(err);
+  }
+});
+
+exports.deleteAnalyses = (analysisIds) => new Promise(async (resolve, reject) => {
+  await Analysis.deleteMany({
+    _id: {
+      $in: analysisIds
+    }
+  });
+
+  try {
+    // Deleting files from the bucket
+    await s3.deleteObjects({
+      Bucket: process.env.AWS_BUCKET,
+      Delete: {
+        Objects: analysisIds.map((analysisId) => ({ Key: `analyses/${analysisId}.json` })),
+        Quiet: false
+      }
+    }).promise();
+
+    resolve();
   } catch (err) {
     reject(err);
   }

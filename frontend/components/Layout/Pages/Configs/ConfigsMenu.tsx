@@ -28,7 +28,7 @@ const ConfigsMenu = ({ configId }) => {
       <Menu.Item
         color="red"
         icon={<IoTrash size={14} />}
-        onClick={() => deleteConfig.mutate({ configId })}
+        onClick={() => deleteConfig.mutate(configId)}
       >
         Delete Config
       </Menu.Item>
