@@ -31,7 +31,7 @@ router.route('/').get(async (req, res) => {
   if (req.isAuthenticated()) {
     const matches = await Match.find({ ownerId: req.user._id }, {
       ownerId: 0, settings: 0, __v: 0
-    });
+    }).limit(100);
     return res.status(200).send(matches);
   }
   return res.sendStatus(403);

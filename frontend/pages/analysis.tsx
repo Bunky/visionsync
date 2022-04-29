@@ -25,7 +25,9 @@ const Analysis = () => {
   const [showDetections, setShowDetections] = useState(true);
 
   useEffect(() => {
-    if (analysisStatus === 'success' && !analysis.active) {
+    if (analysis && !analysis.active) {
+      console.log('redirected to home!');
+      console.log(analysis);
       router.push('/');
     }
   }, [analysis, analysisStatus, router]);

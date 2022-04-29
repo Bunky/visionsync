@@ -5,15 +5,17 @@ import {
 import useAnalyses from '../hooks/Analysis/useAnalyses';
 import AnalysesTable from '../components/Layout/Pages/Analyses/AnalysesTable';
 import ViewAnalysisModal from '../components/Layout/Pages/Analyses/ViewAnalysisModal';
+import useMatches from '../hooks/Matches/useMatches';
 
 const Analyses = () => {
   const { status: analysesStatus } = useAnalyses();
+  const { status: matchesStatus } = useMatches();
 
-  if (analysesStatus === 'loading') {
+  if (analysesStatus === 'loading' || matchesStatus === 'loading') {
     return (<Center sx={{ height: '100%' }}><Loader /></Center>);
   }
 
-  if (analysesStatus === 'error') {
+  if (analysesStatus === 'error' || matchesStatus === 'error') {
     return (<Center sx={{ height: '100%' }}>Error</Center>);
   }
 
@@ -27,6 +29,7 @@ const Analyses = () => {
 
 const Container = styled.div`
   max-height: 100%;
+  height: 100%;
 `;
 
 export default Analyses;

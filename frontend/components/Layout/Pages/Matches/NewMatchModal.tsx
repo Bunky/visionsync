@@ -5,14 +5,16 @@ import {
 import { Dropzone } from '@mantine/dropzone';
 import { useForm } from '@mantine/hooks';
 import { IoCloudUpload, IoStop } from 'react-icons/io5';
+import { useRecoilState } from 'recoil';
 import useUploadFile from '../../../../hooks/Matches/useUploadFile';
 import useConfigs from '../../../../hooks/Configs/useConfigs';
+import newMatchModalState from '../../../../atoms/newMatchModalState';
 
-const NewMatchModal = ({ edit }) => {
+const NewMatchModal = () => {
+  const [modal, setModal] = useRecoilState(newMatchModalState);
   const uploadFile = useUploadFile();
   const { data: configs, status: configsStatus } = useConfigs();
 
-  const [opened, setOpened] = useState(false);
   const [error, setError] = useState(null);
   const [files, setFiles] = useState(null);
   const form = useForm({
@@ -45,7 +47,9 @@ const NewMatchModal = ({ edit }) => {
   };
 
   const handleClose = () => {
-    setOpened(false);
+    setModal({
+      open: false
+    });
     setTimeout(() => {
       form.reset();
       setFiles(null);
@@ -54,64 +58,59 @@ const NewMatchModal = ({ edit }) => {
   };
 
   return (
-    <Group>
-      <Button onClick={() => setOpened(true)}>
-        New Match
-      </Button>
-      <Modal
-        opened={opened}
-        onClose={handleClose}
-        title="New Match"
-      >
-        <Group grow direction="column" spacing="sm">
-          <TextInput
-            required
-            label="Title"
-            placeholder=""
-            {...form.getInputProps('title')}
-          />
-          <Select
-            label="Config"
-            placeholder="Select a config"
-            data={configsStatus === 'success' ? configs.map((config) => ({ value: config._id, label: config.title })) : []}
-            {...form.getInputProps('config')}
-            searchable
-          />
-          {files === null ? (
-            <Dropzone
-              onDrop={(file) => setFiles(file)}
-              onReject={(file) => console.log('rejected files', file)}
-              maxSize={300 * 1024 ** 2}
-              multiple={false}
-              accept={['video/x-matroska']}
-            >
-              {(status) => (
-                <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
-                  {status.rejected && <IoStop />}
-                  <IoCloudUpload />
-                  <div>
-                    <Text inline>
-                      Drag videos here or click to select
-                    </Text>
-                    <Text size="xs" color="dimmed" inline mt={7}>
-                      The video should not exceed 500mb
-                    </Text>
-                  </div>
-                </Group>
-              )}
-            </Dropzone>
-          ) : (
-            `${files[0].name} | ${files[0].size}bytes`
-          )}
-          {!!error && (
-            <Text color="red" size="sm">
-              {error}
-            </Text>
-          )}
-          <Button onClick={submitUpload}>Upload</Button>
-        </Group>
-      </Modal>
-    </Group>
+    <Modal
+      opened={modal.open}
+      onClose={handleClose}
+      title="New Match"
+    >
+      <Group grow direction="column" spacing="sm">
+        <TextInput
+          required
+          label="Title"
+          placeholder=""
+          {...form.getInputProps('title')}
+        />
+        <Select
+          label="Config"
+          placeholder="Select a config"
+          data={configsStatus === 'success' ? configs.map((config) => ({ value: config._id, label: config.title })) : []}
+          {...form.getInputProps('config')}
+          searchable
+        />
+        {files === null ? (
+          <Dropzone
+            onDrop={(file) => setFiles(file)}
+            onReject={(file) => console.log('rejected files', file)}
+            maxSize={300 * 1024 ** 2}
+            multiple={false}
+            accept={['video/x-matroska']}
+          >
+            {(status) => (
+              <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
+                {status.rejected && <IoStop />}
+                <IoCloudUpload />
+                <div>
+                  <Text inline>
+                    Drag videos here or click to select
+                  </Text>
+                  <Text size="xs" color="dimmed" inline mt={7}>
+                    The video should not exceed 500mb
+                  </Text>
+                </div>
+              </Group>
+            )}
+          </Dropzone>
+        ) : (
+          `${files[0].name} | ${files[0].size}bytes`
+        )}
+        {!!error && (
+          <Text color="red" size="sm">
+            {error}
+          </Text>
+        )}
+        <Button onClick={submitUpload}>Upload</Button>
+      </Group>
+    </Modal>
   );
 };
 

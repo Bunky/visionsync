@@ -29,6 +29,7 @@
     "react-icons": "^4.3.1",
     "react-player": "^2.10.0",
     "react-query": "^3.34.12",
+    "react-table": "^7.7.0",
     "recoil": "^0.6.1",
     "socket.io-client": "^4.4.1",
     "styled-components": "^5.3.3"
