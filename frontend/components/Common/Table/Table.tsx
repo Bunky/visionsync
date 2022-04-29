@@ -1,9 +1,10 @@
 /* eslint-disable react/no-unstable-nested-components */
 import {
-  ActionIcon, Button, Checkbox, Group, Paper, ScrollArea, Stack, Table, Text, TextInput, useMantineTheme
+  ActionIcon, Button, Checkbox, Group, Paper, Popover, ScrollArea, Stack, Table, Text, TextInput, useMantineTheme
 } from '@mantine/core';
 import {
   IoAdd,
+  IoClose,
   IoSearch, IoTrash
 } from 'react-icons/io5';
 import {
@@ -13,11 +14,13 @@ import {
   useTable, useSortBy, usePagination, useGlobalFilter, useRowSelect, useFlexLayout
 } from 'react-table';
 import styled from 'styled-components';
+import { useState } from 'react';
 
 const CustomTable = ({
   columns, data, deleteMutation, openCreateModal = null, rowHeight = false
 }) => {
   const theme = useMantineTheme();
+  const [delPopover, setDelPopover] = useState(false);
   const {
     getTableProps,
     getTableBodyProps,
@@ -81,18 +84,51 @@ const CustomTable = ({
           sx={{ width: '100%' }}
         />
         <Group position="right">
-          <Button
-            loading={deleteMutation.isLoading}
-            color="red"
-            leftIcon={<IoTrash />}
-            disabled={selectedFlatRows.length === 0}
-            onClick={() => {
-              deleteMutation.mutate(selectedFlatRows.map((row) => row.original._id));
-              toggleAllPageRowsSelected(false);
-            }}
+          <Popover
+            opened={delPopover && selectedFlatRows.length > 0}
+            onClose={() => setDelPopover(false)}
+            target={(
+              <Button
+                loading={deleteMutation.isLoading}
+                color="red"
+                leftIcon={<IoTrash />}
+                disabled={selectedFlatRows.length === 0}
+                onClick={() => setDelPopover((o) => !o)}
+              >
+                Delete
+              </Button>
+            )}
+            spacing="sm"
+            position="bottom"
+            placement="end"
+            withArrow
           >
-            Delete
-          </Button>
+            <Stack>
+              <Text size="sm">Are you sure?</Text>
+              <Group noWrap>
+                <Button
+                  compact
+                  variant="default"
+                  leftIcon={<IoClose />}
+                  onClick={() => setDelPopover(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  compact
+                  loading={deleteMutation.isLoading}
+                  color="red"
+                  leftIcon={<IoTrash />}
+                  onClick={() => {
+                    deleteMutation.mutate(selectedFlatRows.map((row) => row.original._id));
+                    toggleAllPageRowsSelected(false);
+                  }}
+                >
+                  Delete
+                </Button>
+              </Group>
+            </Stack>
+          </Popover>
         </Group>
       </Group>
       <StyledTable {...getTableProps()}>

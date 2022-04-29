@@ -34,7 +34,7 @@ const AnalysesTable = () => {
     Header: '',
     accessor: 'actions',
     Cell: ({ row }) => (
-      <Group position="right" noWrap sx={{ width: '100%' }}>
+      <Group spacing="sm" position="right" noWrap sx={{ width: '100%' }}>
         <Button
           onClick={() => setModal({
             open: true,
@@ -48,9 +48,9 @@ const AnalysesTable = () => {
         <AnalysesMenu analysisId={row.original._id} />
       </Group>
     ),
-    width: 173,
-    maxWidth: 173,
-    minWidth: 173,
+    width: 183,
+    maxWidth: 183,
+    minWidth: 183,
     disableSortBy: true
   }], []);
 

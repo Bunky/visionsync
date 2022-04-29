@@ -31,7 +31,7 @@ const ConfigsTable = () => {
     Header: '',
     accessor: 'actions',
     Cell: ({ row }) => (
-      <Group position="right" noWrap sx={{ width: '100%' }}>
+      <Group spacing="sm" position="right" noWrap sx={{ width: '100%' }}>
         <Button
           onClick={() => setModal({
             open: true,
@@ -45,9 +45,9 @@ const ConfigsTable = () => {
         <ConfigsMenu configId={row.original._id} />
       </Group>
     ),
-    width: 173,
-    maxWidth: 173,
-    minWidth: 173,
+    width: 196,
+    maxWidth: 196,
+    minWidth: 196,
     disableSortBy: true
   }], []);
 

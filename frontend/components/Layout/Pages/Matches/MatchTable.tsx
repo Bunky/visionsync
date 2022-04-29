@@ -9,7 +9,7 @@ import {
 import { format } from 'date-fns';
 import { useRecoilState } from 'recoil';
 import { useMemo } from 'react';
-import VideoMenu from './MatchMenu';
+import MatchMenu from './MatchMenu';
 import useMatches from '../../../../hooks/Matches/useMatches';
 import viewMatchModalState from '../../../../atoms/viewMatchModalState';
 import useStartAnalysis from '../../../../hooks/Analysis/useStartAnalysis';
@@ -17,7 +17,7 @@ import Table from '../../../Common/Table/Table';
 import useDeleteMatches from '../../../../hooks/Matches/useDeleteMatches';
 import newMatchModalState from '../../../../atoms/newMatchModalState';
 
-const VideoTable = () => {
+const MatchTable = () => {
   const { data: matches } = useMatches();
   const [, setModal] = useRecoilState(viewMatchModalState);
   const [, setNewModal] = useRecoilState(newMatchModalState);
@@ -28,7 +28,7 @@ const VideoTable = () => {
     Header: 'Match',
     accessor: 'title',
     Cell: ({ value, row }) => (
-      <Group dir="row" sx={{ width: '100%' }}>
+      <Group dir="row" noWrap sx={{ width: '100%' }}>
         <AspectRatio ratio={16 / 9} sx={{ width: 100 }}>
           <Image src={`http://d1pu8bxuwsqdvz.cloudfront.net/thumbnails/${row.original._id}.png`} radius="md" />
         </AspectRatio>
@@ -46,7 +46,7 @@ const VideoTable = () => {
     Header: '',
     accessor: 'actions',
     Cell: ({ row }) => (
-      <Group position="right" noWrap sx={{ width: '100%' }}>
+      <Group spacing="sm" position="right" noWrap sx={{ width: '100%' }}>
         <Button
           onClick={() => setModal({
             open: true,
@@ -64,12 +64,12 @@ const VideoTable = () => {
         >
           Analyse
         </Button>
-        <VideoMenu matchId={row.original._id} />
+        <MatchMenu matchId={row.original._id} />
       </Group>
     ),
-    width: 262,
-    maxWidth: 262,
-    minWidth: 262,
+    width: 268,
+    maxWidth: 268,
+    minWidth: 268,
     disableSortBy: true
   }], []);
 
@@ -85,4 +85,4 @@ const VideoTable = () => {
   );
 };
 
-export default VideoTable;
+export default MatchTable;
