@@ -5,7 +5,7 @@ import {
 import useConfigs from '../hooks/Configs/useConfigs';
 import ConfigsTable from '../components/Layout/Pages/Configs/ConfigsTable';
 import ViewConfigModal from '../components/Layout/Pages/Configs/ViewConfigModal';
-import EditConfigModal from '../components/Layout/Pages/Configs/EditConfigModal';
+import ConfigModal from '../components/Layout/Pages/Configs/ConfigModal';
 
 const Configs = () => {
   const { status: configsStatus } = useConfigs();
@@ -22,7 +22,7 @@ const Configs = () => {
     <Container>
       <ConfigsTable />
       <ViewConfigModal />
-      <EditConfigModal />
+      <ConfigModal />
     </Container>
   );
 };

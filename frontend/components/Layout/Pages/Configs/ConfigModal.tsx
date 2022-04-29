@@ -3,14 +3,15 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
+import { IoCopy, IoSave } from 'react-icons/io5';
 import { useRecoilState } from 'recoil';
-import editConfigModalState from '../../../../atoms/editConfigModalState';
+import configModalState from '../../../../atoms/configModalState';
 import useConfigs from '../../../../hooks/Configs/useConfigs';
 import useEditConfig from '../../../../hooks/Configs/useEditConfig';
 
-const EditConfigModal = () => {
-  const [modal, setModal] = useRecoilState(editConfigModalState);
-  const { data: configs, status: configsStatus } = useConfigs();
+const ConfigModal = () => {
+  const [modal, setModal] = useRecoilState(configModalState);
+  const { data: configs } = useConfigs();
   const editConfig = useEditConfig();
 
   const [error, setError] = useState(null);
@@ -27,15 +28,16 @@ const EditConfigModal = () => {
   });
 
   useEffect(() => {
-    if (modal.open && modal.configId !== '') {
-      form.setFieldValue('title', configs.filter((config) => config._id === modal.configId)[0].title);
+    if (modal.open && modal.configId !== '' && !modal.duplicate) {
+      form.setFieldValue('title', configs.find((config) => config._id === modal.configId).title);
     }
-  }, [modal.configId]);
+  }, [modal.configId, modal.duplicate, modal.open]);
 
   const submitSave = () => {
     setError(null);
     editConfig.mutate({
       configId: modal.configId,
+      duplicate: modal.duplicate,
       changes: {
         title: form.values.title
       }
@@ -45,9 +47,13 @@ const EditConfigModal = () => {
   };
 
   const handleClose = () => {
-    form.reset();
+    setTimeout(() => {
+      form.reset();
+      setError(null);
+    }, 250);
     setModal({
       open: false,
+      duplicate: modal.duplicate,
       configId: modal.configId
     });
   };
@@ -56,7 +62,7 @@ const EditConfigModal = () => {
     <Modal
       opened={modal.open}
       onClose={handleClose}
-      title="Edit Config"
+      title={modal.duplicate ? 'Duplicate Config' : 'Edit Config'}
     >
       <Group grow direction="column" spacing="sm">
         <TextInput
@@ -70,10 +76,23 @@ const EditConfigModal = () => {
             {error}
           </Text>
         )}
-        <Button onClick={submitSave}>Save</Button>
+        <Group noWrap position="right">
+          <Button
+            variant="default"
+            onClick={handleClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={submitSave}
+            leftIcon={modal.duplicate ? <IoCopy /> : <IoSave />}
+          >
+            {modal.duplicate ? 'Create' : 'Save'}
+          </Button>
+        </Group>
       </Group>
     </Modal>
   );
 };
 
-export default EditConfigModal;
+export default ConfigModal;

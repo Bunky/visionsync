@@ -10,17 +10,24 @@ const useEditConfig = () => {
   return useMutation(editConfig, {
     onMutate: async (updatedConfig) => {
       await queryClient.cancelQueries('configs');
-      const previousConfigs = queryClient.getQueryData('configs');
+      let previousConfigs = queryClient.getQueryData('configs');
 
-      const updatedConfigs = previousConfigs.map((config) => {
-        if (config._id === updatedConfig.configId) {
-          return { ...config, ...updatedConfig.changes };
-        }
-        return { ...config };
-      });
+      if (updatedConfig.duplicate) {
+        const config = previousConfigs.find((pConfig) => pConfig._id === updatedConfig.configId);
+        previousConfigs = [...previousConfigs, {
+          ...config, _id: 'temp', title: updatedConfig.changes.title, createdAt: new Date()
+        }];
+      } else {
+        previousConfigs = previousConfigs.map((config) => {
+          if (config._id === updatedConfig.configId) {
+            return { ...config, ...updatedConfig.changes };
+          }
+          return { ...config };
+        });
+      }
 
-      queryClient.setQueryData('configs', updatedConfigs);
-      return { previousConfigs: updatedConfigs };
+      queryClient.setQueryData('configs', previousConfigs);
+      return { previousConfigs };
     },
     onError: (err, newConfig, context: any) => {
       notifications.showNotification({

@@ -19,7 +19,7 @@ const AnalysesMenu = ({ analysisId }) => {
           icon={<IoTrash />}
           onClick={() => setDelOpen(true)}
         >
-          Delete Analysis
+          Delete
         </Menu.Item>
       </Menu>
       <ConfirmDeleteModal

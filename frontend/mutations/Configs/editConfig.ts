@@ -5,5 +5,5 @@ export default async (config) => fetch(`${process.env.NEXT_PUBLIC_API_URL}/confi
     Accept: 'application/json',
     'Content-Type': 'application/json',
   },
-  body: JSON.stringify(config.changes)
+  body: JSON.stringify(config)
 });

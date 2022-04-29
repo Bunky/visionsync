@@ -3,7 +3,7 @@ import { useNotifications } from '@mantine/notifications';
 import { IoAlert } from 'react-icons/io5';
 import uploadFile from '../../mutations/uploadFile';
 
-const useUploadFile = () => {
+const useCreateMatch = () => {
   const queryClient = useQueryClient();
   const notifications = useNotifications();
 
@@ -41,4 +41,4 @@ const useUploadFile = () => {
   });
 };
 
-export default useUploadFile;
+export default useCreateMatch;

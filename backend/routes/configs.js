@@ -30,7 +30,7 @@ router.route('/').post(async (req, res) => {
     const config = await getJsonValue(`${matchId}-settings`);
     await uploadConfig(req.user._id, req.body.title, config);
 
-    return res.status(200).send(config);
+    return res.status(200);
   }
   return res.sendStatus(403);
 });
@@ -41,8 +41,13 @@ router.route('/').post(async (req, res) => {
 
 router.route('/:configId').post(async (req, res) => {
   if (req.isAuthenticated()) {
-    const configs = await Config.findByIdAndUpdate(req.params.configId, req.body);
-    return res.status(200).send(configs);
+    if (req.body.duplicate) {
+      const config = await Config.findById(req.params.configId);
+      await uploadConfig(req.user._id, req.body.changes.title, config.config);
+      return res.status(200);
+    }
+    await Config.findByIdAndUpdate(req.params.configId, req.body.changes);
+    return res.status(200);
   }
   return res.sendStatus(403);
 });

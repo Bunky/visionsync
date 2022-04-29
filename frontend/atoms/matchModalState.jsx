@@ -1,8 +1,10 @@
 import { atom } from 'recoil';
 
 export default atom({
-  key: 'newMatchModal',
+  key: 'matchModal',
   default: {
-    open: false
+    open: false,
+    edit: false,
+    matchId: ''
   }
 });

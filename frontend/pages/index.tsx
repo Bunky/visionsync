@@ -4,9 +4,8 @@ import {
 } from '@mantine/core';
 import useMatches from '../hooks/Matches/useMatches';
 import MatchTable from '../components/Layout/Pages/Matches/MatchTable';
-import NewMatchModal from '../components/Layout/Pages/Matches/NewMatchModal';
+import MatchModal from '../components/Layout/Pages/Matches/MatchModal';
 import ViewMatchModal from '../components/Layout/Pages/Matches/ViewMatchModal';
-import EditMatchModal from '../components/Layout/Pages/Matches/EditMatchModal';
 
 const Home = () => {
   const { status: matchesStatus } = useMatches();
@@ -22,9 +21,8 @@ const Home = () => {
   return (
     <Container>
       <MatchTable />
-      <NewMatchModal />
+      <MatchModal />
       <ViewMatchModal />
-      <EditMatchModal />
     </Container>
   );
 };

@@ -2,10 +2,11 @@ import { Menu, Divider } from '@mantine/core';
 import { useState } from 'react';
 import {
   IoTrash,
-  IoPencil
+  IoPencil,
+  IoCopy
 } from 'react-icons/io5';
 import { useRecoilState } from 'recoil';
-import editConfigModalState from '../../../../atoms/editConfigModalState';
+import editConfigModalState from '../../../../atoms/configModalState';
 import useDeleteConfig from '../../../../hooks/Configs/useDeleteConfig';
 import ConfirmDeleteModal from '../../../Common/ConfirmDeleteModal/ConfirmDeleteModal';
 
@@ -22,10 +23,21 @@ const ConfigsMenu = ({ configId }) => {
           icon={<IoPencil />}
           onClick={() => setModal({
             open: true,
+            duplicate: false,
             configId
           })}
         >
-          Edit Config
+          Edit
+        </Menu.Item>
+        <Menu.Item
+          icon={<IoCopy />}
+          onClick={() => setModal({
+            open: true,
+            duplicate: true,
+            configId
+          })}
+        >
+          Duplicate
         </Menu.Item>
         <Divider />
         <Menu.Label>Danger Zone</Menu.Label>
@@ -34,7 +46,7 @@ const ConfigsMenu = ({ configId }) => {
           icon={<IoTrash />}
           onClick={() => setDelOpen(true)}
         >
-          Delete Config
+          Delete
         </Menu.Item>
       </Menu>
       <ConfirmDeleteModal

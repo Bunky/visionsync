@@ -5,27 +5,28 @@ import {
   IoPencil
 } from 'react-icons/io5';
 import { useRecoilState } from 'recoil';
-import editMatchModalState from '../../../../atoms/editMatchModalState';
+import matchModalState from '../../../../atoms/matchModalState';
 import useDeleteMatch from '../../../../hooks/Matches/useDeleteMatch';
 import ConfirmDeleteModal from '../../../Common/ConfirmDeleteModal/ConfirmDeleteModal';
 
 const MatchMenu = ({ matchId }) => {
   const deleteMatch = useDeleteMatch();
-  const [, setModal] = useRecoilState(editMatchModalState);
+  const [, setModal] = useRecoilState(matchModalState);
   const [delOpen, setDelOpen] = useState(false);
 
   return (
     <>
       <Menu>
-        <Menu.Label>Video</Menu.Label>
+        <Menu.Label>Match</Menu.Label>
         <Menu.Item
           icon={<IoPencil />}
           onClick={() => setModal({
             open: true,
+            edit: true,
             matchId
           })}
         >
-          Edit Video
+          Edit
         </Menu.Item>
         <Divider />
         <Menu.Label>Danger Zone</Menu.Label>
@@ -34,7 +35,7 @@ const MatchMenu = ({ matchId }) => {
           icon={<IoTrash />}
           onClick={() => setDelOpen(true)}
         >
-          Delete Match
+          Delete
         </Menu.Item>
       </Menu>
       <ConfirmDeleteModal

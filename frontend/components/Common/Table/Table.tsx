@@ -2,14 +2,9 @@
 import {
   ActionIcon, Button, Checkbox, Group, Paper, Popover, ScrollArea, Stack, Table, Text, TextInput, useMantineTheme
 } from '@mantine/core';
-import {
-  IoAdd,
-  IoClose,
-  IoSearch, IoTrash
-} from 'react-icons/io5';
-import {
-  FaSort, FaSortDown, FaSortUp
-} from 'react-icons/fa';
+import { IoClose, IoSearch, IoTrash } from 'react-icons/io5';
+import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa';
+import { BsPlusLg } from 'react-icons/bs';
 import {
   useTable, useSortBy, usePagination, useGlobalFilter, useRowSelect, useFlexLayout
 } from 'react-table';
@@ -70,7 +65,7 @@ const CustomTable = ({
       <Group noWrap mb="md" spacing="sm">
         {openCreateModal && (
           <Button
-            leftIcon={<IoAdd />}
+            leftIcon={<BsPlusLg />}
             onClick={openCreateModal}
           >
             New

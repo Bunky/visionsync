@@ -1,9 +1,10 @@
 import { atom } from 'recoil';
 
 export default atom({
-  key: 'editConfigModal',
+  key: 'configModal',
   default: {
     open: false,
+    duplicate: false,
     configId: ''
   }
 });
