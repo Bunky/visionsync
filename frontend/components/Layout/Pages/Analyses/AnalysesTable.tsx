@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
 import {
-  Group, Button
+  Group, Button, Text
 } from '@mantine/core';
 import { IoCode } from 'react-icons/io5';
 import { format } from 'date-fns';
@@ -22,12 +22,12 @@ const AnalysesTable = () => {
   const columns = useMemo(() => [{
     Header: 'Match',
     accessor: 'matchId',
-    Cell: ({ value }) => matches.find((match) => match._id === value).title || 'Deleted Match',
+    Cell: ({ value }) => (<Text size="sm">{matches.find((match) => match._id === value).title || 'Deleted Match'}</Text>),
     minWidth: 200,
   }, {
     Header: 'Uploaded',
     accessor: 'createdAt',
-    Cell: ({ value }) => format(new Date(value), 'dd/MM/yyyy HH:mm'),
+    Cell: ({ value }) => (<Text size="sm">{format(new Date(value), 'dd/MM/yyyy HH:mm')}</Text>),
     maxWidth: 200,
     minWidth: 160,
   }, {

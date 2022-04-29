@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
 import {
-  Group, Button
+  Group, Button, Text
 } from '@mantine/core';
 import { IoCode } from 'react-icons/io5';
 import { format } from 'date-fns';
@@ -20,11 +20,12 @@ const ConfigsTable = () => {
   const columns = useMemo(() => [{
     Header: 'Title',
     accessor: 'title',
+    Cell: ({ value }) => (<Text size="sm">{value}</Text>),
     minWidth: 200,
   }, {
     Header: 'Uploaded',
     accessor: 'createdAt',
-    Cell: ({ value }) => format(new Date(value), 'dd/MM/yyyy HH:mm'),
+    Cell: ({ value }) => (<Text size="sm">{format(new Date(value), 'dd/MM/yyyy HH:mm')}</Text>),
     maxWidth: 200,
     minWidth: 160,
   }, {
