@@ -22,7 +22,17 @@ const AnalysesTable = () => {
   const columns = useMemo(() => [{
     Header: 'Match',
     accessor: 'matchId',
-    Cell: ({ value }) => (<Text size="sm">{matches.find((match) => match._id === value).title || 'Deleted Match'}</Text>),
+    Cell: ({ value }) => (
+      <Text
+        size="sm"
+        sx={{
+          whiteSpace: 'nowrap',
+          overflow: 'hidden'
+        }}
+      >
+        {matches.find((match) => match._id === value).title || 'Deleted Match'}
+      </Text>
+    ),
     minWidth: 200,
   }, {
     Header: 'Uploaded',
@@ -59,6 +69,7 @@ const AnalysesTable = () => {
       data={analyses}
       columns={columns}
       deleteMutation={deleteAnalyses}
+      hiddenColumns={['createdAt']}
     />
   );
 };

@@ -9,11 +9,14 @@ import {
   useTable, useSortBy, usePagination, useGlobalFilter, useRowSelect, useFlexLayout
 } from 'react-table';
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useViewportSize } from '@mantine/hooks';
 
 const CustomTable = ({
-  columns, data, deleteMutation, openCreateModal = null, rowHeight = false
+  columns, data, deleteMutation, openCreateModal = null, rowHeight = false, hiddenColumns = []
 }) => {
+  const { width } = useViewportSize();
+
   const theme = useMantineTheme();
   const [delPopover, setDelPopover] = useState(false);
   const {
@@ -25,11 +28,11 @@ const CustomTable = ({
     setGlobalFilter,
     selectedFlatRows,
     toggleAllPageRowsSelected,
+    setHiddenColumns
   } = useTable(
     {
       columns,
       data,
-      initialState: { pageIndex: 0, pageSize: 10 },
       disableResizing: true
     },
     useGlobalFilter,
@@ -59,6 +62,14 @@ const CustomTable = ({
       ]);
     }
   );
+
+  useEffect(() => {
+    if (width < 1000) {
+      setHiddenColumns(hiddenColumns);
+    } else if (width >= 1000) {
+      setHiddenColumns([]);
+    }
+  }, [width]);
 
   return (
     <Container>

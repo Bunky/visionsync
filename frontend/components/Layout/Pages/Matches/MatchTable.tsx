@@ -30,7 +30,15 @@ const MatchTable = () => {
         <AspectRatio ratio={16 / 9} sx={{ width: 100, minWidth: 100 }}>
           <Image src={`http://d1pu8bxuwsqdvz.cloudfront.net/thumbnails/${row.original._id}.png`} radius="md" />
         </AspectRatio>
-        <Text size="sm">{value}</Text>
+        <Text
+          size="sm"
+          sx={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden'
+          }}
+        >
+          {value}
+        </Text>
       </Group>
     ),
     minWidth: 200
@@ -39,7 +47,7 @@ const MatchTable = () => {
     accessor: 'createdAt',
     Cell: ({ value }) => (<Text size="sm">{format(new Date(value), 'dd/MM/yyyy HH:mm')}</Text>),
     maxWidth: 200,
-    minWidth: 160,
+    minWidth: 160
   }, {
     Header: '',
     accessor: 'actions',
@@ -78,8 +86,11 @@ const MatchTable = () => {
       columns={columns}
       deleteMutation={deleteMatches}
       openCreateModal={() => setNewModal({
-        open: true
+        open: true,
+        edit: false,
+        matchId: null
       })}
+      hiddenColumns={['createdAt']}
     />
   );
 };

@@ -20,7 +20,17 @@ const ConfigsTable = () => {
   const columns = useMemo(() => [{
     Header: 'Title',
     accessor: 'title',
-    Cell: ({ value }) => (<Text size="sm">{value}</Text>),
+    Cell: ({ value }) => (
+      <Text
+        size="sm"
+        sx={{
+          whiteSpace: 'nowrap',
+          overflow: 'hidden'
+        }}
+      >
+        {value}
+      </Text>
+    ),
     minWidth: 200,
   }, {
     Header: 'Uploaded',
@@ -57,6 +67,7 @@ const ConfigsTable = () => {
       data={configs}
       columns={columns}
       deleteMutation={deleteConfigs}
+      hiddenColumns={['createdAt']}
     />
   );
 };
