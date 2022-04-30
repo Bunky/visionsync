@@ -27,7 +27,7 @@ const MatchTable = () => {
     accessor: 'title',
     Cell: ({ value, row }) => (
       <Group dir="row" noWrap sx={{ width: '100%' }}>
-        <AspectRatio ratio={16 / 9} sx={{ width: 100 }}>
+        <AspectRatio ratio={16 / 9} sx={{ width: 100, minWidth: 100 }}>
           <Image src={`http://d1pu8bxuwsqdvz.cloudfront.net/thumbnails/${row.original._id}.png`} radius="md" />
         </AspectRatio>
         <Text size="sm">{value}</Text>

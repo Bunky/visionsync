@@ -1,11 +1,13 @@
-import { Header as HeaderContainer, Burger, MediaQuery } from '@mantine/core';
-// import Image from 'next/image';
+import {
+  Header as HeaderContainer, Burger, MediaQuery, Group, Text
+} from '@mantine/core';
+import Image from 'next/image';
 import styled from 'styled-components';
 import Menu from './Menu';
-// import logo from '../../../public/images/logo.png';
+import logo from '../../../public/logo.svg';
 
 const Header = ({ open, setOpen }) => (
-  <Container height={70} padding="xs">
+  <Container height={70} p="md">
     <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
       <Burger
         opened={open}
@@ -14,8 +16,18 @@ const Header = ({ open, setOpen }) => (
         mr="xl"
       />
     </MediaQuery>
-    {/* <Image src={logo} width={80} height={40} alt="Logo" placeholder="blur" /> */}
-    VisionSync
+    <Group>
+      <Image src={logo} width={25} height={25} alt="Logo" />
+      <Text
+        size="lg"
+        weight={700}
+        variant="gradient"
+        gradient={{ from: 'violet', to: 'cyan', deg: 45 }}
+        style={{ fontFamily: 'Raleway, sans-serif' }}
+      >
+        VisionSync
+      </Text>
+    </Group>
     <Menu />
   </Container>
 );
