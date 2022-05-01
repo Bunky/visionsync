@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
 import {
-  ActionIcon, Button, Checkbox, Group, Paper, Popover, ScrollArea, Stack, Table, Text, TextInput, useMantineTheme
+  ActionIcon, Button, Checkbox, Group, LoadingOverlay, Paper, Popover, ScrollArea, Stack, Table, Text, TextInput, useMantineTheme
 } from '@mantine/core';
 import { IoClose, IoSearch, IoTrash } from 'react-icons/io5';
 import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa';
@@ -168,6 +168,7 @@ const CustomTable = ({
             prepareRow(row);
             return (
               <BodyRow theme={theme} height={rowHeight} {...row.getRowProps()}>
+                <LoadingOverlay visible={row.original.loading} />
                 {row.cells.map((cell) => (
                   <BodyCell height={rowHeight} maxWidth={cell.column.maxWidth} {...cell.getCellProps()}>
                     {cell.render('Cell')}
@@ -209,7 +210,6 @@ const HeaderRow = styled(Group)`
 const HeaderCell = styled.div`
   max-width: ${({ maxWidth }) => maxWidth}px;
   background-color: ${({ isSorted, theme }) => (isSorted && theme.colors.dark[6])};
-  /* border-radius: 5px; */
   padding: 8px 16px;
   user-select: none;
   transition: background-color 0.2s ease-in-out;
@@ -231,7 +231,8 @@ const Body = styled(Stack)`
 const BodyRow = styled(Paper).attrs({
   p: 0
 })`
-  /* gap: 16px; */
+  position: relative;
+  overflow: hidden;
 
   :nth-child(even) {
     background-color: ${({ theme }) => theme.colors.dark[7]} !important;
