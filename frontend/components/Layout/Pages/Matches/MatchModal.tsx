@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import {
-  Button, Group, Modal, TextInput, Text, Select
+  Button, Group, Modal, TextInput, Text, Select, Stack, ActionIcon
 } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { useForm } from '@mantine/hooks';
 import {
-  IoCloudUpload, IoSave, IoStop
+  IoAlert, IoClose, IoCloudUpload, IoSave, IoStop, IoVideocam
 } from 'react-icons/io5';
+import { AiOutlineFile } from 'react-icons/ai';
 import { useRecoilState } from 'recoil';
+import { useNotifications } from '@mantine/notifications';
+import prettyBytes from 'pretty-bytes';
 import useCreateMatch from '../../../../hooks/Matches/useCreateMatch';
 import useConfigs from '../../../../hooks/Configs/useConfigs';
 import matchModalState from '../../../../atoms/matchModalState';
@@ -15,6 +18,7 @@ import useMatches from '../../../../hooks/Matches/useMatches';
 import useEditMatch from '../../../../hooks/Matches/useEditMatch';
 
 const NewMatchModal = () => {
+  const notifications = useNotifications();
   const [modal, setModal] = useRecoilState(matchModalState);
   const createMatch = useCreateMatch();
   const editMatch = useEditMatch();
@@ -41,6 +45,10 @@ const NewMatchModal = () => {
       form.setFieldValue('title', matches.find((match) => match._id === modal.matchId).title);
     }
   }, [modal.matchId, modal.edit, modal.open]);
+
+  useEffect(() => {
+    console.log(files);
+  }, [files]);
 
   const submitUpload = () => {
     setError(null);
@@ -101,32 +109,62 @@ const NewMatchModal = () => {
               searchable
               clearable
             />
-            {files === null ? (
-              <Dropzone
-                onDrop={(file) => setFiles(file)}
-                onReject={(file) => console.log('rejected files', file)}
-                maxSize={300 * 1024 ** 2}
-                multiple={false}
-                accept={['video/x-matroska']}
-              >
-                {(status) => (
-                  <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
-                    {status.rejected && <IoStop />}
-                    <IoCloudUpload />
-                    <div>
-                      <Text inline>
-                        Drag videos here or click to select
+            <Stack justify="flex-start" spacing={0}>
+              <Text mb={4}>
+                File
+              </Text>
+              {files === null ? (
+                <Dropzone
+                  onDrop={(file) => setFiles(file)}
+                  onReject={(rejectedFiles) => {
+                    notifications.showNotification({
+                      title: 'Error', message: rejectedFiles[0].errors[0].message, color: 'red', icon: <IoAlert />
+                    });
+                  }}
+                  maxSize={500 * 1024 ** 2}
+                  multiple={false}
+                  accept={['video/x-matroska']}
+                >
+                  {(status) => (
+                    <Group position="center" spacing="xl" style={{ minHeight: 80, pointerEvents: 'none' }}>
+                      <Text size="xl" color="dimmed">
+                        {status.rejected && <IoStop />}
+                        <IoVideocam />
                       </Text>
-                      <Text size="xs" color="dimmed" inline mt={7}>
-                        The video should not exceed 500mb
-                      </Text>
-                    </div>
+                      <Stack spacing={0}>
+                        <Text>
+                          Drag videos here or click to select
+                        </Text>
+                        <Text size="xs" color="dimmed">
+                          The video should not exceed 500mb
+                        </Text>
+                      </Stack>
+                    </Group>
+                  )}
+                </Dropzone>
+              ) : (
+                <Group position="apart">
+                  <Group>
+                    <Text size="xl" color="dimmed" inline>
+                      <AiOutlineFile />
+                    </Text>
+                    <Text>
+                      {files[0].name}
+                    </Text>
                   </Group>
-                )}
-              </Dropzone>
-            ) : (
-              `${files[0].name} | ${files[0].size}bytes`
-            )}
+                  <Group>
+                    <Text>
+                      {prettyBytes(files[0].size)}
+                    </Text>
+                    <ActionIcon
+                      onClick={() => setFiles(null)}
+                    >
+                      <IoClose />
+                    </ActionIcon>
+                  </Group>
+                </Group>
+              )}
+            </Stack>
           </>
         )}
         {!!error && (
