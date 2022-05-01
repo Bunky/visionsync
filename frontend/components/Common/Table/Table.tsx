@@ -152,10 +152,10 @@ const CustomTable = ({
                   <Group position="apart">
                     <Text size="sm" weight={700}>{column.render('Header')}</Text>
                     {column.canSort && (
-                      <ActionIcon variant="transparent">
+                      <Icon>
                         {column.isSorted && (column.isSortedDesc ? <FaSortDown /> : <FaSortUp />)}
                         {!column.isSorted && <FaSort />}
-                      </ActionIcon>
+                      </Icon>
                     )}
                   </Group>
                 </HeaderCell>
@@ -192,6 +192,13 @@ const Container = styled.div`
   height: 100%;
 `;
 
+const Icon = styled.div`
+  transition: opacity 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const StyledTable = styled(Table).attrs({
   as: 'div'
 })`
@@ -214,12 +221,11 @@ const HeaderCell = styled.div`
   user-select: none;
   transition: background-color 0.2s ease-in-out;
 
-  .mantine-ActionIcon-transparent svg {
-    transition: opacity 0.2s ease-in-out;
+  ${Icon} {
     opacity: ${({ isSorted }) => (isSorted ? 1 : 0)};
   }
 
-  &:hover .mantine-ActionIcon-transparent svg {
+  &:hover ${Icon} {
     opacity: 1;
   }
 `;
