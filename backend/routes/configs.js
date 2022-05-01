@@ -29,8 +29,7 @@ router.route('/').post(async (req, res) => {
     const { matchId } = getActive(req.user._id);
     const config = await getJsonValue(`${matchId}-settings`);
     await uploadConfig(req.user._id, req.body.title, config);
-
-    return res.status(200);
+    return res.sendStatus(200);
   }
   return res.sendStatus(403);
 });
@@ -44,10 +43,10 @@ router.route('/:configId').post(async (req, res) => {
     if (req.body.duplicate) {
       const config = await Config.findById(req.params.configId);
       await uploadConfig(req.user._id, req.body.changes.title, config.config);
-      return res.status(200);
+      return res.sendStatus(200);
     }
     await Config.findByIdAndUpdate(req.params.configId, req.body.changes);
-    return res.status(200);
+    return res.sendStatus(200);
   }
   return res.sendStatus(403);
 });

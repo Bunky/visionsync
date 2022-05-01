@@ -6,6 +6,7 @@ import useAnalyses from '../hooks/Analysis/useAnalyses';
 import AnalysesTable from '../components/Layout/Pages/Analyses/AnalysesTable';
 import ViewAnalysisModal from '../components/Layout/Pages/Analyses/ViewAnalysisModal';
 import useMatches from '../hooks/Matches/useMatches';
+import Error from '../components/Common/Error/Error';
 
 const Analyses = () => {
   const { status: analysesStatus } = useAnalyses();
@@ -16,7 +17,7 @@ const Analyses = () => {
   }
 
   if (analysesStatus === 'error' || matchesStatus === 'error') {
-    return (<Center sx={{ height: '100%' }}>Error</Center>);
+    return (<Center sx={{ height: '100%' }}><Error /></Center>);
   }
 
   return (

@@ -13,7 +13,7 @@ const useCreateMatch = () => {
 
       const previousMatches = queryClient.getQueryData('matches');
       queryClient.setQueryData('matches', [...previousMatches, {
-        matchId: 'uploading',
+        _id: 'uploading',
         title: newMatch.get('title'),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

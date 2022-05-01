@@ -53,14 +53,14 @@ const AnalysesTable = () => {
           leftIcon={<IoCode />}
           compact
         >
-          View Data
+          View
         </Button>
         <AnalysesMenu analysisId={row.original._id} />
       </Group>
     ),
-    width: 183,
-    maxWidth: 183,
-    minWidth: 183,
+    width: 148,
+    maxWidth: 148,
+    minWidth: 148,
     disableSortBy: true
   }], []);
 

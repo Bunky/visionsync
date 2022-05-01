@@ -16,6 +16,7 @@ import PlayerStatsModal from '../components/Layout/Pages/Home/PlayerStatsModal';
 import useAnalysis from '../hooks/Analysis/useAnalysis';
 import useStopAnalysis from '../hooks/Analysis/useStopAnalysis';
 import useLiveSocket from '../hooks/useLiveSocket';
+import Error from '../components/Common/Error/Error';
 
 const Analysis = () => {
   const { data: analysis, status: analysisStatus } = useAnalysis();
@@ -37,7 +38,7 @@ const Analysis = () => {
   }
 
   if (analysisStatus === 'error') {
-    return (<Center sx={{ height: '100%' }}>Error</Center>);
+    return (<Center sx={{ height: '100%' }}><Error /></Center>);
   }
 
   if (!analysis.active) {

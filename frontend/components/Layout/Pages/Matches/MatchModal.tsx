@@ -46,10 +46,6 @@ const NewMatchModal = () => {
     }
   }, [modal.matchId, modal.edit, modal.open]);
 
-  useEffect(() => {
-    console.log(files);
-  }, [files]);
-
   const submitUpload = () => {
     setError(null);
 

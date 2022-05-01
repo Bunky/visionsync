@@ -19,6 +19,7 @@ import useConfig from '../hooks/Configs/useConfig';
 import useUpdateConfig from '../hooks/Configs/useUpdateConfig';
 import useAnalysis from '../hooks/Analysis/useAnalysis';
 import NewConfigModal from '../components/Layout/Pages/Config/NewConfigModal';
+import Error from '../components/Common/Error/Error';
 
 const Config = () => {
   const { data: analysis, status: analysisStatus } = useAnalysis();
@@ -75,7 +76,7 @@ const Config = () => {
   }
 
   if (configStatus === 'error' || analysisStatus === 'error') {
-    return (<Center sx={{ height: '100%' }}>Error</Center>);
+    return (<Center sx={{ height: '100%' }}><Error /></Center>);
   }
 
   if (!analysis.active) {

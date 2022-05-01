@@ -6,6 +6,7 @@ import useConfigs from '../hooks/Configs/useConfigs';
 import ConfigsTable from '../components/Layout/Pages/Configs/ConfigsTable';
 import ViewConfigModal from '../components/Layout/Pages/Configs/ViewConfigModal';
 import ConfigModal from '../components/Layout/Pages/Configs/ConfigModal';
+import Error from '../components/Common/Error/Error';
 
 const Configs = () => {
   const { status: configsStatus } = useConfigs();
@@ -15,7 +16,7 @@ const Configs = () => {
   }
 
   if (configsStatus === 'error') {
-    return (<Center sx={{ height: '100%' }}>Error</Center>);
+    return (<Center sx={{ height: '100%' }}><Error /></Center>);
   }
 
   return (

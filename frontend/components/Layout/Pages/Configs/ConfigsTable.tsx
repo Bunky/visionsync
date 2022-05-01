@@ -18,7 +18,7 @@ const ConfigsTable = () => {
   const deleteConfigs = useDeleteConfigs();
 
   const columns = useMemo(() => [{
-    Header: 'Title',
+    Header: 'Config',
     accessor: 'title',
     Cell: ({ value }) => (
       <Text
@@ -51,14 +51,14 @@ const ConfigsTable = () => {
           leftIcon={<IoCode />}
           compact
         >
-          View Config
+          View
         </Button>
         <ConfigsMenu configId={row.original._id} />
       </Group>
     ),
-    width: 196,
-    maxWidth: 196,
-    minWidth: 196,
+    width: 148,
+    maxWidth: 148,
+    minWidth: 148,
     disableSortBy: true
   }], []);
 

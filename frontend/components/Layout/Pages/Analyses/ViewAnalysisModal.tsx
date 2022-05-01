@@ -33,6 +33,7 @@ const ViewAnalysisModal = () => {
       })}
       title="View Analysis"
       size="55%"
+      overflow="inside"
     >
       {json ? (
         <Tabs>

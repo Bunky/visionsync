@@ -1,23 +1,12 @@
-import { Center, Loader, Modal } from '@mantine/core';
+import { Modal } from '@mantine/core';
 import { Prism } from '@mantine/prism';
-import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import viewConfigModalState from '../../../../atoms/viewConfigModalState';
-import fetchConfigJson from '../../../../fetches/fetchConfigJson';
+import useConfigs from '../../../../hooks/Configs/useConfigs';
 
 const ViewConfigModal = () => {
   const [modal, setModal] = useRecoilState(viewConfigModalState);
-  const [json, setJson] = useState(null);
-
-  useEffect(() => {
-    if (modal.open) {
-      const fetchJson = async () => {
-        setJson(await fetchConfigJson(modal.configId));
-      };
-
-      fetchJson();
-    }
-  }, [modal]);
+  const { data: configs } = useConfigs();
 
   return (
     <Modal
@@ -28,19 +17,14 @@ const ViewConfigModal = () => {
       })}
       title="View Config"
       size="55%"
+      overflow="inside"
     >
-      {json ? (
-        <Prism
-          withLineNumbers
-          language="json"
-        >
-          {JSON.stringify(json, null, 2)}
-        </Prism>
-      ) : (
-        <Center>
-          <Loader />
-        </Center>
-      )}
+      <Prism
+        withLineNumbers
+        language="json"
+      >
+        {JSON.stringify(configs.find((config) => config._id === modal.configId)?.config, null, 2)}
+      </Prism>
     </Modal>
   );
 };

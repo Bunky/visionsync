@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import { useViewportSize } from '@mantine/hooks';
 
 const CustomTable = ({
-  columns, data, deleteMutation, openCreateModal = null, rowHeight = false, hiddenColumns = []
+  columns, data, deleteMutation, openCreateModal = null, rowHeight = false, hiddenColumns = [], openCreateDisabled = false,
 }) => {
   const { width } = useViewportSize();
 
@@ -78,6 +78,7 @@ const CustomTable = ({
           <Button
             leftIcon={<BsPlusLg />}
             onClick={openCreateModal}
+            disabled={openCreateDisabled}
           >
             New
           </Button>

@@ -90,6 +90,7 @@ const MatchTable = () => {
         edit: false,
         matchId: null
       })}
+      openCreateDisabled={!!matches.find((match) => match._id === 'uploading')}
       hiddenColumns={['createdAt']}
     />
   );

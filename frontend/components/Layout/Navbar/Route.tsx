@@ -22,6 +22,7 @@ const Container = styled(Group)`
   border-radius: ${({ theme }) => theme.radius.sm}px;
   padding: ${({ theme }) => theme.spacing.xs}px;
   cursor: pointer;
+  user-select: none;
 
   &:hover {
     background-color: ${({ theme }) => theme.colors.dark[8]};

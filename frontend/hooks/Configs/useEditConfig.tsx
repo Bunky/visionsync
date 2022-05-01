@@ -15,7 +15,7 @@ const useEditConfig = () => {
       if (updatedConfig.duplicate) {
         const config = previousConfigs.find((pConfig) => pConfig._id === updatedConfig.configId);
         previousConfigs = [...previousConfigs, {
-          ...config, _id: 'temp', title: updatedConfig.changes.title, createdAt: new Date()
+          ...config, _id: 'uploading', title: updatedConfig.changes.title, createdAt: new Date()
         }];
       } else {
         previousConfigs = previousConfigs.map((config) => {

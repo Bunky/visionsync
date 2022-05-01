@@ -7,6 +7,7 @@ import {
 } from 'react-icons/io5';
 import { useRecoilState } from 'recoil';
 import editConfigModalState from '../../../../atoms/configModalState';
+import useConfigs from '../../../../hooks/Configs/useConfigs';
 import useDeleteConfig from '../../../../hooks/Configs/useDeleteConfig';
 import ConfirmDeleteModal from '../../../Common/ConfirmDeleteModal/ConfirmDeleteModal';
 
@@ -14,6 +15,7 @@ const ConfigsMenu = ({ configId }) => {
   const deleteConfig = useDeleteConfig();
   const [, setModal] = useRecoilState(editConfigModalState);
   const [delOpen, setDelOpen] = useState(false);
+  const { data: configs } = useConfigs();
 
   return (
     <>
@@ -31,6 +33,7 @@ const ConfigsMenu = ({ configId }) => {
         </Menu.Item>
         <Menu.Item
           icon={<IoCopy />}
+          disabled={!!configs.find((config) => config._id === 'uploading')}
           onClick={() => setModal({
             open: true,
             duplicate: true,
