@@ -1,8 +1,8 @@
 /* eslint-disable react/no-unstable-nested-components */
 import {
-  Group, Button, Image, AspectRatio, Text
+  Group, Button, Image, AspectRatio, Text, Paper, Center
 } from '@mantine/core';
-import { IoVideocam } from 'react-icons/io5';
+import { IoImage, IoVideocam } from 'react-icons/io5';
 import { BiAnalyse } from 'react-icons/bi';
 import { format } from 'date-fns';
 import { useRecoilState } from 'recoil';
@@ -28,7 +28,24 @@ const MatchTable = () => {
     Cell: ({ value, row }) => (
       <Group dir="row" noWrap sx={{ width: '100%' }}>
         <AspectRatio ratio={16 / 9} sx={{ width: 100, minWidth: 100 }}>
-          <Image src={`http://d1pu8bxuwsqdvz.cloudfront.net/thumbnails/${row.original._id}.png`} radius="md" />
+          <Image
+            src={`http://d1pu8bxuwsqdvz.cloudfront.net/thumbnails/${row.original._id}.png`}
+            width={100}
+            withPlaceholder
+            placeholder={(
+              <Paper
+                sx={{
+                  width: 100,
+                  height: 56.25,
+                }}
+              >
+                <Center style={{ height: 56.25 }}>
+                  <IoImage />
+                </Center>
+              </Paper>
+            )}
+            radius="sm"
+          />
         </AspectRatio>
         <Text
           size="sm"

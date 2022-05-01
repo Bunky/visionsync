@@ -241,6 +241,13 @@ const BodyRow = styled(Paper).attrs({
     background-color: ${({ theme }) => theme.colors.dark[8]} !important;
   }
 
+  :nth-child(even) .mantine-Image-placeholder .mantine-Paper-root {
+    background-color: ${({ theme }) => theme.colors.dark[8]} !important;
+  }
+  :nth-child(odd) .mantine-Image-placeholder .mantine-Paper-root{
+    background-color: ${({ theme }) => theme.colors.dark[7]} !important;
+  }
+
   ${({ height }) => height && `
     height: ${height}px;
     max-height: ${height}px;
