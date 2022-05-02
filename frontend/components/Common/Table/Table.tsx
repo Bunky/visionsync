@@ -1,8 +1,10 @@
 /* eslint-disable react/no-unstable-nested-components */
 import {
-  ActionIcon, Button, Checkbox, Group, LoadingOverlay, Paper, Popover, ScrollArea, Stack, Table, Text, TextInput, useMantineTheme
+  Button, Checkbox, Group, LoadingOverlay, Paper, Popover, ScrollArea, Stack, Table, Text, TextInput, useMantineTheme
 } from '@mantine/core';
-import { IoClose, IoSearch, IoTrash } from 'react-icons/io5';
+import {
+  IoClose, IoSadOutline, IoSearch, IoTrash
+} from 'react-icons/io5';
 import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa';
 import { BsPlusLg } from 'react-icons/bs';
 import {
@@ -178,7 +180,13 @@ const CustomTable = ({
             );
           })}
           {page.length === 0 && (
-            <span>No results!</span>
+            <Group sx={{ width: '100%', height: '100%' }} position="center">
+              <Text size="xl" color="dimmed"><IoSadOutline /></Text>
+              <Stack spacing={0}>
+                <Text size="sm">No results found</Text>
+                <Text size="xs" color="dimmed">Try adjusting your filters</Text>
+              </Stack>
+            </Group>
           )}
         </Body>
       </StyledTable>
@@ -232,6 +240,11 @@ const HeaderCell = styled.div`
 
 const Body = styled(Stack)`
   max-height: calc(100% - 36px);
+  height: calc(100% - 36px);
+
+  .mantine-ScrollArea-viewport > div {
+    height: 100%;
+  }
 `;
 
 const BodyRow = styled(Paper).attrs({
