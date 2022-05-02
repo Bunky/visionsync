@@ -8,16 +8,16 @@ require('dotenv').config();
 const fileUpload = require('express-fileupload');
 const { socketConnection } = require('./utils/socket-io');
 const { redisConnection } = require('./utils/redis');
+const { systemLogger: log } = require('./utils/logger');
 
 // =================================================================================================
 //                                       Web Server Configuration
 // =================================================================================================
 
-// const app = module.exports.app = express();
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 
 app.use((req, res, next) => {
@@ -90,7 +90,7 @@ mongoose.connect(process.env.MONGOURL, {
 });
 const { connection } = mongoose;
 connection.once('open', () => {
-  console.log('MongoDB Atlas database connection established successfully');
+  log.info('MongoDB Atlas database connection established successfully!');
 });
 
 // =================================================================================================
@@ -98,6 +98,9 @@ connection.once('open', () => {
 // =================================================================================================
 
 server.listen(process.env.PORT, (err) => {
-  if (err) throw err;
-  console.info(`> Ready on http://localhost:${process.env.PORT}`);
+  if (err) {
+    log.fatal('Error launching web server', err);
+    throw err;
+  }
+  log.info(`Web Server ready on http://localhost:${process.env.PORT}`);
 });

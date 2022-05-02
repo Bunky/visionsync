@@ -2,9 +2,10 @@ const router = require('express').Router();
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const Config = require('../models/config.model');
-const { uploadConfig, deleteConfig, deleteConfigs } = require('../utils/configs');
+const { uploadConfig, deleteConfig, deleteConfigs } = require('../components/configs');
 const { getActive } = require('../processor/lineDetection');
 const { getJsonValue } = require('../utils/redis');
+const { systemLogger: log } = require('../utils/logger');
 
 // =================================================================================================
 //                                           Get Configs
@@ -61,6 +62,12 @@ router.route('/').delete(async (req, res) => {
       await deleteConfigs(req.body.configIds);
       return res.sendStatus(200);
     } catch (err) {
+      log.error('Error deleting config', {
+        userId: req.user._id,
+        userEmail: req.user.email,
+        configIds: req.body.configIds,
+        err
+      });
       return res.sendStatus(500);
     }
   }
@@ -73,6 +80,12 @@ router.route('/:configId').delete(async (req, res) => {
       await deleteConfig(req.params.configId);
       return res.sendStatus(200);
     } catch (err) {
+      log.error('Error deleting config', {
+        userId: req.user._id,
+        userEmail: req.user.email,
+        configId: req.params.configId,
+        err
+      });
       return res.sendStatus(500);
     }
   }

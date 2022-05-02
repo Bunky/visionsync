@@ -5,7 +5,8 @@ const {
   startAnalysis, getActive, stopAnalysis
 } = require('../processor/lineDetection');
 const Analysis = require('../models/analysis.model');
-const { uploadAnalysis, deleteAnalysis, deleteAnalyses } = require('../utils/analysis');
+const { uploadAnalysis, deleteAnalysis, deleteAnalyses } = require('../components/analysis');
+const { systemLogger: log } = require('../utils/logger');
 
 // =================================================================================================
 //                                           Upload Analysis
@@ -21,6 +22,11 @@ router.route('/upload').post(async (req, res) => {
 
       return res.sendStatus(200);
     } catch (err) {
+      log.error('Error uploading analysis', {
+        userId: req.user._id,
+        userEmail: req.user.email,
+        err
+      });
       return res.sendStatus(500);
     }
   }
@@ -51,6 +57,12 @@ router.route('/').delete(async (req, res) => {
       await deleteAnalyses(req.body.analysisIds);
       return res.sendStatus(200);
     } catch (err) {
+      log.error('Error deleting analyses', {
+        userId: req.user._id,
+        userEmail: req.user.email,
+        analysisIds: req.body.analysisIds,
+        err
+      });
       return res.sendStatus(500);
     }
   }
@@ -63,6 +75,12 @@ router.route('/:analysisId').delete(async (req, res) => {
       await deleteAnalysis(req.params.analysisId);
       return res.sendStatus(200);
     } catch (err) {
+      log.error('Error deleting analysis', {
+        userId: req.user._id,
+        userEmail: req.user.email,
+        analysisId: req.params.analysisId,
+        err
+      });
       return res.sendStatus(500);
     }
   }

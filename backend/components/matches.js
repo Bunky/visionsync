@@ -9,6 +9,7 @@ const path = require('path');
 const Match = require('../models/match.model');
 const Config = require('../models/config.model');
 const defaultSettings = require('../processor/defaultSettings.json');
+const { systemLogger: log } = require('../utils/logger');
 
 // aws stuff
 const s3 = new AWS.S3({
@@ -35,7 +36,7 @@ const generateThumbnail = (matchData, matchId) => new Promise((resolve, reject) 
     }).on('end', async () => {
       const thumbnailBuffer = await fs.readFileSync(path.join(tmpobj.name, `${matchId}.png`));
       fs.rmdirSync(tmpobj.name, { recursive: true });
-      console.log('Thumbnail generated successfully');
+      log.info('Thumbnail generated successfully');
       return resolve(thumbnailBuffer);
     }).on('err', (err) => reject(err));
 });
@@ -67,19 +68,19 @@ exports.uploadMatch = (ownerId, title, configId, matchData) => new Promise(async
     .outputOptions('-movflags frag_keyframe+empty_moov');
 
   ffmpegCommand.on('end', () => {
-    console.log('Video converted successfully');
+    log.info('Video converted successfully');
   }).on('error', (err) => {
-    console.log(`Error: ${err.message}`);
+    log.error(`${err.message}`);
   }).on('progress', (p) => {
-    // console.log('progress', p);
+    // log.info('progress', p);
   }).pipe(passthroughStream);
 
   try {
-    await s3.upload({
-      Bucket: process.env.AWS_BUCKET,
-      Key: `thumbnails/${match._id}.png`,
-      Body: await generateThumbnail(matchData, match._id.toString())
-    }).promise();
+    // await s3.upload({
+    //   Bucket: process.env.AWS_BUCKET,
+    //   Key: `thumbnails/${match._id}.png`,
+    //   Body: await generateThumbnail(matchData, match._id.toString())
+    // }).promise();
     await s3.upload({
       Bucket: process.env.AWS_BUCKET,
       Key: `matches/${match._id}.mp4`,

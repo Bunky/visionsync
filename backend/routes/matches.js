@@ -2,7 +2,8 @@ const router = require('express').Router();
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const Match = require('../models/match.model');
-const { uploadMatch, deleteMatch, deleteMatches } = require('../utils/matches');
+const { uploadMatch, deleteMatch, deleteMatches } = require('../components/matches');
+const { systemLogger: log } = require('../utils/logger');
 
 // =================================================================================================
 //                                           Upload Match
@@ -17,6 +18,11 @@ router.route('/upload').post(async (req, res) => {
       await uploadMatch(req.user._id.toString(), title, configId, req.files.match.data);
       return res.sendStatus(200);
     } catch (err) {
+      log.error('Error uploading match', {
+        userId: req.user._id,
+        userEmail: req.user.email,
+        err
+      });
       return res.sendStatus(500);
     }
   }
@@ -59,6 +65,12 @@ router.route('/').delete(async (req, res) => {
       await deleteMatches(req.body.matchIds);
       return res.sendStatus(200);
     } catch (err) {
+      log.error('Error deleting matches', {
+        userId: req.user._id,
+        userEmail: req.user.email,
+        matchIds: req.body.matchIds,
+        err
+      });
       return res.sendStatus(500);
     }
   }
@@ -71,6 +83,12 @@ router.route('/:matchId').delete(async (req, res) => {
       await deleteMatch(req.params.matchId);
       return res.sendStatus(200);
     } catch (err) {
+      log.error('Error deleting match', {
+        userId: req.user._id,
+        userEmail: req.user.email,
+        matchId: req.params.matchId,
+        err
+      });
       return res.sendStatus(500);
     }
   }

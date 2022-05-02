@@ -16,7 +16,6 @@ exports.uploadConfig = (ownerId, title, data) => new Promise(async (resolve, rej
     await newConfig.save();
     resolve();
   } catch (err) {
-    console.log(err);
     reject(err);
   }
 });

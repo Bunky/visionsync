@@ -1,13 +1,16 @@
 const { createClient } = require('redis');
+const { redisLogger: log } = require('./logger');
 
 let client;
-
 exports.redisConnection = async () => {
   client = createClient({
     url: `redis://${process.env.REDIS}`,
   });
+
+  client.on('error', (err) => log.fatal('Redis Client Error', err));
+
   await client.connect();
-  console.info(`Redis connection established successfully on ${process.env.REDIS}`);
+  log.info(`Redis connection established successfully on ${process.env.REDIS}`);
 };
 
 exports.redisDisconnect = async () => client.quit();

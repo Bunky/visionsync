@@ -6,6 +6,7 @@ const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const User = require('../models/user.model');
 const defaultSettings = require('../processor/defaultSettings.json');
+const { userLogger: log } = require('../utils/logger');
 
 // =================================================================================================
 //                                               Login
@@ -23,11 +24,16 @@ passport.use('login', new LocalStrategy({
         return done(null, false);
       }
       if (!user.verifyPassword(password, user.password)) {
+        log.info('User login incorrect password', { userEmail: user.email });
         return done(null, false);
       }
       return done(null, user);
-    } catch (e) {
-      return done(e);
+    } catch (err) {
+      log.error('Error logging in user', {
+        userEmail: username,
+        err
+      });
+      return done(err);
     }
   });
 }));
@@ -50,6 +56,11 @@ router.route('/login').post((req, res, next) => {
     passport.authenticate('login', (err, user) => {
       if (err) {
         res.status(200).send({ authenticated: false, message: 'System error, please try again' });
+        log.error('Error logging in user', {
+          userId: user._id,
+          userEmail: user.email,
+          err
+        });
         return next(err);
       }
       if (!user) {
@@ -59,9 +70,17 @@ router.route('/login').post((req, res, next) => {
       req.logIn(user, async (loginError) => {
         if (loginError) {
           res.status(200).send({ authenticated: false, message: 'System error, please try again' });
+          log.error('Error logging in user', {
+            userId: user._id,
+            userEmail: user.email,
+            err
+          });
           return next(loginError);
         }
-        console.log(`User ${user.email} logged in.`);
+        log.info('User logged in', {
+          userId: user._id,
+          userEmail: user.email
+        });
         return res.status(200).send({ authenticated: true, message: 'Successfully logged in' });
       });
     })(req, res, next);
@@ -82,6 +101,9 @@ passport.use('signup', new LocalStrategy({
   try {
     const user = await User.findOne({ email: req.body.email });
     if (user !== null) {
+      log.warn('User attempted creating account with taken name', {
+        userEmail: req.body.email,
+      });
       return done(null, false, { message: 'Email already taken' });
     }
 
@@ -97,13 +119,24 @@ passport.use('signup', new LocalStrategy({
       });
 
       await newUser.save();
-      console.log(`User ${req.body.email} created.`); // Report event
+      log.info('User created', {
+        userId: newUser._id,
+        userEmail: newUser.email
+      });
       return done(null, newUser);
-    } catch (e) {
-      return done(e);
+    } catch (err) {
+      log.error('Error creating user', {
+        userEmail: req.body.email,
+        err
+      });
+      return done(err);
     }
-  } catch (e) {
-    return done(e);
+  } catch (err) {
+    log.error('Error creating user', {
+      userEmail: req.body.email,
+      err
+    });
+    return done(err);
   }
 }));
 
@@ -137,6 +170,11 @@ router.route('/signup').post((req, res, next) => {
   if (error === undefined) {
     passport.authenticate('signup', async (err, user, info) => {
       if (err) {
+        log.error('Error signing up user', {
+          userId: user._id,
+          userEmail: user.email,
+          err
+        });
         res.status(200).send({ authenticated: false, message: 'System error, please try again' });
         return next(err);
       }
@@ -146,12 +184,20 @@ router.route('/signup').post((req, res, next) => {
 
       req.login(user, (loginError) => {
         if (loginError) {
+          log.error('Error automatically signing in user', {
+            userId: user._id,
+            userEmail: user.email,
+            err: loginError
+          });
           return res.status(200).send({
             authenticated: false,
             message: 'Signed up successfully, but failed to automatically log in. Please try logging in.',
           });
         }
-        console.log(`User ${user.email} logged in after signing up.`); // Report event
+        log.info('User logged in after signing up', {
+          userId: user._id,
+          userEmail: user.email
+        });
         return res.status(200).send({ authenticated: true, message: 'Signed up and logged in!' });
       });
     })(req, res, next);
@@ -166,11 +212,14 @@ router.route('/signup').post((req, res, next) => {
 
 router.route('/logout').get((req, res) => {
   if (req.isAuthenticated()) {
-    console.log(`User ${req.user.email} logged out.`); // Report event
+    log.info('User logged out', {
+      userId: req.user._id,
+      userEmail: req.user.email
+    });
     req.logout();
     return res.sendStatus(200);
   }
-  return res.sendStatus(400);
+  return res.sendStatus(403);
 });
 
 // =================================================================================================
@@ -187,7 +236,12 @@ router.route('/').get(async (req, res) => {
         return res.status(200).send(user);
       }
       return res.status(200).send({ unauthorised: true });
-    } catch (e) {
+    } catch (err) {
+      log.error('Error fetching current user', {
+        userId: req.user._id,
+        userEmail: req.user.email,
+        err
+      });
       return res.status(200).send({ unauthorised: true });
     }
   } else {
@@ -214,7 +268,11 @@ router.route('/email').post(async (req, res) => {
         return res.status(200).send({ unique: false });
       }
       return res.status(200).send({ unique: true });
-    } catch (e) {
+    } catch (err) {
+      log.error('Error validating email uniqueness', {
+        email: req.body.email,
+        err
+      });
       return res.status(200).send({ error: { message: 'Error validating email uniqueness!' } });
     }
   } else {

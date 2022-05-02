@@ -2,8 +2,9 @@ const { spawn } = require('child_process');
 const { sendMessage, isConnected } = require('../utils/socket-io');
 const Match = require('../models/match.model');
 const { setJsonValue, getJsonValue, delJsonValue } = require('../utils/redis');
-const { uploadAnalysis } = require('../utils/analysis');
-const { uploadConfig } = require('../utils/configs');
+const { uploadAnalysis } = require('../components/analysis');
+const { uploadConfig } = require('../components/configs');
+const { analysisLogger: log } = require('../utils/logger');
 
 let activeAnalysis = []; // Change this so it uses redis instead of a variable!
 
@@ -14,6 +15,10 @@ exports.startAnalysis = async (room, matchId) => {
   await setJsonValue(`${matchId}-settings`, match.config);
   await setJsonValue(`${matchId}-analysis`, []);
 
+  log.info(`Starting analysis for match ${matchId}`, {
+    userId: room,
+    matchId
+  });
   const pythonProcess = spawn('python', ['./processor/python/main.py', matchId]);
   pythonProcess.stdout.on('data', (data) => {
     const messages = JSON.parse(data.toString());
@@ -26,7 +31,7 @@ exports.startAnalysis = async (room, matchId) => {
         sendMessage(room, 'live', message.data);
       }
       if (message.type === 'info') {
-        console.log(message.data);
+        log.info(message.data);
       }
       if (message.type === 'detections') {
         const detections = JSON.parse(`[${message.data}]`);
@@ -64,10 +69,12 @@ exports.startAnalysis = async (room, matchId) => {
     });
   });
   pythonProcess.stderr.on('data', (data) => {
-    console.log(data.toString());
+    log.info(data.toString());
   });
   pythonProcess.on('exit', (code) => {
-    console.log(`Process exited with code ${code}`);
+    log.info(`Process exited with code ${code}`, {
+      matchId
+    });
     exports.stopAnalysis(matchId);
   });
 
@@ -79,10 +86,16 @@ exports.startAnalysis = async (room, matchId) => {
 };
 
 exports.stopAnalysis = async (matchId) => {
+  log.info(`Stopping analysis for match ${matchId}`, {
+    matchId
+  });
+
   try {
     process.kill(activeAnalysis.filter((analysis) => analysis.matchId === matchId.toString())[0].pid);
   } catch (err) {
-    console.log('Failed to kill process!');
+    log.warn(`Failed to kill process for ${matchId}`, {
+      matchId
+    });
   }
   activeAnalysis = activeAnalysis.filter((analysis) => analysis.matchId !== matchId.toString());
 
@@ -90,7 +103,6 @@ exports.stopAnalysis = async (matchId) => {
   match.settings = await getJsonValue(`${matchId}-settings`);
   const analysis = await getJsonValue(`${matchId}-analysis`);
   await uploadAnalysis(matchId, match.ownerId, analysis, match.settings);
-  // await uploadConfig(match.ownerId, 'auto-saved', match.settings);
   await match.save();
   await delJsonValue(`${matchId}-settings`);
   await delJsonValue(`${matchId}-analysis`);

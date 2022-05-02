@@ -34,7 +34,6 @@ exports.uploadAnalysis = (matchId, ownerId, data, settings) => new Promise(async
 
     resolve(s3Response);
   } catch (err) {
-    console.log(err);
     await Analysis.deleteOne({ _id: analysis._id });
     reject(err);
   }
