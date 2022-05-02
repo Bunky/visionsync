@@ -44,16 +44,16 @@ exports.uploadAnalysis = (matchId, ownerId, data, settings) => new Promise(async
 // =================================================================================================
 
 exports.deleteAnalysis = (analysisId) => new Promise(async (resolve, reject) => {
-  await Analysis.deleteOne({ analysisId });
+  await Analysis.findByIdAndDelete(analysisId);
 
   try {
     // Deleting files from the bucket
-    const s3Response = s3.deleteObject({
+    await s3.deleteObject({
       Bucket: process.env.AWS_BUCKET,
       Key: `analyses/${analysisId}.json`
     }).promise();
 
-    resolve(s3Response);
+    resolve();
   } catch (err) {
     reject(err);
   }
