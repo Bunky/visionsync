@@ -46,22 +46,22 @@ const NewMatchModal = () => {
     }
   }, [modal.matchId, modal.edit, modal.open]);
 
-  const submitUpload = () => {
+  const submitUpload = (values) => {
     setError(null);
 
     if (modal.edit) {
       editMatch.mutate({
         matchId: modal.matchId,
         changes: {
-          title: form.values.title
+          title: values.title
         }
       });
       handleClose();
     } else if (files !== null) {
       const formData = new FormData();
       formData.append('match', files[0]);
-      formData.append('title', form.values.title);
-      formData.append('configId', form.values.config);
+      formData.append('title', values.title);
+      formData.append('configId', values.config);
       createMatch.mutate(formData);
       handleClose();
     } else {
@@ -88,101 +88,103 @@ const NewMatchModal = () => {
       onClose={handleClose}
       title={modal.edit ? 'Edit Match' : 'New Match'}
     >
-      <Group grow direction="column" spacing="sm">
-        <TextInput
-          required
-          label="Title"
-          placeholder=""
-          {...form.getInputProps('title')}
-        />
-        {!modal.edit && (
-          <>
-            <Select
-              label="Config"
-              placeholder="Select a config"
-              data={configsStatus === 'success' ? configs.map((config) => ({ value: config._id, label: config.title })) : []}
-              {...form.getInputProps('config')}
-              searchable
-              clearable
-            />
-            <Stack justify="flex-start" spacing={0}>
-              <Text mb={4}>
-                File
-              </Text>
-              {files === null ? (
-                <Dropzone
-                  onDrop={(file) => setFiles(file)}
-                  onReject={(rejectedFiles) => {
-                    notifications.showNotification({
-                      title: 'Error', message: rejectedFiles[0].errors[0].message, color: 'red', icon: <IoAlert />
-                    });
-                  }}
-                  maxSize={500 * 1024 ** 2}
-                  multiple={false}
-                  accept={['video/x-matroska']}
-                >
-                  {(status) => (
-                    <Group position="center" spacing="xl" style={{ minHeight: 80, pointerEvents: 'none' }}>
-                      <Text size="xl" color="dimmed">
-                        {status.rejected && <IoStop />}
-                        <IoVideocam />
+      <form onSubmit={form.onSubmit(submitUpload)}>
+        <Group grow direction="column" spacing="sm">
+          <TextInput
+            required
+            label="Title"
+            placeholder=""
+            {...form.getInputProps('title')}
+          />
+          {!modal.edit && (
+            <>
+              <Select
+                label="Config"
+                placeholder="Select a config"
+                data={configsStatus === 'success' ? configs.map((config) => ({ value: config._id, label: config.title })) : []}
+                {...form.getInputProps('config')}
+                searchable
+                clearable
+              />
+              <Stack justify="flex-start" spacing={0}>
+                <Text mb={4}>
+                  File
+                </Text>
+                {files === null ? (
+                  <Dropzone
+                    onDrop={(file) => setFiles(file)}
+                    onReject={(rejectedFiles) => {
+                      notifications.showNotification({
+                        title: 'Error', message: rejectedFiles[0].errors[0].message, color: 'red', icon: <IoAlert />
+                      });
+                    }}
+                    maxSize={500 * 1024 ** 2}
+                    multiple={false}
+                    accept={['video/x-matroska']}
+                  >
+                    {(status) => (
+                      <Group position="center" spacing="xl" style={{ minHeight: 80, pointerEvents: 'none' }}>
+                        <Text size="xl" color="dimmed">
+                          {status.rejected && <IoStop />}
+                          <IoVideocam />
+                        </Text>
+                        <Stack spacing={0}>
+                          <Text>
+                            Drag videos here or click to select
+                          </Text>
+                          <Text size="xs" color="dimmed">
+                            The video should not exceed 500mb
+                          </Text>
+                        </Stack>
+                      </Group>
+                    )}
+                  </Dropzone>
+                ) : (
+                  <Group position="apart">
+                    <Group>
+                      <Text size="xl" color="dimmed" inline>
+                        <AiOutlineFile />
                       </Text>
-                      <Stack spacing={0}>
-                        <Text>
-                          Drag videos here or click to select
-                        </Text>
-                        <Text size="xs" color="dimmed">
-                          The video should not exceed 500mb
-                        </Text>
-                      </Stack>
+                      <Text>
+                        {files[0].name}
+                      </Text>
                     </Group>
-                  )}
-                </Dropzone>
-              ) : (
-                <Group position="apart">
-                  <Group>
-                    <Text size="xl" color="dimmed" inline>
-                      <AiOutlineFile />
-                    </Text>
-                    <Text>
-                      {files[0].name}
-                    </Text>
+                    <Group>
+                      <Text>
+                        {prettyBytes(files[0].size)}
+                      </Text>
+                      <ActionIcon
+                        onClick={() => setFiles(null)}
+                      >
+                        <IoClose />
+                      </ActionIcon>
+                    </Group>
                   </Group>
-                  <Group>
-                    <Text>
-                      {prettyBytes(files[0].size)}
-                    </Text>
-                    <ActionIcon
-                      onClick={() => setFiles(null)}
-                    >
-                      <IoClose />
-                    </ActionIcon>
-                  </Group>
-                </Group>
-              )}
-            </Stack>
-          </>
-        )}
-        {!!error && (
-          <Text color="red" size="sm">
-            {error}
-          </Text>
-        )}
-        <Group noWrap position="right">
-          <Button
-            variant="default"
-            onClick={handleClose}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={submitUpload}
-            leftIcon={modal.edit ? <IoSave /> : <IoCloudUpload />}
-          >
-            {modal.edit ? 'Save' : 'Upload'}
-          </Button>
+                )}
+              </Stack>
+            </>
+          )}
+          {!!error && (
+            <Text color="red" size="sm">
+              {error}
+            </Text>
+          )}
+          <Group noWrap position="right">
+            <Button
+              variant="default"
+              onClick={handleClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              leftIcon={modal.edit ? <IoSave /> : <IoCloudUpload />}
+              type="submit"
+            >
+              {modal.edit ? 'Save' : 'Upload'}
+            </Button>
+          </Group>
         </Group>
-      </Group>
+      </form>
     </Modal>
   );
 };

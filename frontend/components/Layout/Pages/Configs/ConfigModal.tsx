@@ -33,13 +33,13 @@ const ConfigModal = () => {
     }
   }, [modal.configId, modal.duplicate, modal.open]);
 
-  const submitSave = () => {
+  const submitSave = (values) => {
     setError(null);
     editConfig.mutate({
       configId: modal.configId,
       duplicate: modal.duplicate,
       changes: {
-        title: form.values.title
+        title: values.title
       }
     });
 
@@ -64,33 +64,35 @@ const ConfigModal = () => {
       onClose={handleClose}
       title={modal.duplicate ? 'Duplicate Config' : 'Edit Config'}
     >
-      <Group grow direction="column" spacing="sm">
-        <TextInput
-          required
-          label="Title"
-          placeholder=""
-          {...form.getInputProps('title')}
-        />
-        {!!error && (
-          <Text color="red" size="sm">
-            {error}
-          </Text>
-        )}
-        <Group noWrap position="right">
-          <Button
-            variant="default"
-            onClick={handleClose}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={submitSave}
-            leftIcon={modal.duplicate ? <IoCopy /> : <IoSave />}
-          >
-            {modal.duplicate ? 'Create' : 'Save'}
-          </Button>
+      <form onSubmit={form.onSubmit(submitSave)}>
+        <Group grow direction="column" spacing="sm">
+          <TextInput
+            required
+            label="Title"
+            placeholder=""
+            {...form.getInputProps('title')}
+          />
+          {!!error && (
+            <Text color="red" size="sm">
+              {error}
+            </Text>
+          )}
+          <Group noWrap position="right">
+            <Button
+              variant="default"
+              onClick={handleClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              leftIcon={modal.duplicate ? <IoCopy /> : <IoSave />}
+            >
+              {modal.duplicate ? 'Create' : 'Save'}
+            </Button>
+          </Group>
         </Group>
-      </Group>
+      </form>
     </Modal>
   );
 };
