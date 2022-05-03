@@ -9,14 +9,14 @@ const useLogout = () => {
       await queryClient.cancelQueries('user');
 
       const previousUser = queryClient.getQueryData('user');
-      queryClient.setQueryData('user', undefined);
+      queryClient.setQueryData('user', {});
       return previousUser;
     },
     onError: (err, variables, previousUser) => {
       queryClient.setQueryData('user', previousUser);
     },
     onSettled: () => {
-      queryClient.invalidateQueries('user');
+      queryClient.resetQueries();
     },
   });
 };

@@ -14,7 +14,7 @@ const Menu = () => {
   const { data: user, status: userStatus } = useUser();
   const [open, setOpen] = useState(false);
 
-  if (userStatus === 'success') {
+  if (userStatus === 'success' && user._id) {
     return (
       <Dropdown
         control={<User firstName={user.firstName} lastName={user.lastName} />}

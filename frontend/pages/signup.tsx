@@ -73,7 +73,7 @@ const Signup = () => {
   });
 
   useEffect(() => {
-    if (userStatus === 'success') {
+    if (userStatus === 'success' && user?._id) {
       router.push('/');
     }
   }, [userStatus, user]);

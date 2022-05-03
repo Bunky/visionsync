@@ -17,7 +17,7 @@ const Layout = ({ children }) => {
   const { data: user, status: userStatus } = useUser();
 
   useEffect(() => {
-    if (userStatus === 'error') {
+    if (userStatus === 'error' || (userStatus === 'success' && !user?._id)) {
       router.push('/login');
     }
   }, [userStatus, user]);
@@ -43,7 +43,7 @@ const Layout = ({ children }) => {
           }
         }}
       >
-        {userStatus === 'success' ? (
+        {userStatus === 'success' && user._id ? (
           children
         ) : (
           <Center sx={{ height: '100%' }}><Loader /></Center>

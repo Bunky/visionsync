@@ -23,18 +23,18 @@ const App = (props: AppProps) => {
     },
   }));
 
-  useEffect(() => {
-    const localStoragePersistor = createWebStoragePersistor({
-      storage: window.localStorage,
-      key: 'visionSync_Cache',
-      throttleTime: 0
-    });
+  // useEffect(() => {
+  //   const localStoragePersistor = createWebStoragePersistor({
+  //     storage: window.localStorage,
+  //     key: 'visionSync_Cache',
+  //     throttleTime: 0
+  //   });
 
-    persistQueryClient({
-      queryClient,
-      persistor: localStoragePersistor,
-    });
-  });
+  //   persistQueryClient({
+  //     queryClient,
+  //     persistor: localStoragePersistor,
+  //   });
+  // });
 
   return (
     <>

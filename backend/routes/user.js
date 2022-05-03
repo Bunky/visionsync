@@ -145,13 +145,16 @@ router.route('/logout').get(catchErrors(async (req, res) => {
 // =================================================================================================
 
 router.route('/').get(catchErrors(async (req, res) => {
-  const user = await User.findById(req.user._id, {
-    password: 0, __v: 0, settings: 0,
-  });
-  if (user) {
-    return res.status(200).send(user);
+  if (req.isAuthenticated()) {
+    const user = await User.findById(req.user._id, {
+      password: 0, __v: 0, settings: 0,
+    });
+    if (user) {
+      return res.status(200).send(user);
+    }
+    return res.status(200).send({});
   }
-  return res.sendStatus(403);
+  return res.status(200).send({});
 }));
 
 // =================================================================================================
