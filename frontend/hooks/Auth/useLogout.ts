@@ -1,29 +1,21 @@
 import { useMutation, useQueryClient } from 'react-query';
+import logout from '../../mutations/Auth/logout';
 
 const useLogout = () => {
   const queryClient = useQueryClient();
 
-  return useMutation(async () => fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/logout`, {
-    method: 'GET',
-    credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-    },
-  }), {
+  return useMutation(logout, {
     onMutate: async () => {
       await queryClient.cancelQueries('user');
 
-      // Optimistically clear user data
       const previousUser = queryClient.getQueryData('user');
-      queryClient.setQueryData('user', { unauthorised: true });
+      queryClient.setQueryData('user', undefined);
       return previousUser;
     },
     onError: (err, variables, previousUser) => {
-      // If error, reset user data
       queryClient.setQueryData('user', previousUser);
     },
     onSettled: () => {
-      // Refetch after success or error
       queryClient.invalidateQueries('user');
     },
   });

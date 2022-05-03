@@ -22,7 +22,7 @@ const useDeleteConfig = () => {
       queryClient.setQueryData('configs', context.previousConfigs);
     },
     onSuccess: (res, configId, context: any) => {
-      if (res.status === 429 || res.status === 500) {
+      if (res.status !== 200) {
         notifications.showNotification({
           title: 'Error', message: 'Failed to delete config!', color: 'red', icon: <IoAlert />
         });

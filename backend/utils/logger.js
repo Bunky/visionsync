@@ -11,8 +11,9 @@ const systemLogger = winston.createLogger({
     new winston.transports.File({ filename: 'logs/systemLogs/error.log', level: 'error' }),
     new winston.transports.File({ filename: 'logs/systemLogs/combined.log' }),
     new winston.transports.MongoDB({
-      level: 'error',
+      level: 'info',
       db: process.env.MONGO_LOGGER_URL,
+      storeHost: true,
       options: {
         useUnifiedTopology: true
       },
@@ -38,8 +39,9 @@ const userLogger = winston.createLogger({
     new winston.transports.File({ filename: 'logs/userLogs/error.log', level: 'error' }),
     new winston.transports.File({ filename: 'logs/userLogs/combined.log' }),
     new winston.transports.MongoDB({
-      level: 'error',
+      level: 'info',
       db: process.env.MONGO_LOGGER_URL,
+      storeHost: true,
       options: {
         useUnifiedTopology: true
       },
@@ -65,8 +67,9 @@ const socketLogger = winston.createLogger({
     new winston.transports.File({ filename: 'logs/socketLogs/error.log', level: 'error' }),
     new winston.transports.File({ filename: 'logs/socketLogs/combined.log' }),
     new winston.transports.MongoDB({
-      level: 'error',
+      level: 'info',
       db: process.env.MONGO_LOGGER_URL,
+      storeHost: true,
       options: {
         useUnifiedTopology: true
       },
@@ -92,8 +95,9 @@ const redisLogger = winston.createLogger({
     new winston.transports.File({ filename: 'logs/redisLogs/error.log', level: 'error' }),
     new winston.transports.File({ filename: 'logs/redisLogs/combined.log' }),
     new winston.transports.MongoDB({
-      level: 'error',
+      level: 'info',
       db: process.env.MONGO_LOGGER_URL,
+      storeHost: true,
       options: {
         useUnifiedTopology: true
       },
@@ -119,8 +123,9 @@ const analysisLogger = winston.createLogger({
     new winston.transports.File({ filename: 'logs/analysisLogs/error.log', level: 'error' }),
     new winston.transports.File({ filename: 'logs/analysisLogs/combined.log' }),
     new winston.transports.MongoDB({
-      level: 'error',
+      level: 'info',
       db: process.env.MONGO_LOGGER_URL,
+      storeHost: true,
       options: {
         useUnifiedTopology: true
       },
@@ -146,7 +151,12 @@ if (process.env.NODE_ENV !== 'production') {
         format: 'YYYY-MM-DD HH:mm:ss.SSS'
       }),
       winston.format.printf(
-        (info) => `[${info.timestamp}] [${info.level}]: ${info.message}`
+        (info) => {
+          if (info instanceof Error) {
+            return `[${info.timestamp}] [${info.level}]: ${info.message} ${info.stack || info}`;
+          }
+          return `[${info.timestamp}] [${info.level}]: ${info.message}`;
+        }
       )
     )
   });

@@ -23,7 +23,6 @@ const Heatmap = ({
   useEffect(() => {
     if (ref.current && width !== 100 && height !== 100) {
       draw();
-      console.log('Drawn!');
     }
   }, [data, width, height]);
 
@@ -32,7 +31,6 @@ const Heatmap = ({
       if (ref.current.offsetWidth > 0 && ref.current.offsetHeight > 0) {
         setWidth(ref.current.offsetWidth);
         setHeight(ref.current.offsetHeight);
-        console.log('Updated size!');
       }
     }
   }, [ref.current]);

@@ -7,11 +7,13 @@ import {
 import { useForm } from '@mantine/hooks';
 import { IoLockClosedOutline, IoMailOutline } from 'react-icons/io5';
 import styled from 'styled-components';
+import { useQueryClient } from 'react-query';
 import useUser from '../hooks/Auth/useUser';
 import useLogin from '../hooks/Auth/useLogin';
 
 const Login = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const login = useLogin();
   const { data: user, status: userStatus } = useUser();
   const [loading, setLoading] = useState(false);
@@ -34,11 +36,9 @@ const Login = () => {
 
   useEffect(() => {
     if (userStatus === 'success') {
-      if (user && !user.unauthorised) {
-        router.push('/');
-      }
+      router.push('/');
     }
-  }, [user]);
+  }, [userStatus, user]);
 
   const submitLogin = (data) => {
     setError(null);
@@ -49,11 +49,14 @@ const Login = () => {
       },
       onSuccess: async (res) => {
         const json = await res.json();
-        if (!json.authenticated) {
+        if (!res.ok) {
+          setError(json.error);
+        } else if (json.message) {
           setError(json.message);
         }
       },
-      onSettled: () => {
+      onSettled: async () => {
+        await queryClient.invalidateQueries('user');
         setLoading(false);
       }
     });

@@ -27,8 +27,6 @@ const Analysis = () => {
 
   useEffect(() => {
     if (analysis && !analysis.active) {
-      console.log('redirected to home!');
-      console.log(analysis);
       router.push('/');
     }
   }, [analysis, analysisStatus, router]);

@@ -5,42 +5,40 @@ const Config = require('../models/config.model');
 const { uploadConfig, deleteConfig, deleteConfigs } = require('../components/configs');
 const { getActive } = require('../processor/lineDetection');
 const { getJsonValue } = require('../utils/redis');
-const { systemLogger: log } = require('../utils/logger');
-
-// =================================================================================================
-//                                           Get Configs
-// =================================================================================================
-
-router.route('/').get(async (req, res) => {
-  if (req.isAuthenticated()) {
-    const configs = await Config.find({ ownerId: req.user._id }, {
-      ownerId: 0, __v: 0
-    });
-    return res.status(200).send(configs);
-  }
-  return res.sendStatus(403);
-});
+const validation = require('../middleware/validation/validation');
+const { configs: configSchemas } = require('../middleware/validation/schemas');
+const { catchErrors } = require('../middleware/errorHandler');
 
 // =================================================================================================
 //                                           New Config
 // =================================================================================================
 
-router.route('/').post(async (req, res) => {
-  if (req.isAuthenticated()) {
-    const { matchId } = getActive(req.user._id);
-    const config = await getJsonValue(`${matchId}-settings`);
-    await uploadConfig(req.user._id, req.body.title, config);
-    return res.sendStatus(200);
-  }
-  return res.sendStatus(403);
-});
+router.route('/').post(validation(configSchemas.upload, 'body'), catchErrors(async (req, res) => {
+  const { matchId } = getActive(req.user._id);
+  const config = await getJsonValue(`${matchId}-settings`);
+  await uploadConfig(req.user._id, req.body.title, config);
+  return res.sendStatus(200);
+}));
+
+// =================================================================================================
+//                                           Get Configs
+// =================================================================================================
+
+router.route('/').get(catchErrors(async (req, res) => {
+  const configs = await Config.find({ ownerId: req.user._id }, {
+    ownerId: 0, __v: 0
+  });
+  return res.status(200).send(configs);
+}));
 
 // =================================================================================================
 //                                           Edit Config
 // =================================================================================================
 
-router.route('/:configId').post(async (req, res) => {
-  if (req.isAuthenticated()) {
+router.route('/:configId').post(
+  validation(configSchemas.edit, 'params'),
+  validation(configSchemas.editBody, 'body'),
+  catchErrors(async (req, res) => {
     if (req.body.duplicate) {
       const config = await Config.findById(req.params.configId);
       await uploadConfig(req.user._id, req.body.changes.title, config.config);
@@ -48,48 +46,21 @@ router.route('/:configId').post(async (req, res) => {
     }
     await Config.findByIdAndUpdate(req.params.configId, req.body.changes);
     return res.sendStatus(200);
-  }
-  return res.sendStatus(403);
-});
+  })
+);
 
 // =================================================================================================
 //                                         Delete Config
 // =================================================================================================
 
-router.route('/').delete(async (req, res) => {
-  if (req.isAuthenticated()) {
-    try {
-      await deleteConfigs(req.body.configIds);
-      return res.sendStatus(200);
-    } catch (err) {
-      log.error('Error deleting config', {
-        userId: req.user._id,
-        userEmail: req.user.email,
-        configIds: req.body.configIds,
-        err
-      });
-      return res.sendStatus(500);
-    }
-  }
-  return res.sendStatus(403);
-});
+router.route('/').delete(validation(configSchemas.deleteMultiple, 'body'), catchErrors(async (req, res) => {
+  await deleteConfigs(req.body.configIds);
+  return res.sendStatus(200);
+}));
 
-router.route('/:configId').delete(async (req, res) => {
-  if (req.isAuthenticated()) {
-    try {
-      await deleteConfig(req.params.configId);
-      return res.sendStatus(200);
-    } catch (err) {
-      log.error('Error deleting config', {
-        userId: req.user._id,
-        userEmail: req.user.email,
-        configId: req.params.configId,
-        err
-      });
-      return res.sendStatus(500);
-    }
-  }
-  return res.sendStatus(403);
-});
+router.route('/:configId').delete(validation(configSchemas.delete, 'params'), catchErrors(async (req, res) => {
+  await deleteConfig(req.params.configId);
+  return res.sendStatus(200);
+}));
 
 module.exports = router;

@@ -10,6 +10,7 @@ import {
   IoAlertCircleOutline, IoCheckmark, IoLockClosedOutline, IoMailOutline
 } from 'react-icons/io5';
 import styled from 'styled-components';
+import { useQueryClient } from 'react-query';
 import useUser from '../hooks/Auth/useUser';
 import useSignup from '../hooks/Auth/useSignup';
 import useUniqueEmail from '../hooks/Auth/useUniqueEmail';
@@ -36,6 +37,7 @@ const getStrength = (password: string) => {
 
 const Signup = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data: user, status: userStatus } = useUser();
   const signup = useSignup();
   const uniqueEmail = useUniqueEmail();
@@ -72,11 +74,9 @@ const Signup = () => {
 
   useEffect(() => {
     if (userStatus === 'success') {
-      if (user && !user.unauthorised) {
-        router.push('/');
-      }
+      router.push('/');
     }
-  }, [user]);
+  }, [userStatus, user]);
 
   // eslint-disable-next-line max-len, no-control-regex
   const validateEmail = (email) => /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(email);
@@ -92,11 +92,14 @@ const Signup = () => {
       },
       onSuccess: async (res) => {
         const json = await res.json();
-        if (!json.authenticated) {
+        if (!res.ok) {
+          setError(json.error);
+        } else if (json.message) {
           setError(json.message);
         }
       },
-      onSettled: () => {
+      onSettled: async () => {
+        await queryClient.invalidateQueries('user');
         setLoading(false);
       }
     });
@@ -106,10 +109,10 @@ const Signup = () => {
     form.validateField('email');
     if (form.values.email) {
       setLoadingEmail(true);
-      uniqueEmail.mutateAsync(form.values.email, {
+      uniqueEmail.mutate(form.values.email, {
         onSuccess: async (data) => {
           const res = await data.json();
-          if (!res.unique) {
+          if (res.ok && !res.unique) {
             form.setFieldError('email', 'Email taken');
           }
         },

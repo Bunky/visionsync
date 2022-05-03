@@ -14,9 +14,9 @@ const useStartAnalysis = () => {
   const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
-    if (analysisStatus === 'success' && analysis.active && redirect) {
-      router.push('/analysis');
+    if (analysis && analysis.active && redirect) {
       setRedirect(false);
+      router.push('/analysis');
     }
   }, [analysis, analysisStatus, redirect]);
 
@@ -30,7 +30,7 @@ const useStartAnalysis = () => {
       });
     },
     onSuccess: (res, updatedSetting, context: any) => {
-      if (res.status === 429 || res.status === 500) {
+      if (res.status !== 200) {
         notifications.showNotification({
           title: 'Error', message: 'Failed to start remote analysis!', color: 'red', icon: <IoAlert />
         });

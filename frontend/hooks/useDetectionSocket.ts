@@ -5,35 +5,33 @@ import useUser from './Auth/useUser';
 
 const useDetectionSocket = () => {
   const queryClient = useQueryClient();
-  const { data: user, status: userStatus } = useUser();
+  const { data: user } = useUser();
   const [detections, setDetections] = useState([]);
   const [positions, setPositions] = useState([]);
   const [corners, setCorners] = useState([]);
 
   useEffect(() => {
-    if (userStatus === 'success' && user && !user.unauthorised) {
-      const socket = io('http://localhost:3001', { transports: ['websocket'] });
+    const socket = io('http://localhost:3001', { transports: ['websocket'] });
 
-      socket.emit('create', user._id);
+    socket.emit('create', user._id);
 
-      socket.on('connect', () => {
-        console.log('connected to detection socket');
-      });
+    socket.on('connect', () => {
+      console.log('connected to detection socket');
+    });
 
-      socket.on('detections', (data) => {
-        setDetections(data);
-      });
+    socket.on('detections', (data) => {
+      setDetections(data);
+    });
 
-      socket.on('positions', (data) => {
-        setPositions(data.positions);
-        setCorners(data.corners);
-      });
+    socket.on('positions', (data) => {
+      setPositions(data.positions);
+      setCorners(data.corners);
+    });
 
-      return () => {
-        socket.disconnect();
-      };
-    }
-  }, [queryClient, user, userStatus]);
+    return () => {
+      socket.disconnect();
+    };
+  }, [queryClient, user]);
 
   return { detections, positions, corners };
 };

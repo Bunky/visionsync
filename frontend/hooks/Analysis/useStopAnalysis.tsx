@@ -19,7 +19,7 @@ const useStopAnalysis = () => {
       });
     },
     onSuccess: (res, updatedSetting, context: any) => {
-      if (res.status === 429 || res.status === 500) {
+      if (res.status !== 200) {
         notifications.showNotification({
           title: 'Error', message: 'Failed to start remote analysis!', color: 'red', icon: <IoAlert />
         });

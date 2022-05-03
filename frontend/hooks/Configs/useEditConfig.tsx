@@ -31,14 +31,14 @@ const useEditConfig = () => {
     },
     onError: (err, newConfig, context: any) => {
       notifications.showNotification({
-        title: 'Error', message: 'Failed to edit config!', color: 'red', icon: <IoAlert />
+        title: 'Error', message: `Failed to ${newConfig.duplicate ? 'duplicate' : 'edit'} config!`, color: 'red', icon: <IoAlert />
       });
       queryClient.setQueryData('configs', context.previousConfigs);
     },
     onSuccess: (res, newConfig, context: any) => {
-      if (res.status === 429 || res.status === 500) {
+      if (res.status !== 200) {
         notifications.showNotification({
-          title: 'Error', message: 'Failed to edit config!', color: 'red', icon: <IoAlert />
+          title: 'Error', message: `Failed to ${newConfig.duplicate ? 'duplicate' : 'edit'} config!`, color: 'red', icon: <IoAlert />
         });
         queryClient.setQueryData('configs', context.previousConfigs);
       }

@@ -23,7 +23,7 @@ const useUpdateConfig = () => {
       // queryClient.setQueryData('config', context.previousConfig);
     },
     onSuccess: (res, updatedSetting, context: any) => {
-      if (res.status === 429 || res.status === 500) {
+      if (res.status !== 200) {
         notifications.showNotification({
           title: 'Error', message: 'Failed to update settings remotely!', color: 'red', icon: <IoAlert />
         });

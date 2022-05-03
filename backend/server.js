@@ -9,6 +9,8 @@ const fileUpload = require('express-fileupload');
 const { socketConnection } = require('./utils/socket-io');
 const { redisConnection } = require('./utils/redis');
 const { systemLogger: log } = require('./utils/logger');
+const authenticate = require('./middleware/authenticate');
+const { errorHandler } = require('./middleware/errorHandler');
 
 // =================================================================================================
 //                                       Web Server Configuration
@@ -75,11 +77,15 @@ passport.deserializeUser((user, done) => {
 //                                            API Routes
 // =================================================================================================
 
+app.all('*', authenticate);
+
 app.use('/user', require('./routes/user'));
 app.use('/config', require('./routes/config'));
 app.use('/analysis', require('./routes/analysis'));
 app.use('/matches', require('./routes/matches'));
 app.use('/configs', require('./routes/configs'));
+
+app.use(errorHandler);
 
 // =================================================================================================
 //                                           MongoAtlas Config

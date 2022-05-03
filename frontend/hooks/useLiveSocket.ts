@@ -5,28 +5,26 @@ import useUser from './Auth/useUser';
 
 const useLiveSocket = () => {
   const queryClient = useQueryClient();
-  const { data: user, status: userStatus } = useUser();
+  const { data: user } = useUser();
   const [live, setLive] = useState(null);
 
   useEffect(() => {
-    if (userStatus === 'success' && user && !user.unauthorised) {
-      const socket = io('http://localhost:3001', { transports: ['websocket'] });
+    const socket = io('http://localhost:3001', { transports: ['websocket'] });
 
-      socket.emit('create', user._id);
+    socket.emit('create', user._id);
 
-      socket.on('connect', () => {
-        console.log('connected to live socket');
-      });
+    socket.on('connect', () => {
+      console.log('connected to live socket');
+    });
 
-      socket.on('live', (frame) => {
-        setLive(frame);
-      });
+    socket.on('live', (frame) => {
+      setLive(frame);
+    });
 
-      return () => {
-        socket.disconnect();
-      };
-    }
-  }, [queryClient, user, userStatus]);
+    return () => {
+      socket.disconnect();
+    };
+  }, [queryClient, user]);
 
   return live;
 };

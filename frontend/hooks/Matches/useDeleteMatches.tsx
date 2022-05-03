@@ -22,7 +22,7 @@ const useDeleteMatches = () => {
       queryClient.setQueryData('matches', context.previousMatches);
     },
     onSuccess: (res, matchIds, context: any) => {
-      if (res.status === 429 || res.status === 500) {
+      if (res.status !== 200) {
         notifications.showNotification({
           title: 'Error', message: 'Failed to delete matches!', color: 'red', icon: <IoAlert />
         });

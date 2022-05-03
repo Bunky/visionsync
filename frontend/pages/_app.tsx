@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { persistQueryClient } from 'react-query/persistQueryClient-experimental';
@@ -15,13 +15,13 @@ import { theme } from '../styles/theme';
 const App = (props: AppProps) => {
   const { Component, pageProps } = props;
 
-  const queryClient = new QueryClient({
+  const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
-        cacheTime: 1000 * 60 * 60 * 6 // 6 hours
-      },
+        cacheTime: 1000 * 60 * 60 * 6, // 6 hours
+      }
     },
-  });
+  }));
 
   useEffect(() => {
     const localStoragePersistor = createWebStoragePersistor({
