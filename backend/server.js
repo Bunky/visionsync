@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const MongoSessionStore = require('connect-mongo');
 require('dotenv').config();
 const fileUpload = require('express-fileupload');
+const cors = require('cors');
 const { socketConnection } = require('./utils/socket-io');
 const { redisConnection } = require('./utils/redis');
 const { systemLogger: log } = require('./utils/logger');
@@ -21,14 +22,7 @@ const server = http.createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
-
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  next();
-});
+app.use(cors({ credentials: true, origin: true }));
 
 app.use(session({
   secret: process.env.SESSION_SECRET,

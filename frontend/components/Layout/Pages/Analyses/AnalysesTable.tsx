@@ -30,7 +30,7 @@ const AnalysesTable = () => {
           overflow: 'hidden'
         }}
       >
-        {matches.find((match) => match._id === value).title || 'Deleted Match'}
+        {matches.find((match) => match._id === value)?.title || 'Deleted Match'}
       </Text>
     ),
     minWidth: 200,
