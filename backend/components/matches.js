@@ -9,7 +9,7 @@ const path = require('path');
 const Match = require('../models/match.model');
 const Config = require('../models/config.model');
 const defaultSettings = require('../processor/defaultSettings.json');
-const { systemLogger: log } = require('../utils/logger');
+const { systemLogger: logger } = require('../utils/logger');
 
 // aws stuff
 const s3 = new AWS.S3({
@@ -36,7 +36,13 @@ const generateThumbnail = (matchData, matchId) => new Promise((resolve, reject) 
     }).on('end', async () => {
       const thumbnailBuffer = await fs.readFileSync(path.join(tmpobj.name, `${matchId}.png`));
       fs.rmdirSync(tmpobj.name, { recursive: true });
-      log.info('Thumbnail generated successfully');
+      logger.log({
+        level: 'info',
+        message: 'Thumbnail generated successfully',
+        metadata: {
+          matchId,
+        }
+      });
       return resolve(thumbnailBuffer);
     }).on('err', (err) => reject(err));
 });
@@ -68,9 +74,21 @@ exports.uploadMatch = (ownerId, title, configId, matchData) => new Promise(async
     .outputOptions('-movflags frag_keyframe+empty_moov');
 
   ffmpegCommand.on('end', () => {
-    log.info('Video converted successfully');
+    logger.log({
+      level: 'info',
+      message: 'Video converted successfully',
+      metadata: {
+        matchId: match._id,
+      }
+    });
   }).on('error', (err) => {
-    log.error(`${err.message}`);
+    logger.log({
+      level: 'error',
+      message: err.message,
+      metadata: {
+        stack: err.stack
+      }
+    });
   }).on('progress', (p) => {
     // log.info('progress', p);
   }).pipe(passthroughStream);

@@ -1,9 +1,9 @@
-const { systemLogger: log } = require('../utils/logger');
+const { systemLogger: logger } = require('../utils/logger');
 
 const catchErrors = (cb) => (req, res, next) => cb(req, res, next).catch(next);
 
 const errorHandler = (err, req, res, next) => {
-  log.log({
+  logger.log({
     level: 'error',
     message: err.message,
     metadata: {

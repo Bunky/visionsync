@@ -1,4 +1,4 @@
-const { socketLogger: log } = require('./logger');
+const { socketLogger: logger } = require('./logger');
 
 let io;
 let conectedClient = [];
@@ -11,16 +11,34 @@ exports.socketConnection = (server) => {
       connectionId = id;
       conectedClient.push(id);
       socket.join(id);
-      log.info('Client connected', { id });
+      logger.log({
+        level: 'info',
+        message: 'Client connected',
+        metadata: {
+          id
+        }
+      });
     });
 
     socket.on('error', (err) => {
-      log.error('Socket error', err);
+      logger.log({
+        level: 'error',
+        message: 'Socket error',
+        metadata: {
+          stack: err.stack
+        }
+      });
     });
 
     socket.on('disconnect', () => {
       conectedClient = conectedClient.filter((client) => client !== connectionId);
-      log.info('Client disconnected', { id: connectionId });
+      logger.log({
+        level: 'info',
+        message: 'Client disconnected',
+        metadata: {
+          id: connectionId
+        }
+      });
     });
   });
 };

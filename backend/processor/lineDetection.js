@@ -4,7 +4,7 @@ const Match = require('../models/match.model');
 const { setJsonValue, getJsonValue, delJsonValue } = require('../utils/redis');
 const { uploadAnalysis } = require('../components/analysis');
 const { uploadConfig } = require('../components/configs');
-const { analysisLogger: log } = require('../utils/logger');
+const { analysisLogger: logger } = require('../utils/logger');
 
 let activeAnalysis = []; // Change this so it uses redis instead of a variable!
 
@@ -15,9 +15,13 @@ exports.startAnalysis = async (room, matchId) => {
   await setJsonValue(`${matchId}-settings`, match.config);
   await setJsonValue(`${matchId}-analysis`, []);
 
-  log.info(`Starting analysis for match ${matchId}`, {
-    userId: room,
-    matchId
+  logger.log({
+    level: 'info',
+    message: 'Starting analysis',
+    metadata: {
+      userId: room,
+      matchId
+    }
   });
   const pythonProcess = spawn('python', ['./processor/python/main.py', matchId]);
   pythonProcess.stdout.on('data', (data) => {
@@ -31,7 +35,10 @@ exports.startAnalysis = async (room, matchId) => {
         sendMessage(room, 'live', message.data);
       }
       if (message.type === 'info') {
-        log.info(message.data);
+        logger.log({
+          level: 'debug',
+          message: message.data
+        });
       }
       if (message.type === 'detections') {
         const detections = JSON.parse(`[${message.data}]`);
@@ -69,11 +76,18 @@ exports.startAnalysis = async (room, matchId) => {
     });
   });
   pythonProcess.stderr.on('data', (data) => {
-    log.info(data.toString());
+    logger.log({
+      level: 'debug',
+      message: data.toString()
+    });
   });
   pythonProcess.on('exit', (code) => {
-    log.info(`Process exited with code ${code}`, {
-      matchId
+    logger.log({
+      level: 'info',
+      message: `Process exited with code ${code}`,
+      metadata: {
+        matchId
+      }
     });
     exports.stopAnalysis(matchId);
   });
@@ -86,8 +100,12 @@ exports.startAnalysis = async (room, matchId) => {
 };
 
 exports.stopAnalysis = async (matchId) => {
-  log.info(`Stopping analysis for match ${matchId}`, {
-    matchId
+  logger.log({
+    level: 'info',
+    message: 'Stopping analysis',
+    metadata: {
+      matchId
+    }
   });
 
   try {

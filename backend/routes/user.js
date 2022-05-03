@@ -6,7 +6,7 @@ const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const User = require('../models/user.model');
 const defaultSettings = require('../processor/defaultSettings.json');
-const { userLogger: log } = require('../utils/logger');
+const { userLogger: logger } = require('../utils/logger');
 const validation = require('../middleware/validation/validation');
 const { auth } = require('../middleware/validation/schemas');
 const { catchErrors } = require('../middleware/errorHandler');
@@ -27,7 +27,13 @@ passport.use('login', new LocalStrategy({
         return done(null, false);
       }
       if (!user.verifyPassword(password, user.password)) {
-        log.info('User login incorrect password', { userEmail: user.email });
+        logger.log({
+          level: 'info',
+          message: 'User login incorrect password',
+          metadata: {
+            userEmail: user.email
+          }
+        });
         return done(null, false);
       }
       return done(null, user);
@@ -52,9 +58,13 @@ router.route('/login').post(validation(auth.login, 'body'), catchErrors(async (r
       if (loginError) {
         return next(loginError);
       }
-      log.info('User logged in', {
-        userId: user._id,
-        userEmail: user.email
+      logger.log({
+        level: 'info',
+        message: 'User logged in',
+        metadata: {
+          userId: user._id,
+          userEmail: user.email
+        }
       });
       return res.sendStatus(200);
     });
@@ -73,8 +83,12 @@ passport.use('signup', new LocalStrategy({
   try {
     const user = await User.findOne({ email: req.body.email });
     if (user !== null) {
-      log.warn('User attempted creating account with taken name', {
-        userEmail: req.body.email,
+      logger.log({
+        level: 'warn',
+        message: 'User attempted creating account with taken name',
+        metadata: {
+          userEmail: req.body.email
+        }
       });
       return done(null, false, { message: 'Email already taken' });
     }
@@ -91,9 +105,13 @@ passport.use('signup', new LocalStrategy({
       });
 
       await newUser.save();
-      log.info('User created', {
-        userId: newUser._id,
-        userEmail: newUser.email
+      logger.log({
+        level: 'info',
+        message: 'User created',
+        metadata: {
+          userId: newUser._id,
+          userEmail: newUser.email
+        }
       });
       return done(null, newUser);
     } catch (err) {
@@ -118,9 +136,13 @@ router.route('/signup').post(validation(auth.signup, 'body'), catchErrors(async 
       if (loginError) {
         return next(err);
       }
-      log.info('User logged in after signing up', {
-        userId: user._id,
-        userEmail: user.email
+      logger.log({
+        level: 'info',
+        message: 'User logged in after signing up',
+        metadata: {
+          userId: user._id,
+          userEmail: user.email
+        }
       });
       return res.sendStatus(200);
     });
@@ -132,9 +154,13 @@ router.route('/signup').post(validation(auth.signup, 'body'), catchErrors(async 
 // =================================================================================================
 
 router.route('/logout').get(catchErrors(async (req, res) => {
-  log.info('User logged out', {
-    userId: req.user._id,
-    userEmail: req.user.email
+  logger.log({
+    level: 'info',
+    message: 'User logged out',
+    metadata: {
+      userId: req.user._id,
+      userEmail: req.user.email
+    }
   });
   req.logout();
   return res.sendStatus(200);
