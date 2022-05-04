@@ -62,7 +62,7 @@ router.route('/login').post(validation(auth.login, 'body'), catchErrors(async (r
         level: 'info',
         message: 'User logged in',
         metadata: {
-          userId: user._id,
+          userId: user._id.toString(),
           userEmail: user.email
         }
       });
@@ -109,7 +109,7 @@ passport.use('signup', new LocalStrategy({
         level: 'info',
         message: 'User created',
         metadata: {
-          userId: newUser._id,
+          userId: newUser._id.toString(),
           userEmail: newUser.email
         }
       });
@@ -140,7 +140,7 @@ router.route('/signup').post(validation(auth.signup, 'body'), catchErrors(async 
         level: 'info',
         message: 'User logged in after signing up',
         metadata: {
-          userId: user._id,
+          userId: user._id.toString(),
           userEmail: user.email
         }
       });
@@ -158,7 +158,7 @@ router.route('/logout').get(catchErrors(async (req, res) => {
     level: 'info',
     message: 'User logged out',
     metadata: {
-      userId: req.user._id,
+      userId: req.user._id.toString(),
       userEmail: req.user.email
     }
   });

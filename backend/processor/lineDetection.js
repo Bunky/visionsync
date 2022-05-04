@@ -20,7 +20,7 @@ exports.startAnalysis = async (room, matchId) => {
     message: 'Starting analysis',
     metadata: {
       userId: room,
-      matchId
+      matchId: matchId.toString()
     }
   });
   const pythonProcess = spawn('python', ['./processor/python/main.py', matchId]);
@@ -86,7 +86,7 @@ exports.startAnalysis = async (room, matchId) => {
       level: 'info',
       message: `Process exited with code ${code}`,
       metadata: {
-        matchId
+        matchId: matchId.toString()
       }
     });
     exports.stopAnalysis(matchId);
@@ -104,7 +104,7 @@ exports.stopAnalysis = async (matchId) => {
     level: 'info',
     message: 'Stopping analysis',
     metadata: {
-      matchId
+      matchId: matchId.toString()
     }
   });
 

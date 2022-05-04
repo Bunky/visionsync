@@ -40,7 +40,7 @@ const generateThumbnail = (matchData, matchId) => new Promise((resolve, reject) 
         level: 'info',
         message: 'Thumbnail generated successfully',
         metadata: {
-          matchId,
+          matchId: matchId.toString()
         }
       });
       return resolve(thumbnailBuffer);
@@ -78,7 +78,7 @@ exports.uploadMatch = (ownerId, title, configId, matchData) => new Promise(async
       level: 'info',
       message: 'Video converted successfully',
       metadata: {
-        matchId: match._id,
+        matchId: match._id.toString(),
       }
     });
   }).on('error', (err) => {
