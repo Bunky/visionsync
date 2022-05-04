@@ -2,10 +2,10 @@ import {
   Group, Slider, Title, Switch, RadioGroup, Radio, RangeSlider, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Overlay
 } from '@mantine/core';
 import { IoHelp } from 'react-icons/io5';
-import useConfig from '../../../../../hooks/Configs/useConfig';
-import useUpdateConfig from '../../../../../hooks/Configs/useUpdateConfig';
+import useConfig from '../../../../../../hooks/Configs/useConfig';
+import useUpdateConfig from '../../../../../../hooks/Configs/useUpdateConfig';
 
-const CrowdMaskSettings = () => {
+const PlayerMaskSettings = () => {
   const updateConfig = useUpdateConfig();
   const { data: config } = useConfig();
 
@@ -41,12 +41,12 @@ const CrowdMaskSettings = () => {
               min={0}
               max={255}
               step={1}
-              defaultValue={[config.crowdMask.hsv.lower[0], config.crowdMask.hsv.upper[0]]}
+              defaultValue={[config.playerMask.hsv.lower[0], config.playerMask.hsv.upper[0]]}
               onChangeEnd={(v) => updateConfig.mutate({
-                crowdMask: {
+                playerMask: {
                   hsv: {
-                    lower: [v[0], config.crowdMask.hsv.lower[1], config.crowdMask.hsv.lower[2]],
-                    upper: [v[1], config.crowdMask.hsv.upper[1], config.crowdMask.hsv.upper[2]]
+                    lower: [v[0], config.playerMask.hsv.lower[1], config.playerMask.hsv.lower[2]],
+                    upper: [v[1], config.playerMask.hsv.upper[1], config.playerMask.hsv.upper[2]]
                   }
                 }
               })}
@@ -57,12 +57,12 @@ const CrowdMaskSettings = () => {
               min={0}
               max={255}
               step={1}
-              defaultValue={[config.crowdMask.hsv.lower[1], config.crowdMask.hsv.upper[1]]}
+              defaultValue={[config.playerMask.hsv.lower[1], config.playerMask.hsv.upper[1]]}
               onChangeEnd={(v) => updateConfig.mutate({
-                crowdMask: {
+                playerMask: {
                   hsv: {
-                    lower: [config.crowdMask.hsv.lower[0], v[0], config.crowdMask.hsv.lower[2]],
-                    upper: [config.crowdMask.hsv.upper[0], v[1], config.crowdMask.hsv.upper[2]]
+                    lower: [config.playerMask.hsv.lower[0], v[0], config.playerMask.hsv.lower[2]],
+                    upper: [config.playerMask.hsv.upper[0], v[1], config.playerMask.hsv.upper[2]]
                   }
                 }
               })}
@@ -73,12 +73,12 @@ const CrowdMaskSettings = () => {
               min={0}
               max={255}
               step={1}
-              defaultValue={[config.crowdMask.hsv.lower[2], config.crowdMask.hsv.upper[2]]}
+              defaultValue={[config.playerMask.hsv.lower[2], config.playerMask.hsv.upper[2]]}
               onChangeEnd={(v) => updateConfig.mutate({
-                crowdMask: {
+                playerMask: {
                   hsv: {
-                    lower: [config.crowdMask.hsv.lower[0], config.crowdMask.hsv.lower[1], v[0]],
-                    upper: [config.crowdMask.hsv.upper[0], config.crowdMask.hsv.upper[1], v[1]]
+                    lower: [config.playerMask.hsv.lower[0], config.playerMask.hsv.lower[1], v[0]],
+                    upper: [config.playerMask.hsv.upper[0], config.playerMask.hsv.upper[1], v[1]]
                   }
                 }
               })}
@@ -86,7 +86,7 @@ const CrowdMaskSettings = () => {
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.crowdMask.erosion.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.playerMask.erosion.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Title order={5}>Erosion</Title>
@@ -104,16 +104,16 @@ const CrowdMaskSettings = () => {
                   </ThemeIcon>
                 </Tooltip>
                 <Switch
-                  checked={config.crowdMask.erosion.enabled}
-                  onChange={(v) => updateConfig.mutate({ crowdMask: { erosion: { enabled: v.target.checked } } })}
+                  checked={config.playerMask.erosion.enabled}
+                  onChange={(v) => updateConfig.mutate({ playerMask: { erosion: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
             </Group>
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
-              defaultValue={config.crowdMask.erosion.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ crowdMask: { erosion: { shape: parseInt(v, 10) } } })}
+              defaultValue={config.playerMask.erosion.shape.toString()}
+              onChange={(v) => updateConfig.mutate({ playerMask: { erosion: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -126,13 +126,13 @@ const CrowdMaskSettings = () => {
               step={1}
               min={0}
               sx={{ width: '100%' }}
-              defaultValue={config.crowdMask.erosion.size}
-              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { erosion: { size: v } } })}
+              defaultValue={config.playerMask.erosion.size}
+              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { erosion: { size: v } } })}
             />
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.crowdMask.dilation.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.playerMask.dilation.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Title order={5}>Dilation</Title>
@@ -150,16 +150,16 @@ const CrowdMaskSettings = () => {
                   </ThemeIcon>
                 </Tooltip>
                 <Switch
-                  checked={config.crowdMask.dilation.enabled}
-                  onChange={(v) => updateConfig.mutate({ crowdMask: { dilation: { enabled: v.target.checked } } })}
+                  checked={config.playerMask.dilation.enabled}
+                  onChange={(v) => updateConfig.mutate({ playerMask: { dilation: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
             </Group>
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
-              defaultValue={config.crowdMask.dilation.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ crowdMask: { dilation: { shape: parseInt(v, 10) } } })}
+              defaultValue={config.playerMask.dilation.shape.toString()}
+              onChange={(v) => updateConfig.mutate({ playerMask: { dilation: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -172,13 +172,13 @@ const CrowdMaskSettings = () => {
               step={1}
               min={0}
               sx={{ width: '100%' }}
-              defaultValue={config.crowdMask.dilation.size}
-              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { dilation: { size: v } } })}
+              defaultValue={config.playerMask.dilation.size}
+              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { dilation: { size: v } } })}
             />
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.crowdMask.closing.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.playerMask.closing.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Title order={5}>Closing</Title>
@@ -196,16 +196,16 @@ const CrowdMaskSettings = () => {
                   </ThemeIcon>
                 </Tooltip>
                 <Switch
-                  checked={config.crowdMask.closing.enabled}
-                  onChange={(v) => updateConfig.mutate({ crowdMask: { closing: { enabled: v.target.checked } } })}
+                  checked={config.playerMask.closing.enabled}
+                  onChange={(v) => updateConfig.mutate({ playerMask: { closing: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
             </Group>
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
-              defaultValue={config.crowdMask.closing.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ crowdMask: { closing: { shape: parseInt(v, 10) } } })}
+              defaultValue={config.playerMask.closing.shape.toString()}
+              onChange={(v) => updateConfig.mutate({ playerMask: { closing: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -218,13 +218,13 @@ const CrowdMaskSettings = () => {
               step={1}
               min={0}
               sx={{ width: '100%' }}
-              defaultValue={config.crowdMask.closing.size}
-              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { closing: { size: v } } })}
+              defaultValue={config.playerMask.closing.size}
+              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { closing: { size: v } } })}
             />
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.crowdMask.opening.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.playerMask.opening.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Title order={5}>Opening</Title>
@@ -242,16 +242,16 @@ const CrowdMaskSettings = () => {
                   </ThemeIcon>
                 </Tooltip>
                 <Switch
-                  checked={config.crowdMask.opening.enabled}
-                  onChange={(v) => updateConfig.mutate({ crowdMask: { opening: { enabled: v.target.checked } } })}
+                  checked={config.playerMask.opening.enabled}
+                  onChange={(v) => updateConfig.mutate({ playerMask: { opening: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
             </Group>
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
-              defaultValue={config.crowdMask.opening.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ crowdMask: { opening: { shape: parseInt(v, 10) } } })}
+              defaultValue={config.playerMask.opening.shape.toString()}
+              onChange={(v) => updateConfig.mutate({ playerMask: { opening: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -264,8 +264,8 @@ const CrowdMaskSettings = () => {
               step={1}
               min={0}
               sx={{ width: '100%' }}
-              defaultValue={config.crowdMask.opening.size}
-              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { opening: { size: v } } })}
+              defaultValue={config.playerMask.opening.size}
+              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { opening: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -275,8 +275,8 @@ const CrowdMaskSettings = () => {
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Switch
                 label="Invert mask"
-                checked={config.crowdMask.invert}
-                onChange={(v) => updateConfig.mutate({ crowdMask: { invert: v.target.checked } })}
+                checked={config.playerMask.invert}
+                onChange={(v) => updateConfig.mutate({ playerMask: { invert: v.target.checked } })}
               />
               <Tooltip
                 label="Invert the generated mask"
@@ -293,8 +293,8 @@ const CrowdMaskSettings = () => {
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Switch
                 label="Overlap footage"
-                checked={config.crowdMask.overlap}
-                onChange={(v) => updateConfig.mutate({ crowdMask: { overlap: v.target.checked } })}
+                checked={config.playerMask.overlap}
+                onChange={(v) => updateConfig.mutate({ playerMask: { overlap: v.target.checked } })}
               />
               <Tooltip
                 label="Applies to preview only - Overlaps original frame to help define mask parameters"
@@ -315,4 +315,4 @@ const CrowdMaskSettings = () => {
   );
 };
 
-export default CrowdMaskSettings;
+export default PlayerMaskSettings;

@@ -2,8 +2,8 @@ import {
   Group, Slider, Title, Switch, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Overlay
 } from '@mantine/core';
 import { IoHelp } from 'react-icons/io5';
-import useConfig from '../../../../../hooks/Configs/useConfig';
-import useUpdateConfig from '../../../../../hooks/Configs/useUpdateConfig';
+import useConfig from '../../../../../../hooks/Configs/useConfig';
+import useUpdateConfig from '../../../../../../hooks/Configs/useUpdateConfig';
 
 const HoughSettings = () => {
   const updateConfig = useUpdateConfig();

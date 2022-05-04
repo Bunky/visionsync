@@ -14,7 +14,6 @@ const Preview = () => {
 
   useEffect(() => {
     document.getElementById('preview').setAttribute('src', `data:image/jpeg;base64,${socket.preview}`);
-    document.getElementById('result').setAttribute('src', `data:image/jpeg;base64,${socket.result}`);
   }, [socket]);
 
   return (
@@ -57,17 +56,7 @@ const Preview = () => {
               />
             </Group>
           </Group>
-          {/* <AspectRatio ratio={16/9}> */}
           <PreviewWindow id="preview" width="640" height="360" />
-          {/* </AspectRatio> */}
-        </Group>
-      </Paper>
-      <Paper shadow="md" radius="md" p="md" sx={{ width: '100%' }}>
-        <Group direction="column" spacing="xs">
-          <Title order={5}>Result</Title>
-          {/* <AspectRatio ratio={16/9}> */}
-          <PreviewWindow id="result" width="640" height="360" />
-          {/* </AspectRatio> */}
         </Group>
       </Paper>
     </Group>
@@ -75,7 +64,7 @@ const Preview = () => {
 };
 
 const PreviewWindow = styled.img`
-  border-radius: .25rem;
+  border-radius: 8px;
   width: 100%;
   height: 100%;
 `;

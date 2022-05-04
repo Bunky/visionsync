@@ -1,11 +1,11 @@
 import {
-  Group, Slider, Title, Switch, RadioGroup, Radio, RangeSlider, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Overlay
+  Group, Slider, Title, Switch, RadioGroup, Radio, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Overlay
 } from '@mantine/core';
 import { IoHelp } from 'react-icons/io5';
-import useConfig from '../../../../../hooks/Configs/useConfig';
-import useUpdateConfig from '../../../../../hooks/Configs/useUpdateConfig';
+import useConfig from '../../../../../../hooks/Configs/useConfig';
+import useUpdateConfig from '../../../../../../hooks/Configs/useUpdateConfig';
 
-const PlayerMaskSettings = () => {
+const CannySettings = () => {
   const updateConfig = useUpdateConfig();
   const { data: config } = useConfig();
 
@@ -22,9 +22,9 @@ const PlayerMaskSettings = () => {
         <Paper shadow="md" radius="md" p="md">
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
-              <Title order={5}>HSV Thresholds</Title>
+              <Title order={5}>Canny Thresholds</Title>
               <Tooltip
-                label="Thresholds used to determine the lower and upper bounds of the mask"
+                label="Thresholds used for canny edge detection"
                 transition="pop"
                 withArrow
                 wrapLines
@@ -35,64 +35,34 @@ const PlayerMaskSettings = () => {
                 </ThemeIcon>
               </Tooltip>
             </Group>
-            <Text size="sm" color="dimmed" weight={700}>Hue</Text>
-            <RangeSlider
-              sx={{ width: '100%' }}
-              min={0}
+            <Text size="sm" color="dimmed" weight={700}>Threshold One</Text>
+            <Slider
               max={255}
               step={1}
-              defaultValue={[config.playerMask.hsv.lower[0], config.playerMask.hsv.upper[0]]}
-              onChangeEnd={(v) => updateConfig.mutate({
-                playerMask: {
-                  hsv: {
-                    lower: [v[0], config.playerMask.hsv.lower[1], config.playerMask.hsv.lower[2]],
-                    upper: [v[1], config.playerMask.hsv.upper[1], config.playerMask.hsv.upper[2]]
-                  }
-                }
-              })}
+              min={0}
+              sx={{ width: '100%' }}
+              defaultValue={config.canny.thresholdOne}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { thresholdOne: v } })}
             />
-            <Text size="sm" color="dimmed" weight={700}>Saturation</Text>
-            <RangeSlider
-              sx={{ width: '100%' }}
-              min={0}
+            <Text size="sm" color="dimmed" weight={700}>Threshold Two</Text>
+            <Slider
               max={255}
               step={1}
-              defaultValue={[config.playerMask.hsv.lower[1], config.playerMask.hsv.upper[1]]}
-              onChangeEnd={(v) => updateConfig.mutate({
-                playerMask: {
-                  hsv: {
-                    lower: [config.playerMask.hsv.lower[0], v[0], config.playerMask.hsv.lower[2]],
-                    upper: [config.playerMask.hsv.upper[0], v[1], config.playerMask.hsv.upper[2]]
-                  }
-                }
-              })}
-            />
-            <Text size="sm" color="dimmed" weight={700}>Value</Text>
-            <RangeSlider
-              sx={{ width: '100%' }}
               min={0}
-              max={255}
-              step={1}
-              defaultValue={[config.playerMask.hsv.lower[2], config.playerMask.hsv.upper[2]]}
-              onChangeEnd={(v) => updateConfig.mutate({
-                playerMask: {
-                  hsv: {
-                    lower: [config.playerMask.hsv.lower[0], config.playerMask.hsv.lower[1], v[0]],
-                    upper: [config.playerMask.hsv.upper[0], config.playerMask.hsv.upper[1], v[1]]
-                  }
-                }
-              })}
+              sx={{ width: '100%' }}
+              defaultValue={config.canny.thresholdTwo}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { thresholdTwo: v } })}
             />
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.playerMask.erosion.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.canny.blur.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
-              <Title order={5}>Erosion</Title>
+              <Title order={5}>Blur</Title>
               <Group direction="row">
                 <Tooltip
-                  label="Erosion is the expansion of the mask"
+                  label="Blur the input frame to reduce noise in the output of canny"
                   transition="pop"
                   withArrow
                   wrapLines
@@ -104,81 +74,25 @@ const PlayerMaskSettings = () => {
                   </ThemeIcon>
                 </Tooltip>
                 <Switch
-                  checked={config.playerMask.erosion.enabled}
-                  onChange={(v) => updateConfig.mutate({ playerMask: { erosion: { enabled: v.target.checked } } })}
+                  checked={config.canny.blur.enabled}
+                  onChange={(v) => updateConfig.mutate({ canny: { blur: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
             </Group>
-            <Text size="sm" color="dimmed" weight={700}>Shape</Text>
-            <RadioGroup
-              defaultValue={config.playerMask.erosion.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ playerMask: { erosion: { shape: parseInt(v, 10) } } })}
-              style={{ marginTop: -5 }}
-            >
-              <Radio value="0" label="Square" />
-              <Radio value="1" label="Plus" />
-              <Radio value="2" label="Circle" />
-            </RadioGroup>
             <Text size="sm" color="dimmed" weight={700}>Size</Text>
             <Slider
-              max={20}
+              max={50}
               step={1}
-              min={0}
+              min={1}
               sx={{ width: '100%' }}
-              defaultValue={config.playerMask.erosion.size}
-              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { erosion: { size: v } } })}
+              defaultValue={config.canny.blur.size}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { blur: { size: v } } })}
             />
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.playerMask.dilation.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
-          <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
-            <Group position="apart" direction="row" sx={{ width: '100%' }}>
-              <Title order={5}>Dilation</Title>
-              <Group direction="row">
-                <Tooltip
-                  label="Dilation is the contraction of the mask"
-                  transition="pop"
-                  withArrow
-                  wrapLines
-                  width={220}
-                  sx={{ display: 'flex' }}
-                >
-                  <ThemeIcon variant="light" radius="xl" size="xs" sx={{ cursor: 'pointer' }}>
-                    <IoHelp />
-                  </ThemeIcon>
-                </Tooltip>
-                <Switch
-                  checked={config.playerMask.dilation.enabled}
-                  onChange={(v) => updateConfig.mutate({ playerMask: { dilation: { enabled: v.target.checked } } })}
-                  sx={{ zIndex: 7 }}
-                />
-              </Group>
-            </Group>
-            <Text size="sm" color="dimmed" weight={700}>Shape</Text>
-            <RadioGroup
-              defaultValue={config.playerMask.dilation.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ playerMask: { dilation: { shape: parseInt(v, 10) } } })}
-              style={{ marginTop: -5 }}
-            >
-              <Radio value="0" label="Square" />
-              <Radio value="1" label="Plus" />
-              <Radio value="2" label="Circle" />
-            </RadioGroup>
-            <Text size="sm" color="dimmed" weight={700}>Size</Text>
-            <Slider
-              max={20}
-              step={1}
-              min={0}
-              sx={{ width: '100%' }}
-              defaultValue={config.playerMask.dilation.size}
-              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { dilation: { size: v } } })}
-            />
-          </Group>
-        </Paper>
-        <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.playerMask.closing.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.canny.closing.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Title order={5}>Closing</Title>
@@ -196,16 +110,16 @@ const PlayerMaskSettings = () => {
                   </ThemeIcon>
                 </Tooltip>
                 <Switch
-                  checked={config.playerMask.closing.enabled}
-                  onChange={(v) => updateConfig.mutate({ playerMask: { closing: { enabled: v.target.checked } } })}
+                  checked={config.canny.closing.enabled}
+                  onChange={(v) => updateConfig.mutate({ canny: { closing: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
             </Group>
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
-              defaultValue={config.playerMask.closing.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ playerMask: { closing: { shape: parseInt(v, 10) } } })}
+              defaultValue={config.canny.closing.shape.toString()}
+              onChange={(v) => updateConfig.mutate({ canny: { closing: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -218,13 +132,13 @@ const PlayerMaskSettings = () => {
               step={1}
               min={0}
               sx={{ width: '100%' }}
-              defaultValue={config.playerMask.closing.size}
-              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { closing: { size: v } } })}
+              defaultValue={config.canny.closing.size}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { closing: { size: v } } })}
             />
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.playerMask.opening.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.canny.opening.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Title order={5}>Opening</Title>
@@ -242,16 +156,16 @@ const PlayerMaskSettings = () => {
                   </ThemeIcon>
                 </Tooltip>
                 <Switch
-                  checked={config.playerMask.opening.enabled}
-                  onChange={(v) => updateConfig.mutate({ playerMask: { opening: { enabled: v.target.checked } } })}
+                  checked={config.canny.opening.enabled}
+                  onChange={(v) => updateConfig.mutate({ canny: { opening: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
             </Group>
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
-              defaultValue={config.playerMask.opening.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ playerMask: { opening: { shape: parseInt(v, 10) } } })}
+              defaultValue={config.canny.opening.shape.toString()}
+              onChange={(v) => updateConfig.mutate({ canny: { opening: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -264,8 +178,100 @@ const PlayerMaskSettings = () => {
               step={1}
               min={0}
               sx={{ width: '100%' }}
-              defaultValue={config.playerMask.opening.size}
-              onChangeEnd={(v) => updateConfig.mutate({ playerMask: { opening: { size: v } } })}
+              defaultValue={config.canny.opening.size}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { opening: { size: v } } })}
+            />
+          </Group>
+        </Paper>
+        <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
+          {!config.canny.erosion.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
+            <Group position="apart" direction="row" sx={{ width: '100%' }}>
+              <Title order={5}>Erosion</Title>
+              <Group direction="row">
+                <Tooltip
+                  label="Erosion is the expansion of the mask"
+                  transition="pop"
+                  withArrow
+                  wrapLines
+                  width={220}
+                  sx={{ display: 'flex' }}
+                >
+                  <ThemeIcon variant="light" radius="xl" size="xs" sx={{ cursor: 'pointer' }}>
+                    <IoHelp />
+                  </ThemeIcon>
+                </Tooltip>
+                <Switch
+                  checked={config.canny.erosion.enabled}
+                  onChange={(v) => updateConfig.mutate({ canny: { erosion: { enabled: v.target.checked } } })}
+                  sx={{ zIndex: 7 }}
+                />
+              </Group>
+            </Group>
+            <Text size="sm" color="dimmed" weight={700}>Shape</Text>
+            <RadioGroup
+              defaultValue={config.canny.erosion.shape.toString()}
+              onChange={(v) => updateConfig.mutate({ canny: { erosion: { shape: parseInt(v, 10) } } })}
+              style={{ marginTop: -5 }}
+            >
+              <Radio value="0" label="Square" />
+              <Radio value="1" label="Plus" />
+              <Radio value="2" label="Circle" />
+            </RadioGroup>
+            <Text size="sm" color="dimmed" weight={700}>Size</Text>
+            <Slider
+              max={20}
+              step={1}
+              min={0}
+              sx={{ width: '100%' }}
+              defaultValue={config.canny.erosion.size}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { erosion: { size: v } } })}
+            />
+          </Group>
+        </Paper>
+        <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
+          {!config.canny.dilation.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
+            <Group position="apart" direction="row" sx={{ width: '100%' }}>
+              <Title order={5}>Dilation</Title>
+              <Group direction="row">
+                <Tooltip
+                  label="Dilation is the contraction of the mask"
+                  transition="pop"
+                  withArrow
+                  wrapLines
+                  width={220}
+                  sx={{ display: 'flex' }}
+                >
+                  <ThemeIcon variant="light" radius="xl" size="xs" sx={{ cursor: 'pointer' }}>
+                    <IoHelp />
+                  </ThemeIcon>
+                </Tooltip>
+                <Switch
+                  checked={config.canny.dilation.enabled}
+                  onChange={(v) => updateConfig.mutate({ canny: { dilation: { enabled: v.target.checked } } })}
+                  sx={{ zIndex: 7 }}
+                />
+              </Group>
+            </Group>
+            <Text size="sm" color="dimmed" weight={700}>Shape</Text>
+            <RadioGroup
+              defaultValue={config.canny.dilation.shape.toString()}
+              onChange={(v) => updateConfig.mutate({ canny: { dilation: { shape: parseInt(v, 10) } } })}
+              style={{ marginTop: -5 }}
+            >
+              <Radio value="0" label="Square" />
+              <Radio value="1" label="Plus" />
+              <Radio value="2" label="Circle" />
+            </RadioGroup>
+            <Text size="sm" color="dimmed" weight={700}>Size</Text>
+            <Slider
+              max={20}
+              step={1}
+              min={0}
+              sx={{ width: '100%' }}
+              defaultValue={config.canny.dilation.size}
+              onChangeEnd={(v) => updateConfig.mutate({ canny: { dilation: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -274,12 +280,12 @@ const PlayerMaskSettings = () => {
             <Title order={5}>Misc</Title>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Switch
-                label="Invert mask"
-                checked={config.playerMask.invert}
-                onChange={(v) => updateConfig.mutate({ playerMask: { invert: v.target.checked } })}
+                label="Mask preview"
+                checked={config.canny.masked}
+                onChange={(v) => updateConfig.mutate({ canny: { masked: v.target.checked } })}
               />
               <Tooltip
-                label="Invert the generated mask"
+                label="Applies to preview only - Applies the masks to the preview"
                 transition="pop"
                 withArrow
                 wrapLines
@@ -293,11 +299,11 @@ const PlayerMaskSettings = () => {
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Switch
                 label="Overlap footage"
-                checked={config.playerMask.overlap}
-                onChange={(v) => updateConfig.mutate({ playerMask: { overlap: v.target.checked } })}
+                checked={config.canny.overlap}
+                onChange={(v) => updateConfig.mutate({ canny: { overlap: v.target.checked } })}
               />
               <Tooltip
-                label="Applies to preview only - Overlaps original frame to help define mask parameters"
+                label="Applies to preview only - Overlaps original frame to help define canny parameters"
                 transition="pop"
                 withArrow
                 wrapLines
@@ -315,4 +321,4 @@ const PlayerMaskSettings = () => {
   );
 };
 
-export default PlayerMaskSettings;
+export default CannySettings;

@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import {
   Tooltip, AspectRatio
 } from '@mantine/core';
@@ -6,25 +7,13 @@ import { motion } from 'framer-motion';
 import { useRecoilState } from 'recoil';
 import playerStatModalState from '../../../../../atoms/playerStatModalState';
 
-interface PlayerProps {
-  id: string;
-  player: {
-    class: string;
-    colour: Array<number>;
-    x: number;
-    y: number;
-  };
-  playerId: number;
-}
-
-const Player = ({ playerId, player }: PlayerProps) => {
+const Player = ({ playerId, player }) => {
   const [modal, setModal] = useRecoilState(playerStatModalState);
 
   return (
     <Container player={player}>
       <Tooltip
-        label={(player.class)}
-        // .toUpperCase()
+        label={(player.class === 0 ? 'Player' : (player.class === 1 ? 'Ball' : 'Goal'))}
         transition="pop"
         transitionDuration={100}
         gutter={16}

@@ -5,15 +5,11 @@ import {
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
-interface BallProps {
-  position: Array<number>;
-}
-
-const Ball = ({ position }: BallProps) => {
+const Ball = ({ ball }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <Container position={position}>
+    <Container ball={ball}>
       <AspectRatio ratio={1}>
         <Football onClick={() => setOpen(true)} />
       </AspectRatio>
@@ -28,14 +24,14 @@ const Ball = ({ position }: BallProps) => {
   );
 };
 
-const Container = styled(motion.div).attrs(({ position }) => ({
+const Container = styled(motion.div).attrs(({ ball }) => ({
   transition: {
     type: 'tween',
     duration: 1
   },
   animate: {
-    left: `${position[0]}%`,
-    top: `${position[1]}%`,
+    left: `${ball.x}%`,
+    top: `${ball.y}%`,
     x: '-1rem',
     y: '-1rem'
   }

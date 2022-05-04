@@ -1,11 +1,11 @@
 import {
-  Group, Slider, Title, Switch, RadioGroup, Radio, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Overlay
+  Group, Slider, Title, Switch, RadioGroup, Radio, RangeSlider, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Overlay
 } from '@mantine/core';
 import { IoHelp } from 'react-icons/io5';
-import useConfig from '../../../../../hooks/Configs/useConfig';
-import useUpdateConfig from '../../../../../hooks/Configs/useUpdateConfig';
+import useConfig from '../../../../../../hooks/Configs/useConfig';
+import useUpdateConfig from '../../../../../../hooks/Configs/useUpdateConfig';
 
-const CannySettings = () => {
+const CrowdMaskSettings = () => {
   const updateConfig = useUpdateConfig();
   const { data: config } = useConfig();
 
@@ -22,9 +22,9 @@ const CannySettings = () => {
         <Paper shadow="md" radius="md" p="md">
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
-              <Title order={5}>Canny Thresholds</Title>
+              <Title order={5}>HSV Thresholds</Title>
               <Tooltip
-                label="Thresholds used for canny edge detection"
+                label="Thresholds used to determine the lower and upper bounds of the mask"
                 transition="pop"
                 withArrow
                 wrapLines
@@ -35,156 +35,58 @@ const CannySettings = () => {
                 </ThemeIcon>
               </Tooltip>
             </Group>
-            <Text size="sm" color="dimmed" weight={700}>Threshold One</Text>
-            <Slider
+            <Text size="sm" color="dimmed" weight={700}>Hue</Text>
+            <RangeSlider
+              sx={{ width: '100%' }}
+              min={0}
               max={255}
               step={1}
-              min={0}
-              sx={{ width: '100%' }}
-              defaultValue={config.canny.thresholdOne}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { thresholdOne: v } })}
+              defaultValue={[config.crowdMask.hsv.lower[0], config.crowdMask.hsv.upper[0]]}
+              onChangeEnd={(v) => updateConfig.mutate({
+                crowdMask: {
+                  hsv: {
+                    lower: [v[0], config.crowdMask.hsv.lower[1], config.crowdMask.hsv.lower[2]],
+                    upper: [v[1], config.crowdMask.hsv.upper[1], config.crowdMask.hsv.upper[2]]
+                  }
+                }
+              })}
             />
-            <Text size="sm" color="dimmed" weight={700}>Threshold Two</Text>
-            <Slider
+            <Text size="sm" color="dimmed" weight={700}>Saturation</Text>
+            <RangeSlider
+              sx={{ width: '100%' }}
+              min={0}
               max={255}
               step={1}
+              defaultValue={[config.crowdMask.hsv.lower[1], config.crowdMask.hsv.upper[1]]}
+              onChangeEnd={(v) => updateConfig.mutate({
+                crowdMask: {
+                  hsv: {
+                    lower: [config.crowdMask.hsv.lower[0], v[0], config.crowdMask.hsv.lower[2]],
+                    upper: [config.crowdMask.hsv.upper[0], v[1], config.crowdMask.hsv.upper[2]]
+                  }
+                }
+              })}
+            />
+            <Text size="sm" color="dimmed" weight={700}>Value</Text>
+            <RangeSlider
+              sx={{ width: '100%' }}
               min={0}
-              sx={{ width: '100%' }}
-              defaultValue={config.canny.thresholdTwo}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { thresholdTwo: v } })}
-            />
-          </Group>
-        </Paper>
-        <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.canny.blur.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
-          <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
-            <Group position="apart" direction="row" sx={{ width: '100%' }}>
-              <Title order={5}>Blur</Title>
-              <Group direction="row">
-                <Tooltip
-                  label="Blur the input frame to reduce noise in the output of canny"
-                  transition="pop"
-                  withArrow
-                  wrapLines
-                  width={220}
-                  sx={{ display: 'flex' }}
-                >
-                  <ThemeIcon variant="light" radius="xl" size="xs" sx={{ cursor: 'pointer' }}>
-                    <IoHelp />
-                  </ThemeIcon>
-                </Tooltip>
-                <Switch
-                  checked={config.canny.blur.enabled}
-                  onChange={(v) => updateConfig.mutate({ canny: { blur: { enabled: v.target.checked } } })}
-                  sx={{ zIndex: 7 }}
-                />
-              </Group>
-            </Group>
-            <Text size="sm" color="dimmed" weight={700}>Size</Text>
-            <Slider
-              max={50}
+              max={255}
               step={1}
-              min={1}
-              sx={{ width: '100%' }}
-              defaultValue={config.canny.blur.size}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { blur: { size: v } } })}
+              defaultValue={[config.crowdMask.hsv.lower[2], config.crowdMask.hsv.upper[2]]}
+              onChangeEnd={(v) => updateConfig.mutate({
+                crowdMask: {
+                  hsv: {
+                    lower: [config.crowdMask.hsv.lower[0], config.crowdMask.hsv.lower[1], v[0]],
+                    upper: [config.crowdMask.hsv.upper[0], config.crowdMask.hsv.upper[1], v[1]]
+                  }
+                }
+              })}
             />
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.canny.closing.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
-          <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
-            <Group position="apart" direction="row" sx={{ width: '100%' }}>
-              <Title order={5}>Closing</Title>
-              <Group direction="row">
-                <Tooltip
-                  label="Closing is the contraction of the mask"
-                  transition="pop"
-                  withArrow
-                  wrapLines
-                  width={220}
-                  sx={{ display: 'flex' }}
-                >
-                  <ThemeIcon variant="light" radius="xl" size="xs" sx={{ cursor: 'pointer' }}>
-                    <IoHelp />
-                  </ThemeIcon>
-                </Tooltip>
-                <Switch
-                  checked={config.canny.closing.enabled}
-                  onChange={(v) => updateConfig.mutate({ canny: { closing: { enabled: v.target.checked } } })}
-                  sx={{ zIndex: 7 }}
-                />
-              </Group>
-            </Group>
-            <Text size="sm" color="dimmed" weight={700}>Shape</Text>
-            <RadioGroup
-              defaultValue={config.canny.closing.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ canny: { closing: { shape: parseInt(v, 10) } } })}
-              style={{ marginTop: -5 }}
-            >
-              <Radio value="0" label="Square" />
-              <Radio value="1" label="Plus" />
-              <Radio value="2" label="Circle" />
-            </RadioGroup>
-            <Text size="sm" color="dimmed" weight={700}>Size</Text>
-            <Slider
-              max={20}
-              step={1}
-              min={0}
-              sx={{ width: '100%' }}
-              defaultValue={config.canny.closing.size}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { closing: { size: v } } })}
-            />
-          </Group>
-        </Paper>
-        <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.canny.opening.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
-          <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
-            <Group position="apart" direction="row" sx={{ width: '100%' }}>
-              <Title order={5}>Opening</Title>
-              <Group direction="row">
-                <Tooltip
-                  label="Opening is the contraction of the mask"
-                  transition="pop"
-                  withArrow
-                  wrapLines
-                  width={220}
-                  sx={{ display: 'flex' }}
-                >
-                  <ThemeIcon variant="light" radius="xl" size="xs" sx={{ cursor: 'pointer' }}>
-                    <IoHelp />
-                  </ThemeIcon>
-                </Tooltip>
-                <Switch
-                  checked={config.canny.opening.enabled}
-                  onChange={(v) => updateConfig.mutate({ canny: { opening: { enabled: v.target.checked } } })}
-                  sx={{ zIndex: 7 }}
-                />
-              </Group>
-            </Group>
-            <Text size="sm" color="dimmed" weight={700}>Shape</Text>
-            <RadioGroup
-              defaultValue={config.canny.opening.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ canny: { opening: { shape: parseInt(v, 10) } } })}
-              style={{ marginTop: -5 }}
-            >
-              <Radio value="0" label="Square" />
-              <Radio value="1" label="Plus" />
-              <Radio value="2" label="Circle" />
-            </RadioGroup>
-            <Text size="sm" color="dimmed" weight={700}>Size</Text>
-            <Slider
-              max={20}
-              step={1}
-              min={0}
-              sx={{ width: '100%' }}
-              defaultValue={config.canny.opening.size}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { opening: { size: v } } })}
-            />
-          </Group>
-        </Paper>
-        <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.canny.erosion.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.crowdMask.erosion.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Title order={5}>Erosion</Title>
@@ -202,16 +104,16 @@ const CannySettings = () => {
                   </ThemeIcon>
                 </Tooltip>
                 <Switch
-                  checked={config.canny.erosion.enabled}
-                  onChange={(v) => updateConfig.mutate({ canny: { erosion: { enabled: v.target.checked } } })}
+                  checked={config.crowdMask.erosion.enabled}
+                  onChange={(v) => updateConfig.mutate({ crowdMask: { erosion: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
             </Group>
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
-              defaultValue={config.canny.erosion.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ canny: { erosion: { shape: parseInt(v, 10) } } })}
+              defaultValue={config.crowdMask.erosion.shape.toString()}
+              onChange={(v) => updateConfig.mutate({ crowdMask: { erosion: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -224,13 +126,13 @@ const CannySettings = () => {
               step={1}
               min={0}
               sx={{ width: '100%' }}
-              defaultValue={config.canny.erosion.size}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { erosion: { size: v } } })}
+              defaultValue={config.crowdMask.erosion.size}
+              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { erosion: { size: v } } })}
             />
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.canny.dilation.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.crowdMask.dilation.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Title order={5}>Dilation</Title>
@@ -248,16 +150,16 @@ const CannySettings = () => {
                   </ThemeIcon>
                 </Tooltip>
                 <Switch
-                  checked={config.canny.dilation.enabled}
-                  onChange={(v) => updateConfig.mutate({ canny: { dilation: { enabled: v.target.checked } } })}
+                  checked={config.crowdMask.dilation.enabled}
+                  onChange={(v) => updateConfig.mutate({ crowdMask: { dilation: { enabled: v.target.checked } } })}
                   sx={{ zIndex: 7 }}
                 />
               </Group>
             </Group>
             <Text size="sm" color="dimmed" weight={700}>Shape</Text>
             <RadioGroup
-              defaultValue={config.canny.dilation.shape.toString()}
-              onChange={(v) => updateConfig.mutate({ canny: { dilation: { shape: parseInt(v, 10) } } })}
+              defaultValue={config.crowdMask.dilation.shape.toString()}
+              onChange={(v) => updateConfig.mutate({ crowdMask: { dilation: { shape: parseInt(v, 10) } } })}
               style={{ marginTop: -5 }}
             >
               <Radio value="0" label="Square" />
@@ -270,8 +172,100 @@ const CannySettings = () => {
               step={1}
               min={0}
               sx={{ width: '100%' }}
-              defaultValue={config.canny.dilation.size}
-              onChangeEnd={(v) => updateConfig.mutate({ canny: { dilation: { size: v } } })}
+              defaultValue={config.crowdMask.dilation.size}
+              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { dilation: { size: v } } })}
+            />
+          </Group>
+        </Paper>
+        <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
+          {!config.crowdMask.closing.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
+            <Group position="apart" direction="row" sx={{ width: '100%' }}>
+              <Title order={5}>Closing</Title>
+              <Group direction="row">
+                <Tooltip
+                  label="Closing is the contraction of the mask"
+                  transition="pop"
+                  withArrow
+                  wrapLines
+                  width={220}
+                  sx={{ display: 'flex' }}
+                >
+                  <ThemeIcon variant="light" radius="xl" size="xs" sx={{ cursor: 'pointer' }}>
+                    <IoHelp />
+                  </ThemeIcon>
+                </Tooltip>
+                <Switch
+                  checked={config.crowdMask.closing.enabled}
+                  onChange={(v) => updateConfig.mutate({ crowdMask: { closing: { enabled: v.target.checked } } })}
+                  sx={{ zIndex: 7 }}
+                />
+              </Group>
+            </Group>
+            <Text size="sm" color="dimmed" weight={700}>Shape</Text>
+            <RadioGroup
+              defaultValue={config.crowdMask.closing.shape.toString()}
+              onChange={(v) => updateConfig.mutate({ crowdMask: { closing: { shape: parseInt(v, 10) } } })}
+              style={{ marginTop: -5 }}
+            >
+              <Radio value="0" label="Square" />
+              <Radio value="1" label="Plus" />
+              <Radio value="2" label="Circle" />
+            </RadioGroup>
+            <Text size="sm" color="dimmed" weight={700}>Size</Text>
+            <Slider
+              max={20}
+              step={1}
+              min={0}
+              sx={{ width: '100%' }}
+              defaultValue={config.crowdMask.closing.size}
+              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { closing: { size: v } } })}
+            />
+          </Group>
+        </Paper>
+        <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
+          {!config.crowdMask.opening.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
+            <Group position="apart" direction="row" sx={{ width: '100%' }}>
+              <Title order={5}>Opening</Title>
+              <Group direction="row">
+                <Tooltip
+                  label="Opening is the contraction of the mask"
+                  transition="pop"
+                  withArrow
+                  wrapLines
+                  width={220}
+                  sx={{ display: 'flex' }}
+                >
+                  <ThemeIcon variant="light" radius="xl" size="xs" sx={{ cursor: 'pointer' }}>
+                    <IoHelp />
+                  </ThemeIcon>
+                </Tooltip>
+                <Switch
+                  checked={config.crowdMask.opening.enabled}
+                  onChange={(v) => updateConfig.mutate({ crowdMask: { opening: { enabled: v.target.checked } } })}
+                  sx={{ zIndex: 7 }}
+                />
+              </Group>
+            </Group>
+            <Text size="sm" color="dimmed" weight={700}>Shape</Text>
+            <RadioGroup
+              defaultValue={config.crowdMask.opening.shape.toString()}
+              onChange={(v) => updateConfig.mutate({ crowdMask: { opening: { shape: parseInt(v, 10) } } })}
+              style={{ marginTop: -5 }}
+            >
+              <Radio value="0" label="Square" />
+              <Radio value="1" label="Plus" />
+              <Radio value="2" label="Circle" />
+            </RadioGroup>
+            <Text size="sm" color="dimmed" weight={700}>Size</Text>
+            <Slider
+              max={20}
+              step={1}
+              min={0}
+              sx={{ width: '100%' }}
+              defaultValue={config.crowdMask.opening.size}
+              onChangeEnd={(v) => updateConfig.mutate({ crowdMask: { opening: { size: v } } })}
             />
           </Group>
         </Paper>
@@ -280,12 +274,12 @@ const CannySettings = () => {
             <Title order={5}>Misc</Title>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Switch
-                label="Mask preview"
-                checked={config.canny.masked}
-                onChange={(v) => updateConfig.mutate({ canny: { masked: v.target.checked } })}
+                label="Invert mask"
+                checked={config.crowdMask.invert}
+                onChange={(v) => updateConfig.mutate({ crowdMask: { invert: v.target.checked } })}
               />
               <Tooltip
-                label="Applies to preview only - Applies the masks to the preview"
+                label="Invert the generated mask"
                 transition="pop"
                 withArrow
                 wrapLines
@@ -299,11 +293,11 @@ const CannySettings = () => {
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Switch
                 label="Overlap footage"
-                checked={config.canny.overlap}
-                onChange={(v) => updateConfig.mutate({ canny: { overlap: v.target.checked } })}
+                checked={config.crowdMask.overlap}
+                onChange={(v) => updateConfig.mutate({ crowdMask: { overlap: v.target.checked } })}
               />
               <Tooltip
-                label="Applies to preview only - Overlaps original frame to help define canny parameters"
+                label="Applies to preview only - Overlaps original frame to help define mask parameters"
                 transition="pop"
                 withArrow
                 wrapLines
@@ -321,4 +315,4 @@ const CannySettings = () => {
   );
 };
 
-export default CannySettings;
+export default CrowdMaskSettings;
