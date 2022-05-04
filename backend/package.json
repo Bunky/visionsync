@@ -29,6 +29,7 @@
     "opencv4nodejs": "^5.6.0",
     "passport": "^0.5.2",
     "passport-local": "^1.0.0",
+    "rate-limiter-flexible": "^2.3.7",
     "redis": "^4.0.4",
     "socket.io": "^4.4.1",
     "stream": "0.0.2",

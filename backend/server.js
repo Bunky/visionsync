@@ -12,6 +12,7 @@ const { redisConnection } = require('./utils/redis');
 const { systemLogger: log } = require('./utils/logger');
 const authenticate = require('./middleware/authenticate');
 const { errorHandler } = require('./middleware/errorHandler');
+const rateLimiter = require('./middleware/rateLimiter');
 
 // =================================================================================================
 //                                       Web Server Configuration
@@ -36,7 +37,7 @@ app.use(session({
   store: MongoSessionStore.create({
     mongoUrl: process.env.MONGOURL,
     stringify: false,
-    touchAfter: 6 * 3600,
+    touchAfter: 2 * 3600,
   }),
 }));
 
@@ -71,6 +72,7 @@ passport.deserializeUser((user, done) => {
 //                                            API Routes
 // =================================================================================================
 
+app.use(rateLimiter);
 app.all('*', authenticate);
 
 app.use('/user', require('./routes/user'));
