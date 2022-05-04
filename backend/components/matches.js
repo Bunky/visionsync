@@ -28,13 +28,8 @@ const generateThumbnail = (matchData, matchId) => new Promise((resolve, reject) 
   const tmpobj = tmp.dirSync();
 
   ffmpeg(Readable.from(matchData))
-    .takeScreenshots({
-      timemarks: ['00:00:00.000'],
-      filename: matchId,
-      folder: tmpobj.name,
-      size: '640x360',
-    }).on('end', async () => {
-      const thumbnailBuffer = await fs.readFileSync(path.join(tmpobj.name, `${matchId}.png`));
+    .on('end', () => {
+      const thumbnailBuffer = fs.readFileSync(path.join(tmpobj.name, `${matchId}.png`));
       fs.rmdirSync(tmpobj.name, { recursive: true });
       logger.log({
         level: 'info',
@@ -43,8 +38,14 @@ const generateThumbnail = (matchData, matchId) => new Promise((resolve, reject) 
           matchId: matchId.toString()
         }
       });
-      return resolve(thumbnailBuffer);
-    }).on('err', (err) => reject(err));
+      resolve(thumbnailBuffer);
+    })
+    .on('error', (err) => {
+      reject(err);
+    })
+    .outputOptions(['-f image2', '-vframes 1', '-vcodec png', '-f rawvideo', '-s 640x360', '-ss 00:00:00'])
+    .output(path.join(tmpobj.name, `${matchId}.png`))
+    .run();
 });
 
 exports.uploadMatch = (ownerId, title, configId, matchData) => new Promise(async (resolve, reject) => {
@@ -94,11 +95,11 @@ exports.uploadMatch = (ownerId, title, configId, matchData) => new Promise(async
   }).pipe(passthroughStream);
 
   try {
-    // await s3.upload({
-    //   Bucket: process.env.AWS_BUCKET,
-    //   Key: `thumbnails/${match._id}.png`,
-    //   Body: await generateThumbnail(matchData, match._id.toString())
-    // }).promise();
+    await s3.upload({
+      Bucket: process.env.AWS_BUCKET,
+      Key: `thumbnails/${match._id}.png`,
+      Body: await generateThumbnail(matchData, match._id.toString())
+    }).promise();
     await s3.upload({
       Bucket: process.env.AWS_BUCKET,
       Key: `matches/${match._id}.mp4`,
