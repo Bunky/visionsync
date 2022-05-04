@@ -7,7 +7,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import {
-  IoAlertCircleOutline, IoCheckmark, IoLockClosedOutline, IoMailOutline
+  IoAlertCircleOutline, IoCheckmark, IoLockClosedOutline, IoLogInOutline, IoMailOutline
 } from 'react-icons/io5';
 import styled from 'styled-components';
 import { useQueryClient } from 'react-query';
@@ -252,7 +252,12 @@ const Signup = () => {
                   Have an account? Login
                 </Anchor>
               </Link>
-              <Button type="submit">Signup</Button>
+              <Button
+                type="submit"
+                leftIcon={<IoLogInOutline />}
+              >
+                Signup
+              </Button>
             </Group>
           </Group>
         </form>

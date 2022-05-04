@@ -5,7 +5,7 @@ import {
   Center, Group, TextInput, LoadingOverlay, Button, PasswordInput, Paper, Anchor, Text
 } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
-import { IoLockClosedOutline, IoMailOutline } from 'react-icons/io5';
+import { IoLockClosedOutline, IoLogInOutline, IoMailOutline } from 'react-icons/io5';
 import styled from 'styled-components';
 import { useQueryClient } from 'react-query';
 import useUser from '../hooks/Auth/useUser';
@@ -102,7 +102,12 @@ const Login = () => {
                   Don&apos;t have an account? Register
                 </Anchor>
               </Link>
-              <Button type="submit">Login</Button>
+              <Button
+                type="submit"
+                leftIcon={<IoLogInOutline />}
+              >
+                Login
+              </Button>
             </Group>
           </Group>
         </form>
