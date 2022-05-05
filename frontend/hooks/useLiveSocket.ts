@@ -18,7 +18,11 @@ const useLiveSocket = () => {
     });
 
     socket.on('live', (frame) => {
-      setLive(frame);
+      if (frame === false) {
+        queryClient.invalidateQueries('analysis');
+      } else {
+        setLive(frame);
+      }
     });
 
     return () => {

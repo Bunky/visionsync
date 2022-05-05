@@ -97,6 +97,9 @@ exports.startAnalysis = async (room, matchId) => {
     await match.save();
     await delJsonValue(`${matchId}-settings`);
     await delJsonValue(`${matchId}-analysis`);
+
+    // Send false to update the UI
+    sendMessage(room, 'live', false);
   });
 
   activeAnalysis.push({
