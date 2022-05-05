@@ -3,16 +3,18 @@ import {
   Image
 } from '@mantine/core';
 import Player from './Player';
-// import Ball from './Ball';
+import Ball from './Ball';
 import useDetectionSocket from '../../../../../hooks/useDetectionSocket';
-import HeatmapCanvas from '../../Analyses/Modal/HeatmapCanvas';
+import HeatmapCanvas from '../../../../Common/Heatmap/HeatmapCanvas';
 
 interface MinimapProps {
   overlay?: boolean;
+  heatmap: boolean;
+  boundaries: boolean;
 }
 
-const Minimap = ({ overlay }: MinimapProps) => {
-  const { positions, corners } = useDetectionSocket();
+const Minimap = ({ overlay, heatmap, boundaries }: MinimapProps) => {
+  const { positions, corners, allPositions } = useDetectionSocket();
 
   return (
     <Container overlay={overlay}>
@@ -28,21 +30,33 @@ const Minimap = ({ overlay }: MinimapProps) => {
           blur={overlay ? 5 : 25}
           radius={overlay ? 2 : 10}
         />
-      </OverlayContainer>
-      <OverlayContainer>
-        {positions.map((player, index) => (
-          <Player
-            id={`playerIcon-${index}`}
-            playerId={index}
-            player={player}
-          />
-        ))}
-        {/* <Ball position={tempBall} /> */}
-      </OverlayContainer>
-      <OverlayContainer>
-        <FieldOfView corners={corners} />
-      </OverlayContainer>
-    </Container>
+        {heatmap && (
+          <OverlayContainer>
+            <HeatmapCanvas
+              data={[].concat(...allPositions).map((d) => ([d.x, d.y, 1]))}
+              maxOccurances={1}
+              blur={overlay ? 5 : 25}
+              radius={overlay ? 2 : 10}
+            />
+          </OverlayContainer>
+        )}
+        {boundaries && (
+          <OverlayContainer>
+            <FieldOfView corners={corners} />
+          </OverlayContainer>
+        )}
+        <OverlayContainer>
+          {positions.map((player, index) => (player.class === 1 ? (
+            <Ball ball={player} />
+          ) : (
+            <Player
+              id={`playerIcon-${index}`}
+              playerId={index}
+              player={player}
+            />
+          )))}
+        </OverlayContainer>
+      </Container>
   );
 };
 

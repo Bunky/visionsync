@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import {
   Image
 } from '@mantine/core';
-import Canvas from './HeatmapCanvas';
+import Canvas from '../../../../Common/Heatmap/HeatmapCanvas';
 
 const Heatmap = ({ data }) => (
   <Container>
