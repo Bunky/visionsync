@@ -53,8 +53,12 @@ router.route('/:analysisId').delete(validation(analysisSchemas.delete, 'params')
 
 // Start analysis
 router.route('/start').post(validation(analysisSchemas.start, 'body'), catchErrors(async (req, res) => {
-  await startAnalysis(req.user._id.toString(), req.body.matchId);
-  return res.sendStatus(200);
+  const active = getActive(req.user._id);
+  if (!active) {
+    await startAnalysis(req.user._id.toString(), req.body.matchId);
+    return res.sendStatus(200);
+  }
+  return res.sendStatus(500);
 }));
 
 // Stop analysis
