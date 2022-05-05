@@ -26,7 +26,7 @@ const CustomTable = ({
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    page,
+    rows,
     setGlobalFilter,
     selectedFlatRows,
     toggleAllPageRowsSelected,
@@ -166,7 +166,7 @@ const CustomTable = ({
           ))}
         </Header>
         <Body grow spacing={0} component={ScrollArea} {...getTableBodyProps()}>
-          {page.map((row) => {
+          {rows.map((row) => {
             prepareRow(row);
             return (
               <BodyRow theme={theme} height={rowHeight} {...row.getRowProps()}>
@@ -179,7 +179,7 @@ const CustomTable = ({
               </BodyRow>
             );
           })}
-          {page.length === 0 && (
+          {rows.length === 0 && (
             <Group sx={{ width: '100%', height: '100%' }} position="center">
               <Text size="xl" color="dimmed"><IoSadOutline /></Text>
               <Stack spacing={0}>

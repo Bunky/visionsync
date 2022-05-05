@@ -81,7 +81,7 @@ exports.startAnalysis = async (room, matchId) => {
       message: data.toString()
     });
   });
-  pythonProcess.on('exit', (code) => {
+  pythonProcess.on('exit', async (code) => {
     logger.log({
       level: 'info',
       message: `Process exited with code ${code}`,
@@ -89,7 +89,14 @@ exports.startAnalysis = async (room, matchId) => {
         matchId: matchId.toString()
       }
     });
-    exports.stopAnalysis(matchId);
+
+    activeAnalysis = activeAnalysis.filter((analysis) => analysis.matchId !== matchId.toString());
+    match.settings = await getJsonValue(`${matchId}-settings`);
+    const analysis = await getJsonValue(`${matchId}-analysis`);
+    await uploadAnalysis(matchId, match.ownerId, analysis, match.settings);
+    await match.save();
+    await delJsonValue(`${matchId}-settings`);
+    await delJsonValue(`${matchId}-analysis`);
   });
 
   activeAnalysis.push({
@@ -111,17 +118,8 @@ exports.stopAnalysis = async (matchId) => {
   try {
     process.kill(activeAnalysis.filter((analysis) => analysis.matchId === matchId.toString())[0].pid);
   } catch (err) {
-    log.warn(`Failed to kill process for ${matchId}`, {
+    logger.warn(`Failed to kill process for ${matchId}`, {
       matchId
     });
   }
-  activeAnalysis = activeAnalysis.filter((analysis) => analysis.matchId !== matchId.toString());
-
-  const match = await Match.findOne({ matchId });
-  match.settings = await getJsonValue(`${matchId}-settings`);
-  const analysis = await getJsonValue(`${matchId}-analysis`);
-  await uploadAnalysis(matchId, match.ownerId, analysis, match.settings);
-  await match.save();
-  await delJsonValue(`${matchId}-settings`);
-  await delJsonValue(`${matchId}-analysis`);
 };

@@ -25,14 +25,14 @@ exports.uploadAnalysis = (matchId, ownerId, data, settings) => new Promise(async
   const analysis = await newAnalysis.save();
 
   try {
-    const s3Response = await s3.upload({
+    await s3.upload({
       Bucket: process.env.AWS_BUCKET,
       Key: `analyses/${analysis._id}.json`,
       Body: JSON.stringify(data),
       ContentType: 'application/json'
     }).promise();
 
-    resolve(s3Response);
+    resolve();
   } catch (err) {
     await Analysis.deleteOne({ _id: analysis._id });
     reject(err);
