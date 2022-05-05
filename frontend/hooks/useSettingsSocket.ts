@@ -7,7 +7,6 @@ const useSettingsSocket = () => {
   const queryClient = useQueryClient();
   const { data: user } = useUser();
   const [preview, setPreview] = useState(null);
-  const [result, setResult] = useState(null);
 
   useEffect(() => {
     const socket = io('http://localhost:3001', { transports: ['websocket'] });
@@ -22,10 +21,6 @@ const useSettingsSocket = () => {
       setPreview(frame);
     });
 
-    socket.on('result', (frame) => {
-      setResult(frame);
-    });
-
     socket.on('updateConfig', (message) => {
       queryClient.setQueryData('config', () => message);
       // const update = (entity) => entity.id === data.id ? { ...entity, ...data.payload } : entity;
@@ -37,10 +32,7 @@ const useSettingsSocket = () => {
     };
   }, [queryClient, user]);
 
-  return {
-    preview,
-    result
-  };
+  return preview;
 };
 
 export default useSettingsSocket;

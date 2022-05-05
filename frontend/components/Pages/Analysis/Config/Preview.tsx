@@ -13,7 +13,7 @@ const Preview = () => {
   const updateConfig = useUpdateConfig();
 
   useEffect(() => {
-    document.getElementById('preview').setAttribute('src', `data:image/jpeg;base64,${socket.preview}`);
+    document.getElementById('preview').setAttribute('src', `data:image/jpeg;base64,${socket}`);
   }, [socket]);
 
   return (
