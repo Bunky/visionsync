@@ -3,9 +3,9 @@ import {
   Center, Loader
 } from '@mantine/core';
 import useConfigs from '../hooks/Configs/useConfigs';
-import ConfigsTable from '../components/Layout/Pages/Configs/ConfigsTable';
-import ViewConfigModal from '../components/Layout/Pages/Configs/ViewConfigModal';
-import ConfigModal from '../components/Layout/Pages/Configs/ConfigModal';
+import ConfigsTable from '../components/Pages/Configs/ConfigsTable';
+import ViewConfigModal from '../components/Pages/Configs/ViewConfigModal';
+import ConfigModal from '../components/Pages/Configs/ConfigModal';
 import Error from '../components/Common/Error/Error';
 
 const Configs = () => {

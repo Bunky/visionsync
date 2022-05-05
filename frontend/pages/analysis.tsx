@@ -10,18 +10,18 @@ import {
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { BiAnalyse } from 'react-icons/bi';
-import Livefeed from '../components/Layout/Pages/Home/LiveFeed/Livefeed';
-import Minimap from '../components/Layout/Pages/Home/Minimap/Minimap';
 import PlayerTable from '../components/Layout/Pages/Home/Players/PlayerTable';
 import Stats from '../components/Layout/Pages/Home/Statistics/Stats';
-import PlayerStatsModal from '../components/Layout/Pages/Home/PlayerStatsModal';
+import Livefeed from '../components/Pages/Analysis/LiveFeed/Livefeed';
+import Minimap from '../components/Pages/Analysis/Minimap/Minimap';
+import PlayerStatsModal from '../components/Pages/Analysis/PlayerStatsModal';
 import useAnalysis from '../hooks/Analysis/useAnalysis';
 import useStopAnalysis from '../hooks/Analysis/useStopAnalysis';
 import useLiveSocket from '../hooks/useLiveSocket';
 import Error from '../components/Common/Error/Error';
 import useMatches from '../hooks/Matches/useMatches';
-import NewConfigModal from '../components/Layout/Pages/Home/NewConfigModal';
-import Config from '../components/Layout/Pages/Home/Config/Config';
+import NewConfigModal from '../components/Pages/Analysis/NewConfigModal';
+import Config from '../components/Pages/Analysis/Config/Config';
 
 const Analysis = () => {
   const { data: analysis, status: analysisStatus } = useAnalysis();

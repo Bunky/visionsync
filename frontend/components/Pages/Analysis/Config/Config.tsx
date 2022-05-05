@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import {
-  Tabs, Grid, Loader, Group, Center, Button
+  Tabs, Grid, Loader, Group, Center
 } from '@mantine/core';
 import {
   IoCodeSlashSharp,
@@ -8,31 +8,18 @@ import {
   IoMan,
   IoPeople, IoSyncCircle, IoTv
 } from 'react-icons/io5';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import CrowdMaskSettings from '../components/Pages/Analysis/Config/Settings/CrowdMaskSettings';
-import Preview from '../components/Pages/Analysis/Config/Preview';
-import PlayerMaskSettings from '../components/Pages/Analysis/Config/Settings/PlayerMaskSettings';
-import CannySettings from '../components/Pages/Analysis/Config/Settings/CannySettings';
-import HoughSettings from '../components/Pages/Analysis/Config/Settings/HoughSettings';
-import useConfig from '../hooks/Configs/useConfig';
-import useUpdateConfig from '../hooks/Configs/useUpdateConfig';
-import useAnalysis from '../hooks/Analysis/useAnalysis';
-import NewConfigModal from '../components/Pages/Analysis/NewConfigModal';
-import Error from '../components/Common/Error/Error';
+import CrowdMaskSettings from './Settings/CrowdMaskSettings';
+import Preview from './Preview';
+import PlayerMaskSettings from './Settings/PlayerMaskSettings';
+import CannySettings from './Settings/CannySettings';
+import HoughSettings from './Settings/HoughSettings';
+import useConfig from '../../../../hooks/Configs/useConfig';
+import useUpdateConfig from '../../../../hooks/Configs/useUpdateConfig';
+import Error from '../../../Common/Error/Error';
 
 const Config = () => {
-  const { data: analysis, status: analysisStatus } = useAnalysis();
   const { data: config, status: configStatus } = useConfig();
   const updateConfig = useUpdateConfig();
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (analysisStatus === 'success' && !analysis.active) {
-      router.push('/');
-    }
-  }, [analysis, analysisStatus, router]);
 
   const updatePreview = (index) => {
     if (config.preview.follow) {
@@ -71,27 +58,18 @@ const Config = () => {
     }
   };
 
-  if (configStatus === 'loading' || analysisStatus === 'loading') {
+  if (configStatus === 'loading') {
     return (<Center sx={{ height: '100%' }}><Loader /></Center>);
   }
 
-  if (configStatus === 'error' || analysisStatus === 'error') {
+  if (configStatus === 'error') {
     return (<Center sx={{ height: '100%' }}><Error /></Center>);
-  }
-
-  if (!analysis.active) {
-    return (<Center sx={{ height: '100%' }}>No active analysis</Center>);
   }
 
   return (
     <Container>
       <Grid sx={{ height: '100%', margin: 0 }}>
         <Grid.Col span={7} sx={{ height: '100%' }}>
-          <Button
-            onClick={() => setOpen(true)}
-          >
-            Save new config
-          </Button>
           <Group direction="row" sx={{ height: '100%' }} noWrap>
             <Tabs
               orientation="vertical"
@@ -116,7 +94,6 @@ const Config = () => {
               <Tabs.Tab label="Line Classification" icon={<IoCodeSlashSharp />}>Sliders to define lines etc</Tabs.Tab>
               <Tabs.Tab label="Intersections" icon={<IoSyncCircle />}>Intersections</Tabs.Tab>
             </Tabs>
-            {/* <Divider orientation='vertical' /> */}
           </Group>
         </Grid.Col>
         <Grid.Col span={5} sx={{ height: '100%' }}>
@@ -128,8 +105,8 @@ const Config = () => {
 };
 
 const Container = styled.div`
-  height: calc(100vh - 70px - 32px);
-  max-height: calc(100vh - 70px - 32px);
+  height: 100%;
+  max-height: 100%;
   overflow: hidden;
 `;
 

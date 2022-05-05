@@ -3,9 +3,9 @@ import {
   Center, Loader
 } from '@mantine/core';
 import useMatches from '../hooks/Matches/useMatches';
-import MatchTable from '../components/Layout/Pages/Matches/MatchTable';
-import MatchModal from '../components/Layout/Pages/Matches/MatchModal';
-import ViewMatchModal from '../components/Layout/Pages/Matches/ViewMatchModal';
+import MatchTable from '../components/Pages/Matches/MatchTable';
+import MatchModal from '../components/Pages/Matches/MatchModal';
+import ViewMatchModal from '../components/Pages/Matches/ViewMatchModal';
 import Error from '../components/Common/Error/Error';
 
 const Home = () => {

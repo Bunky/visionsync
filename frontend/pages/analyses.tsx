@@ -3,8 +3,8 @@ import {
   Center, Loader
 } from '@mantine/core';
 import useAnalyses from '../hooks/Analysis/useAnalyses';
-import AnalysesTable from '../components/Layout/Pages/Analyses/AnalysesTable';
-import ViewAnalysisModal from '../components/Layout/Pages/Analyses/ViewAnalysisModal';
+import AnalysesTable from '../components/Pages/Analyses/AnalysesTable';
+import ViewAnalysisModal from '../components/Pages/Analyses/ViewAnalysisModal';
 import useMatches from '../hooks/Matches/useMatches';
 import Error from '../components/Common/Error/Error';
 
