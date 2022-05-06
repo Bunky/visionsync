@@ -2,27 +2,15 @@ import {
   Center, Loader, Modal, Tabs
 } from '@mantine/core';
 import { Prism } from '@mantine/prism';
-import { useEffect, useState } from 'react';
 import { IoCode, IoMap } from 'react-icons/io5';
 import { useRecoilState } from 'recoil';
-import fetchAnalysisJson from '../../../fetches/fetchAnalysisJson';
 import Heatmap from './Modal/Heatmap';
 import viewAnalysisModalState from '../../../atoms/viewAnalysisModalState';
+import useAnalysisData from '../../../hooks/Analysis/useAnalysisData';
 
 const ViewAnalysisModal = () => {
   const [modal, setModal] = useRecoilState(viewAnalysisModalState);
-
-  const [json, setJson] = useState(null);
-
-  useEffect(() => {
-    if (modal.open) {
-      const fetchJson = async () => {
-        setJson(await fetchAnalysisJson(modal.analysisId));
-      };
-
-      fetchJson();
-    }
-  }, [modal]);
+  const { data, status } = useAnalysisData(modal.analysisId, modal.open);
 
   return (
     <Modal
@@ -35,11 +23,11 @@ const ViewAnalysisModal = () => {
       size="55%"
       overflow="inside"
     >
-      {json ? (
+      {status === 'success' && data ? (
         <Tabs>
           <Tabs.Tab label="Heatmap" icon={<IoMap />}>
             <Heatmap
-              data={[].concat(...json).map((d) => ([d.x, d.y, 1]))}
+              data={[].concat(...data).map((d) => ([d.x, d.y, 1]))}
             />
           </Tabs.Tab>
           <Tabs.Tab label="Data" icon={<IoCode />}>
@@ -47,7 +35,7 @@ const ViewAnalysisModal = () => {
               withLineNumbers
               language="json"
             >
-              {JSON.stringify(json, null, 2)}
+              {JSON.stringify(data, null, 2)}
             </Prism>
           </Tabs.Tab>
         </Tabs>

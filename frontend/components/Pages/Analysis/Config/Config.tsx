@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import {
-  Tabs, Grid, Loader, Group, Center
+  Tabs, Loader, Group, Center
 } from '@mantine/core';
 import {
   IoCodeSlashSharp,

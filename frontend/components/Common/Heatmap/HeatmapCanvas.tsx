@@ -5,8 +5,8 @@ const Heatmap = ({
   radius, blur, data, maxOccurances
 }) => {
   const ref = useRef();
-  const [width, setWidth] = useState(100);
-  const [height, setHeight] = useState(100);
+  const [width, setWidth] = useState(1);
+  const [height, setHeight] = useState(1);
 
   let circleCanvas = null;
   let gradientCanvas = null;
@@ -21,7 +21,7 @@ const Heatmap = ({
   };
 
   useEffect(() => {
-    if (ref.current && width !== 100 && height !== 100) {
+    if (ref.current && width !== 1 && height !== 1) {
       draw();
     }
   }, [data, width, height]);
@@ -33,7 +33,7 @@ const Heatmap = ({
         setHeight(ref.current.offsetHeight);
       }
     }
-  }, [ref.current]);
+  }, [ref.current?.offsetWidth, ref.current?.offsetHeight]);
 
   const draw = () => {
     const opacity = 0.05;
