@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import {
-  Menu as Dropdown, Skeleton, Group
+  Menu as Dropdown, Skeleton, Group, useMantineColorScheme
 } from '@mantine/core';
 import {
-  IoSettingsOutline, IoLogOutOutline
+  IoLogOutOutline, IoSunnyOutline, IoMoonOutline
 } from 'react-icons/io5';
 import useUser from '../../../hooks/Auth/useUser';
 import useLogout from '../../../hooks/Auth/useLogout';
 import User from './User';
 
 const Menu = () => {
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const dark = colorScheme === 'dark';
   const logout = useLogout();
   const { data: user, status: userStatus } = useUser();
   const [open, setOpen] = useState(false);
@@ -17,7 +19,7 @@ const Menu = () => {
   if (userStatus === 'success' && user._id) {
     return (
       <Dropdown
-        control={<User firstName={user.firstName} lastName={user.lastName} />}
+        control={<User firstName={user.firstName} lastName={user.lastName} dark={dark} />}
         opened={open}
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
@@ -26,7 +28,7 @@ const Menu = () => {
         placement="end"
       >
         <Dropdown.Label>Account</Dropdown.Label>
-        <Dropdown.Item icon={<IoSettingsOutline />}>User Settings</Dropdown.Item>
+        <Dropdown.Item icon={dark ? <IoSunnyOutline /> : <IoMoonOutline />} onClick={() => toggleColorScheme()}>Theme</Dropdown.Item>
         <Dropdown.Item icon={<IoLogOutOutline />} onClick={() => logout.mutate()} color="red">Logout</Dropdown.Item>
       </Dropdown>
     );

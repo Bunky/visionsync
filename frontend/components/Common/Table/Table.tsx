@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
 import {
-  Button, Checkbox, Group, LoadingOverlay, Paper, Popover, ScrollArea, Stack, Table, Text, TextInput, useMantineTheme
+  Button, Checkbox, Group, LoadingOverlay, Paper, Popover, ScrollArea, Stack, Table, Text, TextInput, useMantineColorScheme, useMantineTheme
 } from '@mantine/core';
 import {
   IoClose, IoSadOutline, IoSearch, IoTrash
@@ -17,9 +17,11 @@ import { useViewportSize } from '@mantine/hooks';
 const CustomTable = ({
   columns, data, deleteMutation, openCreateModal = null, rowHeight = false, hiddenColumns = [], openCreateDisabled = false,
 }) => {
+  const { colorScheme } = useMantineColorScheme();
+  const dark = colorScheme === 'dark';
+  const theme = useMantineTheme();
   const { width } = useViewportSize();
 
-  const theme = useMantineTheme();
   const [delPopover, setDelPopover] = useState(false);
   const {
     getTableProps,
@@ -147,6 +149,7 @@ const CustomTable = ({
               {headerGroup.headers.map((column) => (
                 <HeaderCell
                   theme={theme}
+                  dark={dark}
                   maxWidth={column.maxWidth}
                   isSorted={column.isSorted}
                   {...column.getHeaderProps(column.getSortByToggleProps())}
@@ -169,7 +172,7 @@ const CustomTable = ({
           {rows.map((row) => {
             prepareRow(row);
             return (
-              <BodyRow theme={theme} height={rowHeight} {...row.getRowProps()}>
+              <BodyRow theme={theme} dark={dark} height={rowHeight} {...row.getRowProps()}>
                 <LoadingOverlay visible={row.original.loading} />
                 {row.cells.map((cell) => (
                   <BodyCell height={rowHeight} maxWidth={cell.column.maxWidth} {...cell.getCellProps()}>
@@ -224,7 +227,7 @@ const HeaderRow = styled(Group)`
 
 const HeaderCell = styled.div`
   max-width: ${({ maxWidth }) => maxWidth}px;
-  background-color: ${({ isSorted, theme }) => (isSorted && theme.colors.dark[6])};
+  background-color: ${({ isSorted, theme, dark }) => (isSorted && (dark ? theme.colors.dark[6] : theme.colors.gray[6]))};
   padding: 8px 16px;
   user-select: none;
   transition: background-color 0.2s ease-in-out;
@@ -254,17 +257,17 @@ const BodyRow = styled(Paper).attrs({
   overflow: hidden;
 
   :nth-child(even) {
-    background-color: ${({ theme }) => theme.colors.dark[7]} !important;
+    background-color: ${({ theme, dark }) => (dark ? theme.colors.dark[7] : '#fff')} !important;
   }
   :nth-child(odd) {
-    background-color: ${({ theme }) => theme.colors.dark[8]} !important;
+    background-color: ${({ theme, dark }) => (dark ? theme.colors.dark[8] : theme.colors.gray[0])} !important;
   }
 
   :nth-child(even) .mantine-Image-placeholder .mantine-Paper-root {
-    background-color: ${({ theme }) => theme.colors.dark[8]} !important;
+    background-color: ${({ theme, dark }) => (dark ? theme.colors.dark[8] : theme.colors.gray[0])} !important;
   }
   :nth-child(odd) .mantine-Image-placeholder .mantine-Paper-root{
-    background-color: ${({ theme }) => theme.colors.dark[7]} !important;
+    background-color: ${({ theme, dark }) => (dark ? theme.colors.dark[7] : '#fff')} !important;
   }
 
   ${({ height }) => height && `

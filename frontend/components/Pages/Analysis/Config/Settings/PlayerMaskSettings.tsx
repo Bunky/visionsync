@@ -1,17 +1,19 @@
 import {
-  Group, Slider, Title, Switch, RadioGroup, Radio, RangeSlider, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Overlay
+  Group, Slider, Title, Switch, RadioGroup, Radio, RangeSlider, ThemeIcon, Tooltip, ScrollArea, Paper, Text, Overlay, useMantineColorScheme
 } from '@mantine/core';
 import { IoHelp } from 'react-icons/io5';
 import useConfig from '../../../../../hooks/Configs/useConfig';
 import useUpdateConfig from '../../../../../hooks/Configs/useUpdateConfig';
 
 const PlayerMaskSettings = () => {
+  const { colorScheme } = useMantineColorScheme();
+  const dark = colorScheme === 'dark';
   const updateConfig = useUpdateConfig();
   const { data: config } = useConfig();
 
   return (
     <ScrollArea
-      sx={{ width: 'calc(60vw - 389px)', height: '100%' }}
+      sx={{ height: '100%' }}
       styles={{
         scrollbar: {
           zIndex: 6
@@ -86,7 +88,7 @@ const PlayerMaskSettings = () => {
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.playerMask.erosion.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.playerMask.erosion.enabled && <Overlay opacity={dark ? 0.5 : 0.15} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Title order={5}>Erosion</Title>
@@ -132,7 +134,7 @@ const PlayerMaskSettings = () => {
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.playerMask.dilation.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.playerMask.dilation.enabled && <Overlay opacity={dark ? 0.5 : 0.15} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Title order={5}>Dilation</Title>
@@ -178,7 +180,7 @@ const PlayerMaskSettings = () => {
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.playerMask.closing.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.playerMask.closing.enabled && <Overlay opacity={dark ? 0.5 : 0.15} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Title order={5}>Closing</Title>
@@ -224,7 +226,7 @@ const PlayerMaskSettings = () => {
           </Group>
         </Paper>
         <Paper shadow="md" radius="md" p="md" sx={{ position: 'relative', overflow: 'hidden' }}>
-          {!config.playerMask.opening.enabled && <Overlay opacity={0.5} color="#000" zIndex={5} />}
+          {!config.playerMask.opening.enabled && <Overlay opacity={dark ? 0.5 : 0.15} color="#000" zIndex={5} />}
           <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
             <Group position="apart" direction="row" sx={{ width: '100%' }}>
               <Title order={5}>Opening</Title>

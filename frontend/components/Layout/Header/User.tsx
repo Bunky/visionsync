@@ -7,6 +7,7 @@ import styled from 'styled-components';
 interface UserButtonProps extends UnstyledButtonProps {
   firstName: string;
   lastName: string;
+  dark: boolean;
 }
 
 const Menu = forwardRef<HTMLButtonElement, UserButtonProps>(
@@ -27,7 +28,7 @@ const Container = styled(Group)`
   cursor: pointer;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.dark[8]};
+    background-color: ${({ theme, dark }) => (dark ? theme.colors.dark[8] : theme.colors.gray[0])};
   }
 `;
 

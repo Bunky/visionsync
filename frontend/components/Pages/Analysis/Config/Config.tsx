@@ -67,47 +67,40 @@ const Config = () => {
   }
 
   return (
-    <Container>
-      <Grid sx={{ height: '100%', margin: 0 }}>
-        <Grid.Col span={7} sx={{ height: '100%' }}>
-          <Group direction="row" sx={{ height: '100%' }} noWrap>
-            <Tabs
-              orientation="vertical"
-              sx={{ height: '100%', width: '100%' }}
-              styles={{
-                body: {
-                  width: '100%'
-                },
-                tabsListWrapper: {
-                  width: '100%'
-                },
-                tabLabel: {
-                  whiteSpace: 'nowrap'
-                }
-              }}
-              onTabChange={updatePreview}
-            >
-              <Tabs.Tab label="Crowd Mask" icon={<IoPeople />}><CrowdMaskSettings /></Tabs.Tab>
-              <Tabs.Tab label="Player Mask" icon={<IoMan />}><PlayerMaskSettings /></Tabs.Tab>
-              <Tabs.Tab label="Canny" icon={<IoLinkOutline />}><CannySettings /></Tabs.Tab>
-              <Tabs.Tab label="Hough Transform" icon={<IoTv />}><HoughSettings /></Tabs.Tab>
-              <Tabs.Tab label="Line Classification" icon={<IoCodeSlashSharp />}>Sliders to define lines etc</Tabs.Tab>
-              <Tabs.Tab label="Intersections" icon={<IoSyncCircle />}>Intersections</Tabs.Tab>
-            </Tabs>
-          </Group>
-        </Grid.Col>
-        <Grid.Col span={5} sx={{ height: '100%' }}>
-          <Preview />
-        </Grid.Col>
-      </Grid>
+    <Container dir="row" noWrap>
+      <Tabs
+        orientation="vertical"
+        sx={{ height: '100%', width: '100%' }}
+        styles={{
+          body: {
+            width: '100%'
+          },
+          tabsListWrapper: {
+            width: 200
+          },
+          tabLabel: {
+            whiteSpace: 'nowrap'
+          }
+        }}
+        onTabChange={updatePreview}
+      >
+        <Tabs.Tab label="Crowd Mask" icon={<IoPeople />}><CrowdMaskSettings /></Tabs.Tab>
+        <Tabs.Tab label="Player Mask" icon={<IoMan />}><PlayerMaskSettings /></Tabs.Tab>
+        <Tabs.Tab label="Canny" icon={<IoLinkOutline />}><CannySettings /></Tabs.Tab>
+        <Tabs.Tab label="Hough Transform" icon={<IoTv />}><HoughSettings /></Tabs.Tab>
+        <Tabs.Tab label="Line Classification" icon={<IoCodeSlashSharp />}>Sliders to define lines etc</Tabs.Tab>
+        <Tabs.Tab label="Intersections" icon={<IoSyncCircle />}>Intersections</Tabs.Tab>
+      </Tabs>
+      <Preview />
     </Container>
   );
 };
 
-const Container = styled.div`
+const Container = styled(Group)`
   height: 100%;
   max-height: 100%;
   overflow: hidden;
+  align-items: flex-start;
 `;
 
 export default Config;
