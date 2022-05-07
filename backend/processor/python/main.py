@@ -104,11 +104,6 @@ def main():
             "type": "preview",
             "data": utils.get_base64_from_frame(lines_frame)
           })
-        # elif settings["preview"]["stage"] == "circles":
-        #   message.append({
-        #     "type": "preview",
-        #     "data": utils.get_base64_from_frame(circles_frame)
-        #   })
         elif settings["preview"]["stage"] == "intersections":
           message.append({
             "type": "preview",
