@@ -1,22 +1,22 @@
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import {
   Group, Paper, Title, Switch, Overlay, Select, useMantineColorScheme
 } from '@mantine/core';
 import useConfig from '../../../../hooks/Configs/useConfig';
-import useSettingsSocket from '../../../../hooks/useSettingsSocket';
 import useUpdateConfig from '../../../../hooks/Configs/useUpdateConfig';
+import AnalysisContext from '../../../../contexts/analysis/AnalysisContext';
 
 const Preview = () => {
+  const { preview } = useContext(AnalysisContext);
   const { colorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
   const { data: config } = useConfig();
-  const socket = useSettingsSocket();
   const updateConfig = useUpdateConfig();
 
   useEffect(() => {
-    document.getElementById('preview').setAttribute('src', `data:image/jpeg;base64,${socket}`);
-  }, [socket]);
+    document.getElementById('preview').setAttribute('src', `data:image/jpeg;base64,${preview}`);
+  }, [preview]);
 
   return (
     <Paper

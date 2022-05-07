@@ -1,17 +1,15 @@
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { AspectRatio } from '@mantine/core';
-import useLiveSocket from '../../../../hooks/useLiveSocket';
 import DetectionCanvas from './DetectionCanvas';
-import useDetectionSocket from '../../../../hooks/useDetectionSocket';
+import AnalysisContext from '../../../../contexts/analysis/AnalysisContext';
 
 const Livefeed = ({ showDetections }) => {
-  const live = useLiveSocket();
-  const { detections } = useDetectionSocket();
+  const { livefeed, detections } = useContext(AnalysisContext);
 
   useEffect(() => {
-    document.getElementById('live').setAttribute('src', `data:image/jpeg;base64,${live}`);
-  }, [live]);
+    document.getElementById('live').setAttribute('src', `data:image/jpeg;base64,${livefeed}`);
+  }, [livefeed]);
 
   return (
     <Container>
