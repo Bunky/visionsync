@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
-  Center, Group, TextInput, LoadingOverlay, Button, PasswordInput, Paper, Anchor, Text
+  Center, Group, TextInput, LoadingOverlay, Button, PasswordInput, Paper, Anchor, Text, useMantineColorScheme
 } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import { IoLockClosedOutline, IoLogInOutline, IoMailOutline } from 'react-icons/io5';
@@ -12,6 +12,8 @@ import useUser from '../hooks/Auth/useUser';
 import useLogin from '../hooks/Auth/useLogin';
 
 const Login = () => {
+  const { colorScheme } = useMantineColorScheme();
+  const dark = colorScheme === 'dark';
   const router = useRouter();
   const queryClient = useQueryClient();
   const login = useLogin();
@@ -68,6 +70,7 @@ const Login = () => {
         p="md"
         shadow="sm"
         radius="md"
+        dark={dark}
       >
         <form onSubmit={form.onSubmit(submitLogin)}>
           <LoadingOverlay visible={loading} />
@@ -117,7 +120,7 @@ const Login = () => {
 };
 
 const StyledPaper = styled(Paper)`
-  background-color: ${({ theme }) => theme.colors.dark[8]};
+  background-color: ${({ theme, dark }) => (dark ? theme.colors.dark[8] : theme.colors.gray[0])};
   position: relative;
   overflow: hidden;
 `;

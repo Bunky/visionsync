@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
-  Center, Group, TextInput, LoadingOverlay, Button, PasswordInput, Paper, Checkbox, Anchor, Popover, Text, ThemeIcon, Progress, Loader
+  Center, Group, TextInput, LoadingOverlay, Button, PasswordInput, Paper, Checkbox, Anchor, Popover, Text, ThemeIcon, Progress, Loader, useMantineColorScheme
 } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import {
@@ -36,6 +36,8 @@ const getStrength = (password: string) => {
 };
 
 const Signup = () => {
+  const { colorScheme } = useMantineColorScheme();
+  const dark = colorScheme === 'dark';
   const router = useRouter();
   const queryClient = useQueryClient();
   const { data: user, status: userStatus } = useUser();
@@ -133,6 +135,7 @@ const Signup = () => {
         p="md"
         shadow="sm"
         radius="md"
+        dark={dark}
       >
         <form onSubmit={form.onSubmit(submitSignup)}>
           <LoadingOverlay visible={loading} />
@@ -267,7 +270,7 @@ const Signup = () => {
 };
 
 const StyledPaper = styled(Paper)`
-  background-color: ${({ theme }) => theme.colors.dark[8]};
+  background-color: ${({ theme, dark }) => (dark ? theme.colors.dark[8] : theme.colors.gray[0])};
   position: relative;
   overflow: hidden;
 `;
