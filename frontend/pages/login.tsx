@@ -4,12 +4,20 @@ import { useRouter } from 'next/router';
 import {
   Center, Group, TextInput, LoadingOverlay, Button, PasswordInput, Paper, Anchor, Text, useMantineColorScheme
 } from '@mantine/core';
-import { useForm } from '@mantine/hooks';
+import { useForm, zodResolver } from '@mantine/form';
+import { z } from 'zod';
 import { IoLockClosedOutline, IoLogInOutline, IoMailOutline } from 'react-icons/io5';
 import styled from 'styled-components';
 import { useQueryClient } from 'react-query';
 import useUser from '../hooks/Auth/useUser';
 import useLogin from '../hooks/Auth/useLogin';
+
+const validationSchema = z.object({
+  email: z.string().email({ message: 'Invalid email' }),
+  password: z.string()
+    .min(0, { message: 'Your password should have at least 8 characters' })
+    .max(64, { message: 'Your password should be 64 characters or fewer' }),
+});
 
 const Login = () => {
   const { colorScheme } = useMantineColorScheme();
@@ -25,15 +33,7 @@ const Login = () => {
       email: '',
       password: ''
     },
-    validationRules: {
-      // eslint-disable-next-line max-len, no-control-regex
-      email: (value) => /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(value),
-      password: (value) => value.trim().length >= 8,
-    },
-    errorMessages: {
-      email: 'Invalid email',
-      password: 'Invalid password'
-    },
+    schema: zodResolver(validationSchema)
   });
 
   useEffect(() => {

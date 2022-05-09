@@ -5,7 +5,8 @@ import { useRouter } from 'next/router';
 import {
   Center, Group, TextInput, LoadingOverlay, Button, PasswordInput, Paper, Checkbox, Anchor, Popover, Text, ThemeIcon, Progress, Loader, useMantineColorScheme
 } from '@mantine/core';
-import { useForm } from '@mantine/hooks';
+import { useForm, zodResolver } from '@mantine/form';
+import { z } from 'zod';
 import {
   IoAlertCircleOutline, IoCheckmark, IoLockClosedOutline, IoLogInOutline, IoMailOutline
 } from 'react-icons/io5';
@@ -14,6 +15,27 @@ import { useQueryClient } from 'react-query';
 import useUser from '../hooks/Auth/useUser';
 import useSignup from '../hooks/Auth/useSignup';
 import useUniqueEmail from '../hooks/Auth/useUniqueEmail';
+
+const validationSchema = z.object({
+  firstName: z.string()
+    .min(2, { message: 'Your first name should have at least 2 characters' })
+    .max(32, { message: 'Your first name should be 32 characters or fewer' }),
+  lastName: z.string()
+    .min(2, { message: 'Your last name should have at least 2 characters' })
+    .max(32, { message: 'Your last name should be 32 characters or fewer' }),
+  email: z.string().email({ message: 'Invalid email' }),
+  password: z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, { message: 'Invalid password' }),
+  confirmPassword: z.string()
+    .min(0, { message: 'Your password should have at least 8 characters' })
+    .max(64, { message: 'Your password should be 64 characters or fewer' }),
+  termsOfService: z.boolean()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords must match',
+  path: ['confirmPassword'],
+}).refine((data) => data.termsOfService === true, {
+  message: 'You must accept the terms of service',
+  path: ['termsOfService'],
+});
 
 const requirements = [
   { re: /[0-9]/, label: 'Includes number' },
@@ -56,22 +78,23 @@ const Signup = () => {
       confirmPassword: '',
       termsOfService: false
     },
-    validationRules: {
-      firstName: (value) => value.trim().length >= 2,
-      lastName: (value) => value.trim().length >= 2,
-      email: (value) => validateEmail(value),
-      password: (value) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value),
-      confirmPassword: (val, values) => val === values.password,
-      termsOfService: (val) => val
-    },
-    errorMessages: {
-      firstName: 'First name is required',
-      lastName: 'Last name is required',
-      email: 'Invalid email',
-      password: 'Invalid password',
-      confirmPassword: "Passwords don't match",
-      termsOfService: 'Must agree'
-    },
+    schema: zodResolver(validationSchema)
+    // validationRules: {
+    //   firstName: (value) => value.trim().length >= 2,
+    //   lastName: (value) => value.trim().length >= 2,
+    //   email: (value) => validateEmail(value),
+    //   password: (value) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value),
+    //   confirmPassword: (val, values) => val === values.password,
+    //   termsOfService: (val) => val
+    // },
+    // errorMessages: {
+    //   firstName: 'First name is required',
+    //   lastName: 'Last name is required',
+    //   email: 'Invalid email',
+    //   password: 'Invalid password',
+    //   confirmPassword: "Passwords don't match",
+    //   termsOfService: 'Must agree'
+    // },
   });
 
   useEffect(() => {

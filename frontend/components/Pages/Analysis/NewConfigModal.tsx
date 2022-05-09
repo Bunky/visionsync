@@ -1,10 +1,17 @@
 import {
   Text, Group, Button, Modal, TextInput
 } from '@mantine/core';
-import { useForm } from '@mantine/hooks';
+import { useForm, zodResolver } from '@mantine/form';
+import { z } from 'zod';
 import { useState } from 'react';
 import { IoSave } from 'react-icons/io5';
 import useNewConfig from '../../../hooks/Configs/useNewConfig';
+
+const validationSchema = z.object({
+  title: z.string()
+    .min(3, { message: 'The title should have at least 3 characters' })
+    .max(50, { message: 'The title should have 50 or fewer characters' })
+});
 
 const NewConfigModal = ({ open, setOpen }) => {
   const newConfig = useNewConfig();
@@ -13,12 +20,7 @@ const NewConfigModal = ({ open, setOpen }) => {
     initialValues: {
       title: '',
     },
-    validationRules: {
-      title: (value) => /^.{5,35}$/.test(value),
-    },
-    errorMessages: {
-      title: 'Invalid title'
-    },
+    schema: zodResolver(validationSchema)
   });
 
   const submitSave = (values) => {

@@ -47,7 +47,7 @@ const schemas = {
     upload: Joi.object({
       title: Joi.string()
         .min(3)
-        .max(35)
+        .max(50)
         .required(),
       configId: Joi.string()
         .min(0)

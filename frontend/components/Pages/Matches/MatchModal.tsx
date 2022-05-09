@@ -3,7 +3,7 @@ import {
   Button, Group, Modal, TextInput, Text, Select, Stack, ActionIcon
 } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
-import { useForm } from '@mantine/hooks';
+import { useForm, zodResolver } from '@mantine/form';
 import {
   IoAlert, IoClose, IoCloudUpload, IoSave, IoStop, IoVideocam
 } from 'react-icons/io5';
@@ -11,11 +11,18 @@ import { AiOutlineFile } from 'react-icons/ai';
 import { useRecoilState } from 'recoil';
 import { useNotifications } from '@mantine/notifications';
 import prettyBytes from 'pretty-bytes';
+import { z } from 'zod';
 import useCreateMatch from '../../../hooks/Matches/useCreateMatch';
 import useConfigs from '../../../hooks/Configs/useConfigs';
 import matchModalState from '../../../atoms/matchModalState';
 import useMatches from '../../../hooks/Matches/useMatches';
 import useEditMatch from '../../../hooks/Matches/useEditMatch';
+
+const validationSchema = z.object({
+  title: z.string()
+    .min(3, { message: 'The title should have at least 3 characters' })
+    .max(50, { message: 'The title should have 50 or fewer characters' })
+});
 
 const NewMatchModal = () => {
   const notifications = useNotifications();
@@ -32,12 +39,7 @@ const NewMatchModal = () => {
       title: '',
       config: ''
     },
-    validationRules: {
-      title: (value) => /^.{5,35}$/.test(value),
-    },
-    errorMessages: {
-      title: 'Invalid title'
-    },
+    schema: zodResolver(validationSchema)
   });
 
   useEffect(() => {
