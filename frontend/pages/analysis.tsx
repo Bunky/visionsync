@@ -18,6 +18,7 @@ import NewConfigModal from '../components/Pages/Analysis/NewConfigModal';
 import Config from '../components/Pages/Analysis/Config/Config';
 import AnalysisSocketProvider from '../contexts/analysis/AnalysisSocketProvider';
 import AnalysisWrapper from '../components/Pages/Analysis/AnalysisWrapper';
+import Preview from '../components/Pages/Analysis/Config/Preview';
 
 const Analysis = () => {
   const { data: analysis } = useAnalysis();
@@ -44,9 +45,14 @@ const Analysis = () => {
             </Paper>
           </Grid.Col>
           {config ? (
-            <Grid.Col span={12} style={{ height: 'calc(100% - 151.89px)' }}>
-              <Config />
-            </Grid.Col>
+            <>
+              <Grid.Col sm={12} md={12} lg={7} style={{ height: 'calc(100% - 151.89px)' }}>
+                <Config />
+              </Grid.Col>
+              <Grid.Col sm={12} md={12} lg={5} style={{ height: 'calc(100% - 151.89px)' }}>
+                <Preview />
+              </Grid.Col>
+            </>
           ) : (
             <>
               <Grid.Col sm={12} md={6} lg={6} style={{ height: 'calc(100% - 151.89px)' }}>

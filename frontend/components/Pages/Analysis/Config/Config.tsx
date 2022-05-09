@@ -9,7 +9,6 @@ import {
   IoPeople, IoSyncCircle, IoTv
 } from 'react-icons/io5';
 import CrowdMaskSettings from './Settings/CrowdMaskSettings';
-import Preview from './Preview';
 import PlayerMaskSettings from './Settings/PlayerMaskSettings';
 import CannySettings from './Settings/CannySettings';
 import HoughSettings from './Settings/HoughSettings';
@@ -88,7 +87,6 @@ const Config = () => {
         <Tabs.Tab label="Line Classification" icon={<IoCodeSlashSharp />}>Sliders to define lines etc</Tabs.Tab>
         <Tabs.Tab label="Intersections" icon={<IoSyncCircle />}>Intersections</Tabs.Tab>
       </Tabs>
-      <Preview />
     </Container>
   );
 };

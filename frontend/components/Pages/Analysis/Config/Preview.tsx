@@ -24,14 +24,14 @@ const Preview = () => {
       radius="md"
       p="md"
       sx={{
-        position: 'relative', overflow: 'hidden', minWidth: '40%'
+        position: 'relative', overflow: 'hidden', // minWidth: '40%'
       }}
     >
       {!config.preview.enabled && <Overlay opacity={dark ? 0.5 : 0.15} color="#000" zIndex={5} />}
       <Group position="left" direction="column" spacing="xs" sx={{ width: '100%' }}>
-        <Group position="apart" direction="row" sx={{ width: '100%' }}>
-          <Title order={5}>Stage Preview</Title>
-          <Group direction="row">
+        <Group position="apart" direction="row" sx={{ width: '100%' }} noWrap>
+          <Title order={5}>Preview</Title>
+          <Group direction="row" noWrap>
             <Switch
               checked={config.preview.follow}
               onChange={(v) => updateConfig.mutate({ preview: { follow: v.target.checked } })}
