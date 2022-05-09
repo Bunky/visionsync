@@ -42,6 +42,8 @@ const NewConfigModal = ({ open, setOpen }) => {
       opened={open}
       onClose={handleClose}
       title="New Config"
+      overlayBlur={3}
+      size="lg"
     >
       <form onSubmit={form.onSubmit(submitSave)}>
         <Group grow direction="column" spacing="sm">

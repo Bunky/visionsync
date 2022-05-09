@@ -65,6 +65,8 @@ const ConfigModal = () => {
       opened={modal.open}
       onClose={handleClose}
       title={modal.duplicate ? 'Duplicate Config' : 'Edit Config'}
+      overlayBlur={3}
+      size="lg"
     >
       <form onSubmit={form.onSubmit(submitSave)}>
         <Group grow direction="column" spacing="sm">

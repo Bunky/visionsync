@@ -17,7 +17,8 @@ const ViewMatchModal = () => {
         matchId: modal.matchId
       })}
       title="Watch Match"
-      size="55%"
+      overlayBlur={3}
+      size="xl"
     >
       <AspectRatio ratio={16 / 9}>
         <ReactPlayer

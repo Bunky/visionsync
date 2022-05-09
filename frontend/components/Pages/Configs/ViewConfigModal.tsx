@@ -16,7 +16,8 @@ const ViewConfigModal = () => {
         configId: modal.configId
       })}
       title="View Config"
-      size="55%"
+      overlayBlur={3}
+      size="lg"
       overflow="inside"
     >
       <Prism

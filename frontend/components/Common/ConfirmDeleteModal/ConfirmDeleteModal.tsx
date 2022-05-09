@@ -15,6 +15,7 @@ const ConfirmDeleteModal = ({
     onClose={onClose}
     centered
     title="Confirm Deletion"
+    overlayBlur={3}
   >
     <Stack>
       <Text size="sm">

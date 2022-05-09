@@ -17,6 +17,8 @@ const Ball = ({ ball }) => {
         opened={open}
         onClose={() => setOpen(false)}
         title="Ball Statistics!"
+        overlayBlur={3}
+        size="sm"
       >
         I am football!
       </Modal>

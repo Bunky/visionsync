@@ -13,6 +13,8 @@ const PlayerStatsModal = () => {
         playerId: modal.playerId
       })}
       title="Player Statistics!"
+      overlayBlur={3}
+      size="sm"
     >
       {modal.playerId}
     </Modal>

@@ -20,7 +20,8 @@ const ViewAnalysisModal = () => {
         analysisId: modal.analysisId
       })}
       title="View Analysis"
-      size="55%"
+      overlayBlur={3}
+      size="xl"
       overflow="inside"
     >
       {status === 'success' && data ? (

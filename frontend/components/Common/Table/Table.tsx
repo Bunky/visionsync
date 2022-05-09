@@ -227,7 +227,7 @@ const HeaderRow = styled(Group)`
 
 const HeaderCell = styled.div`
   max-width: ${({ maxWidth }) => maxWidth}px;
-  background-color: ${({ isSorted, theme, dark }) => (isSorted && (dark ? theme.colors.dark[6] : theme.colors.gray[6]))};
+  background-color: ${({ isSorted, theme, dark }) => (isSorted && (dark ? theme.colors.dark[6] : theme.colors.gray[2]))};
   padding: 8px 16px;
   user-select: none;
   transition: background-color 0.2s ease-in-out;

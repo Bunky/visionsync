@@ -89,6 +89,8 @@ const NewMatchModal = () => {
       opened={modal.open}
       onClose={handleClose}
       title={modal.edit ? 'Edit Match' : 'New Match'}
+      overlayBlur={3}
+      size="lg"
     >
       <form onSubmit={form.onSubmit(submitUpload)}>
         <Group grow direction="column" spacing="sm">
