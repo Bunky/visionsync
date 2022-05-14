@@ -401,18 +401,34 @@ class ThreadedCamera(object):
     self.FPS = 1/30
 
     # Start frame retrieval thread
+    self.paused = False
     self.thread = Thread(target=self.update, args=())
     self.thread.daemon = True
     self.thread.start()
 
   def update(self):
     while True:
-      if self.capture.isOpened():
-        (self.status, self.frame) = self.capture.read()
+      if not self.paused:
+        if self.capture.isOpened():
+          (self.status, self.frame) = self.capture.read()
+
+          if np.shape(self.frame) == ():
+            self.capture.set(cv.CAP_PROP_POS_FRAMES, 0)
+            continue
+
       time.sleep(self.FPS)
     
   def get_frame(self):
     return self.frame
+  
+  def play(self):
+    self.paused = False
+    
+  def pause(self):
+    self.paused = True
+    
+  def get_paused(self):
+    return self.paused
 
 intersection_dict = [{
   "id": 1,

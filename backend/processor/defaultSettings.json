@@ -4,6 +4,9 @@
     "stage": "crowdMask",
     "follow": false
   },
+  "analysis": {
+    "paused": false
+  },
   "crowdMask": {
     "hsv": {
       "lower": [22, 40, 75],

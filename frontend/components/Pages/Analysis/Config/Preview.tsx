@@ -1,22 +1,33 @@
 import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import {
-  Group, Paper, Title, Switch, Overlay, Select, useMantineColorScheme
+  Group, Paper, Title, Switch, Overlay, Select, useMantineColorScheme, Center, Loader
 } from '@mantine/core';
 import useConfig from '../../../../hooks/Configs/useConfig';
 import useUpdateConfig from '../../../../hooks/Configs/useUpdateConfig';
 import AnalysisContext from '../../../../contexts/analysis/AnalysisContext';
+import Error from '../../../Common/Error/Error';
 
 const Preview = () => {
   const { preview } = useContext(AnalysisContext);
   const { colorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
-  const { data: config } = useConfig();
+  const { data: config, status: configStatus } = useConfig();
   const updateConfig = useUpdateConfig();
 
   useEffect(() => {
-    document.getElementById('preview').setAttribute('src', `data:image/jpeg;base64,${preview}`);
+    if (document.getElementById('preview')) {
+      document.getElementById('preview').setAttribute('src', `data:image/jpeg;base64,${preview}`);
+    }
   }, [preview]);
+
+  if (configStatus === 'loading') {
+    return (<Center sx={{ height: '100%' }}><Loader /></Center>);
+  }
+
+  if (configStatus === 'error') {
+    return (<Center sx={{ height: '100%' }}><Error /></Center>);
+  }
 
   return (
     <Paper

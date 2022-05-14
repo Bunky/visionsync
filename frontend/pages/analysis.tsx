@@ -3,6 +3,8 @@ import {
 } from '@mantine/core';
 import {
   IoCode,
+  IoPause,
+  IoPlay,
   IoSave,
   IoStop
 } from 'react-icons/io5';
@@ -19,10 +21,12 @@ import Config from '../components/Pages/Analysis/Config/Config';
 import AnalysisSocketProvider from '../contexts/analysis/AnalysisSocketProvider';
 import AnalysisWrapper from '../components/Pages/Analysis/AnalysisWrapper';
 import Preview from '../components/Pages/Analysis/Config/Preview';
+import useUpdateConfig from '../hooks/Configs/useUpdateConfig';
 
 const Analysis = () => {
   const { data: analysis } = useAnalysis();
   const { data: matches } = useMatches();
+  const updateConfig = useUpdateConfig();
 
   const useStop = useStopAnalysis();
   const [detections, setDetections] = useState(true);
@@ -30,6 +34,12 @@ const Analysis = () => {
   const [boundaries, setBoundaries] = useState(false);
   const [open, setOpen] = useState(false);
   const [config, setConfig] = useState(false);
+  const [paused, setPaused] = useState(false);
+
+  const pauseAnalysis = () => {
+    updateConfig.mutate({ analysis: { paused: !paused } });
+    setPaused(!paused);
+  };
 
   return (
     <AnalysisSocketProvider>
@@ -68,6 +78,13 @@ const Analysis = () => {
             <Paper p="md" shadow="md">
               <Group dir="row" position="apart">
                 <Group dir="row">
+                  <Button
+                    onClick={pauseAnalysis}
+                    leftIcon={paused ? <IoPlay /> : <IoPause />}
+                    color={paused ? 'green' : 'violet'}
+                  >
+                    {paused ? 'Play' : 'Pause'}
+                  </Button>
                   <Button
                     onClick={() => useStop.mutate(analysis.matchId)}
                     leftIcon={<IoStop />}

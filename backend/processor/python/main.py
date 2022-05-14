@@ -52,6 +52,11 @@ def main():
       # Get latest frame     
       frame = threaded_camera.get_frame()
       
+      if (settings["analysis"]["paused"] == True and threaded_camera.get_paused() == False):
+        threaded_camera.pause()
+      elif (settings["analysis"]["paused"] == False and threaded_camera.get_paused() == True):
+        threaded_camera.play()
+      
       if np.shape(frame) == ():
         break;
       

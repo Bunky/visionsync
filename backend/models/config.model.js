@@ -18,6 +18,12 @@ const config = new Schema({
       required: true
     },
   },
+  analysis: {
+    paused: {
+      type: Boolean,
+      required: true
+    },
+  },
   crowdMask: {
     hsv: {
       lower: {
