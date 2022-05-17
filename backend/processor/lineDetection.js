@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+// const { spawn } = require('child_process');
 const { sendMessage, isConnected } = require('../utils/socket-io');
 const Match = require('../models/match.model');
 const { setJsonValue, getJsonValue, delJsonValue } = require('../utils/redis');
@@ -23,6 +23,7 @@ exports.startAnalysis = async (room, matchId) => {
       matchId: matchId.toString()
     }
   });
+  /*
   const pythonProcess = spawn('python', ['./processor/python/main.py', matchId]);
   pythonProcess.stdout.on('data', (data) => {
     const messages = JSON.parse(data.toString());
@@ -107,6 +108,7 @@ exports.startAnalysis = async (room, matchId) => {
     matchId,
     pid: pythonProcess.pid,
   });
+  */
 };
 
 exports.stopAnalysis = async (matchId) => {
