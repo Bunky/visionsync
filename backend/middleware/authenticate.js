@@ -1,4 +1,4 @@
-const publicPaths = ['/user/login', '/user/signup', '/user/email', '/user'];
+const publicPaths = ['/user/login', '/user/signup', '/user/email', '/user', '/health'];
 
 const authenticate = (req, res, next) => {
   if (publicPaths.indexOf(req.path) > -1) {
