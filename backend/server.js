@@ -81,6 +81,8 @@ app.use('/analysis', require('./routes/analysis'));
 app.use('/matches', require('./routes/matches'));
 app.use('/configs', require('./routes/configs'));
 
+app.route('/health').get((req, res) => res.sendStatus(200));
+
 app.use(errorHandler);
 
 // =================================================================================================
