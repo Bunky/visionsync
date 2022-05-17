@@ -83,6 +83,7 @@ const PlayerTable = () => {
             </th>
           </tr>
         </thead>
+        <tbody>{rows}</tbody>
       </Table>
     </ScrollArea>
   );

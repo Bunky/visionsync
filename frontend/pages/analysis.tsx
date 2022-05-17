@@ -2,16 +2,18 @@ import {
   Text, Grid, Button, Switch, Group, Paper
 } from '@mantine/core';
 import {
-  IoCode,
   IoPause,
   IoPlay,
   IoSave,
+  IoSettingsOutline,
   IoStop
 } from 'react-icons/io5';
 import { useState } from 'react';
 import { BiAnalyse } from 'react-icons/bi';
 import Livefeed from '../components/Pages/Analysis/LiveFeed/Livefeed';
 import Minimap from '../components/Pages/Analysis/Minimap/Minimap';
+// import PlayerTable from '../components/Layout/Pages/Home/Players/PlayerTable';
+// import Stats from '../components/Layout/Pages/Home/Statistics/Stats';
 import PlayerStatsModal from '../components/Pages/Analysis/PlayerStatsModal';
 import useAnalysis from '../hooks/Analysis/useAnalysis';
 import useStopAnalysis from '../hooks/Analysis/useStopAnalysis';
@@ -47,11 +49,19 @@ const Analysis = () => {
         <Grid style={{ height: '100%', margin: 0 }}>
           <Grid.Col span={12}>
             <Paper p="sm" shadow="md">
-              <Text
-                size="lg"
-              >
-                {matches.find((match) => match._id === analysis.matchId)?.title}
-              </Text>
+              <Group dir="row" position="apart">
+                <Text
+                  size="lg"
+                >
+                  {matches.find((match) => match._id === analysis.matchId)?.title}
+                </Text>
+                <Button
+                  onClick={() => setConfig(!config)}
+                  leftIcon={config ? <BiAnalyse /> : <IoSettingsOutline />}
+                >
+                  {config ? 'Analysis' : 'Config'}
+                </Button>
+              </Group>
             </Paper>
           </Grid.Col>
           {config ? (
@@ -70,10 +80,12 @@ const Analysis = () => {
               </Grid.Col>
               <Grid.Col sm={12} md={6} lg={6} style={{ height: 'calc(100% - 151.89px)' }}>
                 <Minimap heatmap={heatmap} boundaries={boundaries} />
-              </Tabs> */}
               </Grid.Col>
             </>
           )}
+          {/* <Grid.Col span={12}>
+          <PlayerTable />
+        </Grid.Col> */}
           <Grid.Col span={12}>
             <Paper p="md" shadow="md">
               <Group dir="row" position="apart">
@@ -91,12 +103,6 @@ const Analysis = () => {
                     color="red"
                   >
                     Stop
-                  </Button>
-                  <Button
-                    onClick={() => setConfig(!config)}
-                    leftIcon={config ? <BiAnalyse /> : <IoCode />}
-                  >
-                    {config ? 'Analysis' : 'Config'}
                   </Button>
                 </Group>
                 {config ? (

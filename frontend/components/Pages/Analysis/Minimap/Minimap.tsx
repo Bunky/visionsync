@@ -1,11 +1,12 @@
+/* eslint-disable max-len */
 import styled from 'styled-components';
 import {
   AspectRatio,
-  Image
+  // Image
 } from '@mantine/core';
 import { useContext } from 'react';
-import Player from './Player';
-import Ball from './Ball';
+// import Player from './Player';
+// import Ball from './Ball';
 import HeatmapCanvas from '../../../Common/Heatmap/HeatmapCanvas';
 import MinimapCanvas from './MinimapCanvas';
 import AnalysisContext from '../../../../contexts/analysis/AnalysisContext';
@@ -22,6 +23,16 @@ const Minimap = ({ overlay, heatmap, boundaries }: MinimapProps) => {
   return (
     <AspectRatio ratio={16 / 9}>
       <Container overlay={overlay}>
+        {/* <Image
+          radius="md"
+          src="/images/pitch.svg"
+          alt="Football pitch"
+        /> */}
+        <img
+          src="/images/pitch.svg"
+          alt="Football pitch"
+          height="100%"
+        />
         {heatmap && (
           <OverlayContainer>
             <HeatmapCanvas
@@ -38,7 +49,8 @@ const Minimap = ({ overlay, heatmap, boundaries }: MinimapProps) => {
           </OverlayContainer>
         )}
         <OverlayContainer>
-          {positions.map((player, index) => (player.class === 1 ? (
+          <MinimapCanvas data={positions} />
+          {/* {positions.map((player, index) => (player.class === 1 ? (
             <Ball ball={player} />
           ) : (
             <Player
@@ -46,7 +58,7 @@ const Minimap = ({ overlay, heatmap, boundaries }: MinimapProps) => {
               playerId={index}
               player={player}
             />
-          )))}
+          )))} */}
         </OverlayContainer>
       </Container>
     </AspectRatio>
