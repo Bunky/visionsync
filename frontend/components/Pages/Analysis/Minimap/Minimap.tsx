@@ -3,10 +3,12 @@ import {
   AspectRatio,
   Image
 } from '@mantine/core';
+import { useContext } from 'react';
 import Player from './Player';
 import Ball from './Ball';
-import useDetectionSocket from '../../../../hooks/useDetectionSocket';
 import HeatmapCanvas from '../../../Common/Heatmap/HeatmapCanvas';
+import MinimapCanvas from './MinimapCanvas';
+import AnalysisContext from '../../../../contexts/analysis/AnalysisContext';
 
 interface MinimapProps {
   overlay?: boolean;
@@ -15,7 +17,7 @@ interface MinimapProps {
 }
 
 const Minimap = ({ overlay, heatmap, boundaries }: MinimapProps) => {
-  const { positions, corners, allPositions } = useDetectionSocket();
+  const { positions, corners, allPositions } = useContext(AnalysisContext);
 
   return (
     <AspectRatio ratio={16 / 9}>

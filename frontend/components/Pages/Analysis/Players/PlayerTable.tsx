@@ -3,11 +3,11 @@ import {
 } from '@mantine/core';
 import { IoVideocam } from 'react-icons/io5';
 import { useRecoilState } from 'recoil';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useInterval } from '@mantine/hooks';
 import PlayerMenu from './PlayerMenu';
-import useDetectionSocket from '../../../../hooks/useDetectionSocket';
 import playerStatModalState from '../../../../atoms/playerStatModalState';
+import AnalysisContext from '../../../../contexts/analysis/AnalysisContext';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -31,7 +31,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const PlayerTable = () => {
-  const { detections } = useDetectionSocket();
+  const { detections } = useContext(AnalysisContext);
   const [, setModal] = useRecoilState(playerStatModalState);
   const { classes, cx } = useStyles();
   const [debouncedDetections, setDebouncedDetections] = useState([]);
