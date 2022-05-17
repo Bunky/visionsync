@@ -6,5 +6,8 @@ module.exports = {
     // your project has type errors.
     // !! WARN !!
     ignoreBuildErrors: true,
+  },
+  images: {
+    loader: 'custom'
   }
 };

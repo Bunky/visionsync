@@ -1,8 +1,8 @@
 import {
   Header as HeaderContainer, Burger, MediaQuery, Group, Text
 } from '@mantine/core';
-import Image from 'next/image';
 import styled from 'styled-components';
+import Image from '../../Common/Image/Image';
 import Menu from './Menu';
 import logo from '../../../public/logo.svg';
 
