@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
