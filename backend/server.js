@@ -23,7 +23,13 @@ const server = http.createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
-app.use(cors({ credentials: true, origin: false }));
+app.use(cors({
+  credentials: true,
+  origin: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  exposedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin']
+}));
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
