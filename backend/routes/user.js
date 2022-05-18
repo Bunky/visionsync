@@ -46,6 +46,9 @@ passport.use('login', new LocalStrategy({
 // ==========================================Login Endpoint============================================
 
 router.route('/login').post(validation(auth.login, 'body'), catchErrors(async (req, res, next) => {
+  console.log('req.headers');
+  console.log(req.headers);
+  console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
   passport.authenticate('login', (err, user) => {
     if (err) {
       return next(err);
