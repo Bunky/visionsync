@@ -37,7 +37,7 @@ app.use(session({
     maxAge: 60000 * 60 * 6,
     secure: process.env.NODE_ENV !== 'development',
     httpOnly: false,
-    sameSite: 'none'
+    sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax'
   },
   store: MongoSessionStore.create({
     mongoUrl: process.env.MONGOURL,
@@ -87,6 +87,16 @@ app.use('/matches', require('./routes/matches'));
 app.use('/configs', require('./routes/configs'));
 
 app.route('/health').get((req, res) => res.sendStatus(200));
+
+app.route('/cookies-please').get((req, res) => {
+  res.cookie('here-you-go', 'thanks-very-much', {
+    maxAge: 60000 * 60 * 6,
+    secure: process.env.NODE_ENV !== 'development',
+    httpOnly: false,
+    sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax'
+  });
+  return res.sendStatus(200);
+});
 
 app.use(errorHandler);
 
