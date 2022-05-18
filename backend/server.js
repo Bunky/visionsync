@@ -25,26 +25,14 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
-// app.use(cors({
-//   credentials: true,
-//   origin: 'https://visionsync.ben-charles.com'
-// }));
 app.use(cors({
   credentials: true,
   origin: process.env.NODE_ENV !== 'development' ? 'https://visionsync.ben-charles.com' : true
 }));
 
-// app.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin', 'https://visionsync.ben-charles.com');
-//   res.header('Access-Control-Allow-Credentials', true);
-//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-//   next();
-// });
-
 if (process.env.NODE_ENV !== 'development') {
   app.set('trust proxy', true);
 }
-// app.set('trust proxy', 1);
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -105,16 +93,6 @@ app.use('/matches', require('./routes/matches'));
 app.use('/configs', require('./routes/configs'));
 
 app.route('/health').get((req, res) => res.sendStatus(200));
-
-app.route('/cookies-please').get((req, res) => {
-  res.cookie('here-you-go', 'thanks-very-much', {
-    maxAge: 60000 * 60 * 6,
-    secure: process.env.NODE_ENV !== 'development',
-    httpOnly: false,
-    sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax'
-  });
-  return res.sendStatus(200);
-});
 
 app.use(errorHandler);
 
