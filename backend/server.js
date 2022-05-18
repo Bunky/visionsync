@@ -25,17 +25,17 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
-// app.use(cors({
-//   credentials: true,
-//   origin: 'https://visionsync.ben-charles.com'
-// }));
+app.use(cors({
+  credentials: true,
+  origin: 'https://visionsync.ben-charles.com'
+}));
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://visionsync.ben-charles.com');
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', 'https://visionsync.ben-charles.com');
+//   res.header('Access-Control-Allow-Credentials', true);
+//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+//   next();
+// });
 
 // if (process.env.NODE_ENV !== 'development') {
 //   app.set('trust proxy', 1);
@@ -49,8 +49,8 @@ app.use(session({
   cookie: {
     maxAge: 60000 * 60 * 6,
     secure: process.env.NODE_ENV !== 'development',
-    // httpOnly: false,
-    // sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
+    httpOnly: false,
+    sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
     domain: process.env.NODE_ENV !== 'development' ? 'visionsync.ben-charles.com' : undefined
   },
   store: MongoSessionStore.create({
