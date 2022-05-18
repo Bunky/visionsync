@@ -23,7 +23,7 @@ const server = http.createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
-app.use(cors({ credentials: true, origin: true }));
+app.use(cors({ credentials: true, origin: false }));
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
