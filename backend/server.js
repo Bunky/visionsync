@@ -49,7 +49,7 @@ app.use(session({
   cookie: {
     maxAge: 60000 * 60 * 6,
     secure: process.env.NODE_ENV !== 'development',
-    httpOnly: false,
+    httpOnly: true,
     sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
     domain: process.env.NODE_ENV !== 'development' ? 'visionsync.ben-charles.com' : undefined
   },
