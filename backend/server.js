@@ -31,7 +31,7 @@ app.use(fileUpload());
 // }));
 app.use(cors({
   credentials: true,
-  origin: true
+  origin: 'https://visionsync.ben-charles.com'
 }));
 
 // app.use((req, res, next) => {
