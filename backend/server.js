@@ -27,13 +27,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use(cors({
   credentials: true,
-  origin: process.env.NODE_ENV !== 'development' ? 'https://visionsync.ben-charles.com' : true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  origin: process.env.NODE_ENV !== 'development' ? 'https://visionsync.ben-charles.com' : true
 }));
 
-if (process.env.NODE_ENV !== 'development') {
-  app.set('trust proxy', true);
-}
+// if (process.env.NODE_ENV !== 'development') {
+//   app.set('trust proxy', true);
+// }
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
