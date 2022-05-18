@@ -27,14 +27,15 @@ app.use(cors({
   credentials: true,
   origin: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  exposedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin']
+  exposedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'Cookies', 'X-Requested-With', 'X-CSRF-Token', 'X-XSRF-Token'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'Cookies', 'X-Requested-With', 'X-CSRF-Token', 'X-XSRF-Token'],
 }));
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  proxy: process.env.NODE_ENV !== 'development',
   cookie: {
     maxAge: 60000 * 60 * 6,
     secure: process.env.NODE_ENV !== 'development',
