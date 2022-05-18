@@ -36,6 +36,8 @@ app.use(session({
   cookie: {
     maxAge: 60000 * 60 * 6,
     secure: process.env.NODE_ENV !== 'development',
+    httpOnly: false,
+    sameSite: 'none'
   },
   store: MongoSessionStore.create({
     mongoUrl: process.env.MONGOURL,
@@ -106,7 +108,7 @@ connection.once('open', () => {
 
 server.listen(process.env.PORT, (err) => {
   if (err) {
-    log.fatal('Error launching web server', err);
+    log.error('Error launching web server', err);
     throw err;
   }
   log.info(`Web Server ready on http://localhost:${process.env.PORT}`);
