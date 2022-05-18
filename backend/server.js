@@ -25,22 +25,22 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
-// app.use(cors({
-//   credentials: true,
-//   origin: true
-// }));
+app.use(cors({
+  credentials: true,
+  origin: true
+}));
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', req.headers.origin);
+//   res.header('Access-Control-Allow-Credentials', true);
+//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+//   next();
+// });
 
 // if (process.env.NODE_ENV !== 'development') {
 //   app.set('trust proxy', 1);
 // }
-app.set('trust proxy', true);
+// app.set('trust proxy', true);
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -56,8 +56,8 @@ app.use(session({
   store: MongoSessionStore.create({
     mongoUrl: process.env.MONGOURL,
     stringify: false,
-    touchAfter: 2 * 3600,
-  }),
+    touchAfter: 2 * 3600
+  })
 }));
 
 // =================================================================================================
