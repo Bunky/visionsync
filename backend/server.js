@@ -27,7 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use(cors({
   credentials: true,
-  origin: process.env.NODE_ENV !== 'development' ? 'https://visionsync.ben-charles.com' : true
+  origin: process.env.NODE_ENV !== 'development' ? 'https://visionsync.ben-charles.com' : true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 }));
 
 if (process.env.NODE_ENV !== 'development') {
