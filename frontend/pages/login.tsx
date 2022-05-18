@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import { useQueryClient } from 'react-query';
 import useUser from '../hooks/Auth/useUser';
 import useLogin from '../hooks/Auth/useLogin';
+import useCookies from '../hooks/Auth/useCookies';
 
 const validationSchema = z.object({
   email: z.string().email({ message: 'Invalid email' }),
@@ -24,6 +25,7 @@ const Login = () => {
   const dark = colorScheme === 'dark';
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { data: cookies } = useCookies();
   const login = useLogin();
   const { data: user, status: userStatus } = useUser();
   const [loading, setLoading] = useState(false);
@@ -35,6 +37,10 @@ const Login = () => {
     },
     schema: zodResolver(validationSchema)
   });
+
+  useEffect(() => {
+    console.log(cookies);
+  }, [cookies]);
 
   useEffect(() => {
     if (userStatus === 'success' && user?._id) {
