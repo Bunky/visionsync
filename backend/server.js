@@ -25,10 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use(cors({
   credentials: true,
-  origin: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  exposedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'Cookies', 'X-Requested-With', 'X-CSRF-Token', 'X-XSRF-Token'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'Cookies', 'X-Requested-With', 'X-CSRF-Token', 'X-XSRF-Token'],
+  origin: true
 }));
 
 app.use(session({
