@@ -28,15 +28,15 @@ app.use(cors({
   origin: true
 }));
 
-if (process.env.NODE_ENV !== 'development') {
-  app.set('trust proxy', 1);
-}
+// if (process.env.NODE_ENV !== 'development') {
+//   app.set('trust proxy', 1);
+// }
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  // proxy: process.env.NODE_ENV !== 'development',
+  proxy: process.env.NODE_ENV !== 'development',
   cookie: {
     maxAge: 60000 * 60 * 6,
     secure: process.env.NODE_ENV !== 'development',
