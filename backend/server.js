@@ -7,6 +7,7 @@ const MongoSessionStore = require('connect-mongo');
 require('dotenv').config();
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const { socketConnection } = require('./utils/socket-io');
 const { redisConnection } = require('./utils/redis');
 const { systemLogger: log } = require('./utils/logger');
@@ -21,17 +22,25 @@ const rateLimiter = require('./middleware/rateLimiter');
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
-app.use(cors({
-  credentials: true,
-  origin: true
-}));
+// app.use(cors({
+//   credentials: true,
+//   origin: true
+// }));
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 // if (process.env.NODE_ENV !== 'development') {
 //   app.set('trust proxy', 1);
 // }
-
+app.set('trust proxy', true);
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -40,8 +49,8 @@ app.use(session({
   cookie: {
     maxAge: 60000 * 60 * 6,
     secure: process.env.NODE_ENV !== 'development',
-    httpOnly: false,
-    sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
+    // httpOnly: false,
+    // sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
     domain: process.env.NODE_ENV !== 'development' ? 'visionsync.ben-charles.com' : undefined
   },
   store: MongoSessionStore.create({
