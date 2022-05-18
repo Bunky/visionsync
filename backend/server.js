@@ -7,7 +7,7 @@ const MongoSessionStore = require('connect-mongo');
 require('dotenv').config();
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
-const cookieParser = require('cookie-parser');
+// const cookieParser = require('cookie-parser');
 const { socketConnection } = require('./utils/socket-io');
 const { redisConnection } = require('./utils/redis');
 const { systemLogger: log } = require('./utils/logger');
@@ -22,7 +22,7 @@ const rateLimiter = require('./middleware/rateLimiter');
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
-app.use(cookieParser());
+// app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use(cors({
