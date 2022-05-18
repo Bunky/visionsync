@@ -41,7 +41,8 @@ app.use(session({
     maxAge: 60000 * 60 * 6,
     secure: process.env.NODE_ENV !== 'development',
     httpOnly: false,
-    sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax'
+    sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
+    domain: process.env.NODE_ENV !== 'development' ? 'visionsync.ben-charles.com' : undefined
   },
   store: MongoSessionStore.create({
     mongoUrl: process.env.MONGOURL,
