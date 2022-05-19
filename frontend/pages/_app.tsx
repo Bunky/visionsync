@@ -8,7 +8,7 @@ import Head from 'next/head';
 import { MantineProvider, ColorSchemeProvider, ColorScheme } from '@mantine/core';
 import { RecoilRoot } from 'recoil';
 import { NotificationsProvider } from '@mantine/notifications';
-import { useLocalStorage } from '@mantine/hooks';
+import { useColorScheme, useLocalStorage } from '@mantine/hooks';
 import GlobalStyles from '../styles/globalStyles';
 import Layout from '../components/Layout/Layout';
 import { theme } from '../styles/theme';
@@ -16,9 +16,10 @@ import { theme } from '../styles/theme';
 const App = (props: AppProps) => {
   const { Component, pageProps } = props;
 
+  const preferredColorScheme = useColorScheme();
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: 'mantine-color-scheme',
-    defaultValue: 'light',
+    defaultValue: preferredColorScheme,
     getInitialValueInEffect: true,
   });
   const toggleColorScheme = (value? : ColorScheme) => setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
@@ -27,6 +28,7 @@ const App = (props: AppProps) => {
     defaultOptions: {
       queries: {
         cacheTime: 1000 * 60 * 60 * 6, // 6 hours
+        staleTime: 10 * 1000, // 5 minutes
       }
     },
   }));

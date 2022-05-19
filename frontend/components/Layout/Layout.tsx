@@ -32,23 +32,23 @@ const Layout = ({ children }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <AppShell
-        padding="md"
-        header={<Header open={open} setOpen={setOpen} />}
-        navbar={<Navbar open={open} />}
-        styles={{
-          main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] },
-          body: {
-            height: 'calc(100% - 70px)'
-          }
-        }}
-      >
-        {userStatus === 'success' && user._id ? (
-          children
-        ) : (
-          <Center sx={{ height: '100%' }}><Loader /></Center>
-        )}
-      </AppShell>
+      {userStatus === 'success' && user._id ? (
+        <AppShell
+          padding="md"
+          header={<Header open={open} setOpen={setOpen} />}
+          navbar={<Navbar open={open} />}
+          styles={{
+            main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] },
+            body: {
+              height: 'calc(100% - 70px)'
+            }
+          }}
+        >
+          {children}
+        </AppShell>
+      ) : (
+        <Center sx={{ height: '100%' }}><Loader /></Center>
+      )}
       <Dialog
         opened={analysis && analysis.active && router.pathname !== '/analysis'}
         size="lg"

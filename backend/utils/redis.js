@@ -8,7 +8,7 @@ exports.redisConnection = async () => {
   });
 
   client.on('error', (err) => logger.log({
-    level: 'fatal',
+    level: 'error',
     message: 'Redis Client Error',
     metadata: {
       stack: err.stack

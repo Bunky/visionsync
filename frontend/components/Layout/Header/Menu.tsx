@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  Menu as Dropdown, Skeleton, Group, useMantineColorScheme
+  Menu as Dropdown, useMantineColorScheme
 } from '@mantine/core';
 import {
   IoLogOutOutline, IoSunnyOutline, IoMoonOutline
@@ -13,32 +13,23 @@ const Menu = () => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
   const logout = useLogout();
-  const { data: user, status: userStatus } = useUser();
+  const { data: user } = useUser();
   const [open, setOpen] = useState(false);
 
-  if (userStatus === 'success' && user._id) {
-    return (
-      <Dropdown
-        control={<User firstName={user.firstName} lastName={user.lastName} dark={dark} />}
-        opened={open}
-        onOpen={() => setOpen(true)}
-        onClose={() => setOpen(false)}
-        trigger="hover"
-        transition="scale"
-        placement="end"
-      >
-        <Dropdown.Label>Account</Dropdown.Label>
-        <Dropdown.Item icon={dark ? <IoSunnyOutline /> : <IoMoonOutline />} onClick={() => toggleColorScheme()}>Theme</Dropdown.Item>
-        <Dropdown.Item icon={<IoLogOutOutline />} onClick={() => logout.mutate()} color="red">Logout</Dropdown.Item>
-      </Dropdown>
-    );
-  }
-
   return (
-    <Group>
-      <Skeleton height={32} circle />
-      <Skeleton height={16} width={75} />
-    </Group>
+    <Dropdown
+      control={<User firstName={user.firstName} lastName={user.lastName} dark={dark} />}
+      opened={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+      trigger="hover"
+      transition="scale"
+      placement="end"
+    >
+      <Dropdown.Label>Account</Dropdown.Label>
+      <Dropdown.Item icon={dark ? <IoSunnyOutline /> : <IoMoonOutline />} onClick={() => toggleColorScheme()}>Theme</Dropdown.Item>
+      <Dropdown.Item icon={<IoLogOutOutline />} onClick={() => logout.mutate()} color="red">Logout</Dropdown.Item>
+    </Dropdown>
   );
 };
 
