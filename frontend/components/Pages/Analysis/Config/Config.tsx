@@ -6,7 +6,7 @@ import {
   IoCodeSlashSharp,
   IoLinkOutline,
   IoMan,
-  IoPeople, IoSyncCircle, IoTv
+  IoPeople, IoTv
 } from 'react-icons/io5';
 import CrowdMaskSettings from './Settings/CrowdMaskSettings';
 import PlayerMaskSettings from './Settings/PlayerMaskSettings';

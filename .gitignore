@@ -77,3 +77,4 @@ typings/
 *.pyc
 backend/.vscode/launch.json
 backend/backend.zip
+backend/processor/python/model/old/best.pt

@@ -35,12 +35,11 @@ const ViewAnalysisModal = () => {
         <Tabs>
           <Tabs.Tab label="Heatmap" icon={<IoMap />}>
             <Select
-              label="Team"
               placeholder="Pick team"
               value={team}
               onChange={setTeam}
               data={[
-                { value: 'both', label: 'Both' },
+                { value: 'both', label: 'Both Teams' },
                 { value: '1', label: 'Team 1' },
                 { value: '2', label: 'Team 2' }
               ]}
