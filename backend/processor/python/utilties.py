@@ -271,7 +271,7 @@ def transform_detections(matrix, detections):
 
     transformed_detections.append({
       "class": detection['class'],
-      "colour": [detection["colour"][0], detection["colour"][1], detection["colour"][2]],
+      "colour": [round(detection["colour"][0], 0), round(detection["colour"][1], 0), round(detection["colour"][2], 0)],
       "team": detection['team'],
       "x": round(float(feet_converted[0][0][0] / resolution[0]) * 100, 2),
       "y": round(float(feet_converted[0][0][1] / resolution[1]) * 100, 2)

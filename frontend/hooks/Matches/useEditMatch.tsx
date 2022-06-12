@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation } from 'react-query';
 import { useNotifications } from '@mantine/notifications';
-import { IoAlert } from 'react-icons/io5';
+import { IoAlert, IoInformationCircle } from 'react-icons/io5';
 import editMatch from '../../mutations/Matches/editMatch';
 
 const useEditMatch = () => {
@@ -35,6 +35,9 @@ const useEditMatch = () => {
         });
         queryClient.setQueryData('matches', context.previousMatches);
       }
+      notifications.showNotification({
+        title: 'Success', message: 'Successfully edited the match!', color: 'green', icon: <IoInformationCircle />
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries('matches');

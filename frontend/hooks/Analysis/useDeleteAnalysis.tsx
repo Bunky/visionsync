@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation } from 'react-query';
 import { useNotifications } from '@mantine/notifications';
-import { IoAlert } from 'react-icons/io5';
+import { IoAlert, IoInformationCircle } from 'react-icons/io5';
 import deleteAnalysis from '../../mutations/Analyses/deleteAnalysis';
 
 const useDeleteAnalysis = () => {
@@ -28,6 +28,9 @@ const useDeleteAnalysis = () => {
         });
         queryClient.setQueryData('analyses', context.previousAnalyses);
       }
+      notifications.showNotification({
+        title: 'Success', message: 'Successfully deleted the analysis!', color: 'green', icon: <IoInformationCircle />
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries('analyses');

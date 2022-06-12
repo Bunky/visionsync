@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation } from 'react-query';
 import { useNotifications } from '@mantine/notifications';
-import { IoAlert } from 'react-icons/io5';
+import { IoAlert, IoInformationCircle } from 'react-icons/io5';
 import deleteMatch from '../../mutations/Matches/deleteMatch';
 
 const useDeleteMatch = () => {
@@ -28,6 +28,9 @@ const useDeleteMatch = () => {
         });
         queryClient.setQueryData('matches', context.previousMatches);
       }
+      notifications.showNotification({
+        title: 'Success', message: 'Successfully deleted the match!', color: 'green', icon: <IoInformationCircle />
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries('matches');

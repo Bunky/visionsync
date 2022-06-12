@@ -61,11 +61,10 @@ const schemas = {
     }),
 
     editBody: Joi.object({
-      changes: Joi.object({
-        title: Joi.string()
-          .min(3)
-          .max(35)
-      }).required()
+      title: Joi.string()
+        .min(3)
+        .max(35)
+        .required()
     }),
 
     deleteMultiple: Joi.object({
@@ -96,6 +95,7 @@ const schemas = {
 
     editBody: Joi.object({
       duplicate: Joi.boolean(),
+      configId: Joi.objectId(),
       changes: Joi.object({
         title: Joi.string()
           .min(3)

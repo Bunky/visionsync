@@ -56,7 +56,6 @@ const Minimap = ({
                 }
                 return false;
               }).map((d) => ([d.x, d.y, 1]))}
-              maxOccurances={10}
               blur={overlay ? 5 : 25}
               radius={overlay ? 1 : 5}
             />

@@ -9,7 +9,7 @@ import Error from '../../Common/Error/Error';
 import useMatches from '../../../hooks/Matches/useMatches';
 import AnalysisContext from '../../../contexts/analysis/AnalysisContext';
 
-const AnalysisWrapper = ({ children }) => {
+const AnalysisWrapper = ({ children, stopped }) => {
   const { started } = useContext(AnalysisContext);
   const { data: analysis, status: analysisStatus } = useAnalysis();
   const { status: matchesStatus } = useMatches();
@@ -41,6 +41,20 @@ const AnalysisWrapper = ({ children }) => {
 
   if (!analysis.active) {
     return (<Center sx={{ height: '100%' }}>No active analysis</Center>);
+  }
+
+  if (stopped) {
+    return (
+      <Center sx={{ height: '100%' }}>
+        <Group>
+          <Loader color="red" />
+          <Stack spacing={0}>
+            <Text>Stopping analysis...</Text>
+            <Text size="sm" color="dimmed">Saving analysis</Text>
+          </Stack>
+        </Group>
+      </Center>
+    );
   }
 
   return (

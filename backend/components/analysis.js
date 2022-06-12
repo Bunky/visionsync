@@ -28,7 +28,7 @@ exports.uploadAnalysis = (matchId, ownerId, data, settings) => new Promise(async
     await s3.upload({
       Bucket: process.env.AWS_BUCKET,
       Key: `analyses/${analysis._id}.json`,
-      Body: JSON.stringify(data),
+      Body: JSON.stringify(data.filter((d) => d.length > 0)),
       ContentType: 'application/json'
     }).promise();
 

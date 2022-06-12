@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation } from 'react-query';
 import { useNotifications } from '@mantine/notifications';
-import { IoAlert } from 'react-icons/io5';
+import { IoAlert, IoInformationCircle } from 'react-icons/io5';
 import deleteConfig from '../../mutations/Configs/deleteConfig';
 
 const useDeleteConfig = () => {
@@ -28,6 +28,9 @@ const useDeleteConfig = () => {
         });
         queryClient.setQueryData('configs', context.previousConfigs);
       }
+      notifications.showNotification({
+        title: 'Success', message: 'Successfully deleted the config!', color: 'green', icon: <IoInformationCircle />
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries('configs');

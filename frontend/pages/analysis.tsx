@@ -46,7 +46,7 @@ const Analysis = () => {
 
   return (
     <AnalysisSocketProvider>
-      <AnalysisWrapper>
+      <AnalysisWrapper stopped={useStop.isLoading || useStop.isSuccess}>
         <Grid style={{ height: '100%', margin: 0 }}>
           <Grid.Col span={12}>
             <Paper p="sm" shadow="md">
