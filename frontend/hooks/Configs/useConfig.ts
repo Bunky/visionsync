@@ -105,6 +105,32 @@ type Config = {
       minAngle: number;
     }
   }
+  lineClassifications: {
+    centre: {
+      angle: Array<number>;
+      length: Array<number>;
+    }
+    side: {
+      angle: Array<number>;
+      length: Array<number>;
+    }
+    goal: {
+      angle: Array<number>;
+      length: Array<number>;
+    }
+    penaltyBox: {
+      angle: Array<number>;
+      length: Array<number>;
+    }
+    penaltyBoxSide: {
+      angle: Array<number>;
+      length: Array<number>;
+    }
+    sixYardLine: {
+      angle: Array<number>;
+      length: Array<number>;
+    }
+  }
 };
 
 const useConfig = () => useQuery<Config, Error>('config', fetchConfig);

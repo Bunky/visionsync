@@ -4,7 +4,7 @@ const { redisLogger: logger } = require('./logger');
 let client;
 exports.redisConnection = async () => {
   client = createClient({
-    url: `redis://${process.env.REDIS}`,
+    url: `redis://${process.env.REDIS}`
   });
 
   client.on('error', (err) => logger.log({

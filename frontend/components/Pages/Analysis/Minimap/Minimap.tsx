@@ -15,9 +15,12 @@ interface MinimapProps {
   overlay?: boolean;
   heatmap: boolean;
   boundaries: boolean;
+  team: string;
 }
 
-const Minimap = ({ overlay, heatmap, boundaries }: MinimapProps) => {
+const Minimap = ({
+  overlay, heatmap, boundaries, team = 'both'
+}: MinimapProps) => {
   const { positions, corners, allPositions } = useContext(AnalysisContext);
 
   return (
@@ -33,19 +36,30 @@ const Minimap = ({ overlay, heatmap, boundaries }: MinimapProps) => {
           alt="Football pitch"
           height="100%"
         />
-        {heatmap && (
-          <OverlayContainer>
-            <HeatmapCanvas
-              data={[].concat(...allPositions).map((d) => ([d.x, d.y, 1]))}
-              maxOccurances={1}
-              blur={overlay ? 5 : 25}
-              radius={overlay ? 2 : 10}
-            />
-          </OverlayContainer>
-        )}
         {boundaries && (
           <OverlayContainer>
             <FieldOfView corners={corners} />
+          </OverlayContainer>
+        )}
+        {heatmap && (
+          <OverlayContainer>
+            <HeatmapCanvas
+              data={[].concat(...allPositions).filter((d) => {
+                if (team === '1' && d.team === 0) {
+                  return true;
+                }
+                if (team === '2' && d.team === 1) {
+                  return true;
+                }
+                if (team === 'both' && d.team > -1) {
+                  return true;
+                }
+                return false;
+              }).map((d) => ([d.x, d.y, 1]))}
+              maxOccurances={10}
+              blur={overlay ? 5 : 25}
+              radius={overlay ? 1 : 5}
+            />
           </OverlayContainer>
         )}
         <OverlayContainer>
@@ -74,17 +88,19 @@ const Container = styled.div`
 `;
 
 const OverlayContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  width: 85.14%;
   height: 100%;
   overflow: hidden;
   border-radius: 8px;
 `;
 
 const FieldOfView = styled.div`
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.3);
   width: 100%;
   height: 100%;
   ${({ corners }) => corners.tl && `

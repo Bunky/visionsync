@@ -7,7 +7,9 @@ import {
 } from 'react-icons/io5';
 
 const PlayerMenu = () => (
-  <Menu>
+  <Menu
+    menuButtonLabel="Player Options"
+  >
     <Menu.Label>Player</Menu.Label>
     <Menu.Item icon={<IoPencil size={14} />}>Edit Player</Menu.Item>
     <Menu.Item icon={<IoStatsChart size={14} />}>Statistics</Menu.Item>

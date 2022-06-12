@@ -296,6 +296,68 @@ const config = new Schema({
       }
     }
   },
+  lineClassifications: {
+    centre: {
+      angle: {
+        type: [Number],
+        required: true
+      },
+      length: {
+        type: [Number],
+        required: true
+      }
+    },
+    side: {
+      angle: {
+        type: [Number],
+        required: true
+      },
+      length: {
+        type: [Number],
+        required: true
+      }
+    },
+    goal: {
+      angle: {
+        type: [Number],
+        required: true
+      },
+      length: {
+        type: [Number],
+        required: true
+      }
+    },
+    penaltyBox: {
+      angle: {
+        type: [Number],
+        required: true
+      },
+      length: {
+        type: [Number],
+        required: true
+      }
+    },
+    penaltyBoxSide: {
+      angle: {
+        type: [Number],
+        required: true
+      },
+      length: {
+        type: [Number],
+        required: true
+      }
+    },
+    sixYardLine: {
+      angle: {
+        type: [Number],
+        required: true
+      },
+      length: {
+        type: [Number],
+        required: true
+      }
+    },
+  },
   intersections: {
 
   }

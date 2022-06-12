@@ -16,7 +16,9 @@ const MatchMenu = ({ matchId }) => {
 
   return (
     <>
-      <Menu>
+      <Menu
+        menuButtonLabel="Match Options"
+      >
         <Menu.Label>Match</Menu.Label>
         <Menu.Item
           icon={<IoPencil />}

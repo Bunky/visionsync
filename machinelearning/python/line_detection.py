@@ -8,7 +8,7 @@ from torch import threshold_
 import time
 import torch
 from bounding_box import bounding_box as bb
-
+from sklearn.cluster import KMeans
 import tensorflow as tf
 import tensorflow_hub as hub
 from matplotlib import pyplot as plt
@@ -311,6 +311,7 @@ def classify_players(frame, detections, module, input_size):
 
       # Get average colour
       mean = cv.mean(cropped_frame, mask=mask)
+      row["colour"] = (round(mean[2], 0), round(mean[1], 0), round(mean[0], 0)) # Not in order as it returns as BGR
       # row["colour"] = (mean[0], mean[1], mean[2])
       
       # Home team
@@ -556,10 +557,10 @@ def generate_intersections(frame, v_lines, h_lines):
       intersection = line_intersection(vline, hline)
       if intersection is not False:
         
-        if vline["angle"] > 0: 
-          v_side = 1
-        else:
+        if intersection[1] > vline["midpoint"][1]: 
           v_side = 0
+        else:
+          v_side = 1
 
         # Work out horizontal side (left of right)
         if vline["angle"] > 0 and hline["angle"] < 0: 
@@ -569,7 +570,7 @@ def generate_intersections(frame, v_lines, h_lines):
         
         for int_dict in intersection_dict:
           if int_dict["v_line"] == vline["id"] and int_dict["h_line"] == hline["id"]:
-            if int_dict["v_side"] == v_side and int_dict["h_side"] == h_side:             
+            if int_dict["v_side"] == v_side and int_dict["h_side"] == h_side:                        
               intersections.append({
                 "id": int_dict["id"],
                 "v_line": vline["id"],
@@ -584,7 +585,7 @@ def generate_intersections(frame, v_lines, h_lines):
   # Draw intersections
   for intersection in intersections:
     cv.circle(frame, (int(intersection["x"]), int(intersection["y"])), 5, (0, 255, 255), 2, cv.LINE_AA)
-    cv.putText(frame, str(intersection["id"]), (int(intersection["x"]), int(intersection["y"])), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv.LINE_AA)
+    cv.putText(frame, str(intersection["id"]), (int(intersection["x"]), int(intersection["y"])), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv.LINE_AA)    
   
   return frame, intersections
  
@@ -1033,15 +1034,21 @@ def add_inputs():
   # Erosion
   cv.createTrackbar("size", "Erosion", 2, 21, on_change)
   cv.createTrackbar("shape", "Erosion", 0, 2, on_change)
+  cv.createTrackbar("size", "Erosion", 0, 21, on_change)
+  cv.createTrackbar("shape", "Erosion", 2, 2, on_change)
   # Dilation
   cv.createTrackbar("size", "Dilation", 2, 21, on_change)
   cv.createTrackbar("shape", "Dilation", 0, 2, on_change)
+  cv.createTrackbar("size", "Dilation", 3, 21, on_change)
+  cv.createTrackbar("shape", "Dilation", 2, 2, on_change)
   # Opening
   cv.createTrackbar("size", "Opening", 0, 21, on_change)
   cv.createTrackbar("shape", "Opening", 0, 2, on_change)
   # Closing
   cv.createTrackbar("size", "Closing", 2, 21, on_change)
   cv.createTrackbar("shape", "Closing", 0, 2, on_change)
+  cv.createTrackbar("size", "Closing", 0, 21, on_change)
+  cv.createTrackbar("shape", "Closing", 2, 2, on_change)
         
   # ================================================== Result ================================================
   cv.createTrackbar("threshold", "Result Controls", 87, 500, on_change)

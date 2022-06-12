@@ -1,5 +1,7 @@
+/* eslint-disable no-nested-ternary */
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import Color from 'color';
 
 const MinimapCanvas = ({ data }) => {
   const ref = useRef();
@@ -36,14 +38,17 @@ const MinimapCanvas = ({ data }) => {
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
       if (detection.class === 0) {
-        ctx.beginPath();
-        ctx.arc(x, y, 10, 0, 2 * Math.PI, false);
-        ctx.fillStyle = `rgb(${detection.colour[0]}, ${detection.colour[1]}, ${detection.colour[2]})`;
-        // ctx.fillStyle = '#0000ff';
-        ctx.fill();
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = '#ffffff';
-        ctx.stroke();
+        if (detection.team !== -1) {
+          ctx.beginPath();
+          ctx.arc(x, y, 10, 0, 2 * Math.PI, false);
+          let color = Color.rgb(detection.colour);
+          color = color.saturate(1.5);
+          ctx.fillStyle = `rgb(${color.red()}, ${color.green()}, ${color.blue()})`;
+          ctx.fill();
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = '#ffffff';
+          ctx.stroke();
+        }
       } else if (detection.class === 1) {
         ctx.beginPath();
         ctx.arc(x, y, 5, 0, 2 * Math.PI, false);

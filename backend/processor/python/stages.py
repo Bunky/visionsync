@@ -8,7 +8,7 @@ resolution = (640, 360)
 def detect_players(settings, frame, model):
   detections = model(frame)
   detections = detections.pandas().xyxy[0]
-  detections = utils.classify_players(settings, frame, detections)
+  detections = utils.classify_players(frame, detections)
   
   # Preview 
   if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'detections'):
@@ -160,6 +160,20 @@ def generate_canny(settings, frame, crowd_mask, player_mask):
   # Add masks
   masked_canny = cv.bitwise_and(canny, canny, mask=crowd_mask)
   masked_canny = cv.bitwise_and(masked_canny, masked_canny, mask=player_mask)
+      
+  # Closing
+  if settings["canny"]["closing"]["enabled"]:
+    closing_element = cv.getStructuringElement(utils.morph_shape(closing_shape), (2 * closing_size + 1, 2 * closing_size + 1), (closing_size, closing_size))
+    masked_canny = cv.morphologyEx(masked_canny, cv.MORPH_CLOSE, closing_element)
+    if not masked:
+      canny = cv.morphologyEx(canny, cv.MORPH_CLOSE, closing_element)
+    
+  # Opening
+  if settings["canny"]["opening"]["enabled"]:
+    opening_element = cv.getStructuringElement(utils.morph_shape(opening_shape), (2 * opening_size + 1, 2 * opening_size + 1), (opening_size, opening_size))
+    masked_canny = cv.morphologyEx(masked_canny, cv.MORPH_OPEN, opening_element)
+    if not masked:
+      canny = cv.morphologyEx(canny, cv.MORPH_OPEN, opening_element)
 
   # Erode mask
   if settings["canny"]["erosion"]["enabled"]:
@@ -174,20 +188,6 @@ def generate_canny(settings, frame, crowd_mask, player_mask):
     masked_canny = cv.dilate(masked_canny, dilate_element)
     if not masked:
       canny = cv.dilate(canny, dilate_element)
-    
-  # Closing
-  if settings["canny"]["closing"]["enabled"]:
-    closing_element = cv.getStructuringElement(utils.morph_shape(closing_shape), (2 * closing_size + 1, 2 * closing_size + 1), (closing_size, closing_size))
-    masked_canny = cv.morphologyEx(masked_canny, cv.MORPH_CLOSE, closing_element)
-    if not masked:
-      canny = cv.morphologyEx(canny, cv.MORPH_CLOSE, closing_element)
-    
-  # Opening
-  if settings["canny"]["opening"]["enabled"]:
-    opening_element = cv.getStructuringElement(utils.morph_shape(opening_shape), (2 * opening_size + 1, 2 * opening_size + 1), (opening_size, opening_size))
-    masked_canny = cv.morphologyEx(masked_canny, cv.MORPH_OPEN, opening_element)
-    if not masked:
-      canny = cv.morphologyEx(canny, cv.MORPH_OPEN, opening_element)
   
   # Preview 
   if settings["preview"]["enabled"] and settings["preview"]["stage"] == 'canny':
@@ -230,7 +230,7 @@ def generate_lines(settings, frame, canny):
     lines = bundler.process_lines(lines)
     
   # Classify lines
-  classified_lines = utils.classify_lines(lines)
+  classified_lines = utils.classify_lines(settings, lines)
   
   # Preview 
   if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'lines'):
@@ -268,10 +268,11 @@ def generate_intersections(settings, frame, lines):
     for hline in h_lines:
       intersection = utils.get_intersection(vline, hline)
       if intersection is not False:
-        if vline["angle"] > 0: 
-          v_side = 1
-        else:
+        # Compare the lines centre point to the intersection point
+        if intersection[1] > vline["midpoint"][1]: 
           v_side = 0
+        else:
+          v_side = 1
 
         # Work out horizontal side (left of right)
         if vline["angle"] > 0 and hline["angle"] < 0: 
@@ -382,7 +383,7 @@ def apply_homography(settings, frame, intersections, detections, last_matrix):
     
     # Draw dots for transformed detections
     for detection in transformed_detections:
-      cv.circle(preview, (int(detection["x"]), int(detection["y"])), 5, (0, 0, 255), 4, cv.LINE_AA)
+      cv.circle(preview, (int((detection["x"] / 100) * resolution[0]), int((detection["y"] / 100) * resolution[1])), 5, (0, 0, 255), 4, cv.LINE_AA)
     
   else:
     preview = False

@@ -14,9 +14,9 @@ const Heatmap = ({ data }) => (
     <StyledHeatmap>
       <Canvas
         data={data}
-        maxOccurances={1}
+        maxOccurances={10}
         blur={25}
-        radius={10}
+        radius={5}
       />
     </StyledHeatmap>
   </Container>

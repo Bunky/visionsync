@@ -25,7 +25,20 @@ const systemLogger = winston.createLogger({
     })
   ],
   exceptionHandlers: [
-    new winston.transports.File({ filename: 'logs/systemLogs/exceptions.log' })
+    new winston.transports.File({ filename: 'logs/systemLogs/exceptions.log' }),
+    new winston.transports.MongoDB({
+      level: 'info',
+      db: process.env.MONGO_LOGGER_URL,
+      storeHost: true,
+      options: {
+        useUnifiedTopology: true
+      },
+      collection: 'systemLogs',
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+      )
+    })
   ]
 });
 
@@ -53,7 +66,20 @@ const userLogger = winston.createLogger({
     })
   ],
   exceptionHandlers: [
-    new winston.transports.File({ filename: 'logs/userLogs/exceptions.log' })
+    new winston.transports.File({ filename: 'logs/userLogs/exceptions.log' }),
+    new winston.transports.MongoDB({
+      level: 'info',
+      db: process.env.MONGO_LOGGER_URL,
+      storeHost: true,
+      options: {
+        useUnifiedTopology: true
+      },
+      collection: 'userLogs',
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+      )
+    })
   ]
 });
 
@@ -81,7 +107,20 @@ const socketLogger = winston.createLogger({
     })
   ],
   exceptionHandlers: [
-    new winston.transports.File({ filename: 'logs/socketLogs/exceptions.log' })
+    new winston.transports.File({ filename: 'logs/socketLogs/exceptions.log' }),
+    new winston.transports.MongoDB({
+      level: 'info',
+      db: process.env.MONGO_LOGGER_URL,
+      storeHost: true,
+      options: {
+        useUnifiedTopology: true
+      },
+      collection: 'socketLogs',
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+      )
+    })
   ]
 });
 
@@ -109,7 +148,20 @@ const redisLogger = winston.createLogger({
     })
   ],
   exceptionHandlers: [
-    new winston.transports.File({ filename: 'logs/redisLogs/exceptions.log' })
+    new winston.transports.File({ filename: 'logs/redisLogs/exceptions.log' }),
+    new winston.transports.MongoDB({
+      level: 'info',
+      db: process.env.MONGO_LOGGER_URL,
+      storeHost: true,
+      options: {
+        useUnifiedTopology: true
+      },
+      collection: 'redisLogs',
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+      )
+    })
   ]
 });
 
@@ -137,7 +189,20 @@ const analysisLogger = winston.createLogger({
     })
   ],
   exceptionHandlers: [
-    new winston.transports.File({ filename: 'logs/analysisLogs/exceptions.log' })
+    new winston.transports.File({ filename: 'logs/analysisLogs/exceptions.log' }),
+    new winston.transports.MongoDB({
+      level: 'info',
+      db: process.env.MONGO_LOGGER_URL,
+      storeHost: true,
+      options: {
+        useUnifiedTopology: true
+      },
+      collection: 'analysisLogs',
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+      )
+    })
   ]
 });
 

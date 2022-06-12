@@ -5,14 +5,10 @@ import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks, peak_widths
-# import tensorflow_hub as hub
 import json
 import time
 
-import tensorflow as tf
 from matplotlib import pyplot as plt
-from matplotlib.collections import LineCollection
-import matplotlib.patches as patches
 
 import utilties as utils
 import stages
@@ -42,8 +38,9 @@ def main():
   # Stores last detected homography matrix
   last_matrix = False
 
-  detections_limit_time = int(round(time.time() * 1000))
-  positions_limit_time = int(round(time.time() * 1000))
+  # detections_limit_time = int(round(time.time() * 1000))
+  # positions_limit_time = int(round(time.time() * 1000))
+  overall_limit_time = int(round(time.time() * 1000))
   while True:
     try:
       # Get latest settings
@@ -58,7 +55,8 @@ def main():
         threaded_camera.play()
       
       if np.shape(frame) == ():
-        break;
+        continue
+        # break
       
       message = []
       message.append({
@@ -77,7 +75,6 @@ def main():
       player_mask, player_mask_frame = stages.generate_player_mask(settings, frame)
       canny, canny_frame = stages.generate_canny(settings, frame, crowd_mask, player_mask)
       lines, lines_frame = stages.generate_lines(settings, frame, canny)
-      # circles, circles_frame = stages.generate_circles(settings, frame, canny)
       intersections, intersections_frame = stages.generate_intersections(settings, frame, lines)
       biv_detections, corners, homography_frame, matrix = stages.apply_homography(settings, frame, intersections, detections, last_matrix)
       
@@ -126,27 +123,33 @@ def main():
       #   "data": current_ms # f"FPS: {str(1.0 / (time.time() - start_time))}"
       # })
 
-      if detections_limit_time + 10 < current_ms:
-        detections_message = []
-        for detection in detections:
-          detections_message.append(detection.to_json())
+      # 20fps
+      # if detections_limit_time + 50 < current_ms:
+      detections_message = []
+      for detection in detections:
+        detections_message.append(detection.to_json())
 
-        message.append({
-          "type": "detections",
-          "data": detections_message
-        })
-        detections_limit_time = current_ms
+      message.append({
+        "type": "detections",
+        "data": detections_message
+      })
+      # detections_limit_time = current_ms
 
-      if positions_limit_time + 200 < current_ms:
+      # 10fps
+      # if positions_limit_time + 100 < current_ms:
+      if (settings["analysis"]["paused"] == False):
         message.append({
           "type": "positions",
           "data": json.dumps(biv_detections),
           "corners": json.dumps(corners)
         })
-        positions_limit_time = current_ms
+      # positions_limit_time = current_ms
 
-      sys.stdout.write(json.dumps(message))
-      sys.stdout.flush()
+      # 20fps
+      if overall_limit_time + 50 < current_ms:
+        sys.stdout.write(json.dumps(message))
+        sys.stdout.flush()
+        overall_limit_time = current_ms
 
     except AttributeError:
       pass

@@ -1,5 +1,5 @@
 import {
-  Text, Grid, Button, Switch, Group, Paper
+  Text, Grid, Button, Switch, Group, Paper, Select
 } from '@mantine/core';
 import {
   IoPause,
@@ -37,6 +37,7 @@ const Analysis = () => {
   const [open, setOpen] = useState(false);
   const [config, setConfig] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [team, setTeam] = useState('both');
 
   const pauseAnalysis = () => {
     updateConfig.mutate({ analysis: { paused: !paused } });
@@ -79,7 +80,7 @@ const Analysis = () => {
                 <Livefeed showDetections={detections} />
               </Grid.Col>
               <Grid.Col sm={12} md={6} lg={6} style={{ height: 'calc(100% - 151.89px)' }}>
-                <Minimap heatmap={heatmap} boundaries={boundaries} />
+                <Minimap heatmap={heatmap} boundaries={boundaries} team={team} />
               </Grid.Col>
             </>
           )}
@@ -124,6 +125,19 @@ const Analysis = () => {
                       onChange={(v) => setHeatmap(v.target.checked)}
                       label="Heatmap"
                     />
+                    {heatmap && (
+                      <Select
+                        placeholder="Pick team"
+                        value={team}
+                        onChange={setTeam}
+                        data={[
+                          { value: 'both', label: 'Both' },
+                          { value: '1', label: 'Team 1' },
+                          { value: '2', label: 'Team 2' }
+                        ]}
+                        mb="xs"
+                      />
+                    )}
                     <Switch
                       checked={boundaries}
                       onChange={(v) => setBoundaries(v.target.checked)}

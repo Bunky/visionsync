@@ -7,7 +7,6 @@ const MongoSessionStore = require('connect-mongo');
 require('dotenv').config();
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
-// const cookieParser = require('cookie-parser');
 const { socketConnection } = require('./utils/socket-io');
 const { redisConnection } = require('./utils/redis');
 const { systemLogger: log } = require('./utils/logger');
@@ -22,7 +21,6 @@ const rateLimiter = require('./middleware/rateLimiter');
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
-// app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use(cors({
@@ -30,19 +28,19 @@ app.use(cors({
   origin: process.env.NODE_ENV !== 'development' ? 'https://visionsync.ben-charles.com' : true
 }));
 
-// if (process.env.NODE_ENV !== 'development') {
-//   app.set('trust proxy', true);
-// }
+if (process.env.NODE_ENV !== 'development') {
+  app.set('trust proxy', true);
+}
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  // proxy: process.env.NODE_ENV !== 'development',
+  proxy: process.env.NODE_ENV !== 'development',
   cookie: {
     maxAge: 60000 * 60 * 6,
     secure: process.env.NODE_ENV !== 'development',
     httpOnly: true,
-    // sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
+    sameSite: process.env.NODE_ENV !== 'development' ? 'none' : 'lax',
     domain: process.env.NODE_ENV !== 'development' ? 'visionsync.ben-charles.com' : undefined
   },
   store: MongoSessionStore.create({

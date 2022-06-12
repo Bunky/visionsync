@@ -66,7 +66,7 @@ router.route('/login').post(validation(auth.login, 'body'), catchErrors(async (r
           userEmail: user.email
         }
       });
-      return res.sendStatus(200).send({ status: 'success' });
+      return res.status(200).send({ status: 'success' });
     });
   })(req, res, next);
 }));
@@ -144,7 +144,7 @@ router.route('/signup').post(validation(auth.signup, 'body'), catchErrors(async 
           userEmail: user.email
         }
       });
-      return res.sendStatus(200).send({ status: 'success' });
+      return res.send(200).send({ status: 'success' });
     });
   })(req, res, next);
 }));

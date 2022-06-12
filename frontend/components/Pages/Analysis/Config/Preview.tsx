@@ -51,7 +51,7 @@ const Preview = () => {
             />
             <Select
               placeholder="Pick stage"
-              defaultValue={config.preview.stage}
+              value={config.preview.stage}
               onChange={(v) => updateConfig.mutate({
                 preview: {
                   stage: v

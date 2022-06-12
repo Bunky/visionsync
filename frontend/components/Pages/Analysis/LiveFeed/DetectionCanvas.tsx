@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import Color from 'color';
 
 const DetectionCanvas = ({ data }) => {
   const ref = useRef();
@@ -34,7 +35,17 @@ const DetectionCanvas = ({ data }) => {
       const w = ((detection.xmax - detection.xmin) / 100) * width;
       const h = ((detection.ymax - detection.ymin) / 100) * height;
 
-      ctx.fillStyle = detection.name === 'player' ? '#ff00f27f' : detection.name === 'ball' ? '#ffffff7f' : '#00ff007f';
+      if (detection.name === 'player') {
+        if (detection.team !== -1) {
+          let color = Color.rgb(detection.colour);
+          color = color.saturate(1.5);
+          ctx.fillStyle = `rgba(${color.red()}, ${color.green()}, ${color.blue()}, 0.5)`;
+        }
+      } else if (detection.name === 'ball') {
+        ctx.fillStyle = '#ffffff7f';
+      } else {
+        ctx.fillStyle = '#00ff007f';
+      }
       ctx.fillRect(x, y, w, h);
     }
   };

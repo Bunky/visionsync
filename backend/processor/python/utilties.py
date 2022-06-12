@@ -4,62 +4,41 @@ import numpy as np
 import math
 import time
 from threading import Thread
+from sklearn.cluster import MiniBatchKMeans
 # from main import resolution
 resolution = (640, 360)
+first_frame = True
+mbKmeans = False
+kmeans = False
 
-def classify_players(settings, frame, detections):
+def classify_players(frame, detections):
+  global first_frame
+  global mbKmeans
+  global kmeans
   classified_detections = []
   
   for index, detection in detections.iterrows():
     if detection["class"] == 0:
-      # # Crop the frame to bounding box
-      # cropped_frame = frame[int(detection['ymin']):int(detection['ymax']), int(detection['xmin']):int(detection['xmax'])]
+      # Crop the frame to bounding box
+      cropped_frame = frame[int(detection['ymin']):int(detection['ymax']), int(detection['xmin']):int(detection['xmax'])]
       
-      # # Player pitch mask
-      # hue_min = cv.getTrackbarPos("Hue Min", "Players")
-      # hue_max = cv.getTrackbarPos("Hue Max", "Players")
-      # sat_min = cv.getTrackbarPos("Sat Min", "Players")
-      # sat_max = cv.getTrackbarPos("Sat Max", "Players")
-      # val_min = cv.getTrackbarPos("Val Min", "Players")
-      # val_max = cv.getTrackbarPos("Val Max", "Players")
+      # Player pitch mask
+      hue_min = 0
+      hue_max = 255
+      sat_min = 0
+      sat_max = 255
+      val_min = 175
+      val_max = 255
       
-      # lower = np.array([hue_min, sat_min, val_min])
-      # upper = np.array([hue_max, sat_max, val_max])
+      lower = np.array([hue_min, sat_min, val_min])
+      upper = np.array([hue_max, sat_max, val_max])
 
-      # mask = cv.inRange(cropped_frame, lower, upper)
-      # output = cv.bitwise_and(cropped_frame, cropped_frame, mask=mask)
+      mask = cv.inRange(cropped_frame, lower, upper)
 
-      # # Get average colour
-      # mean = cv.mean(cropped_frame, mask=mask)
-      # # detection["colour"] = (mean[0], mean[1], mean[2])
-      
-      # # Home team
-      # home_blue_min = cv.getTrackbarPos("home_blue_min", "Players")
-      # home_green_min = cv.getTrackbarPos("home_green_min", "Players")
-      # home_red_min = cv.getTrackbarPos("home_red_min", "Players")
-      # home_blue_max = cv.getTrackbarPos("home_blue_max", "Players")
-      # home_green_max = cv.getTrackbarPos("home_green_max", "Players")
-      # home_red_max = cv.getTrackbarPos("home_red_max", "Players")
-      
-      # # Away team
-      # away_blue_min = cv.getTrackbarPos("away_blue_min", "Players")
-      # away_green_min = cv.getTrackbarPos("away_green_min", "Players")
-      # away_red_min = cv.getTrackbarPos("away_red_min", "Players")
-      # away_blue_max = cv.getTrackbarPos("away_blue_max", "Players")
-      # away_green_max = cv.getTrackbarPos("away_green_max", "Players")
-      # away_red_max = cv.getTrackbarPos("away_red_max", "Players")
-      
-      # # If mean colour is within threshold range for home team parameters
-      # if home_blue_min < mean[0] < home_blue_max and home_green_min < mean[1] < home_green_max and home_red_min < mean[2] < home_red_max:
-      #   detection["colour"] = (0, 0, 255)
-      # elif away_blue_min < mean[0] < away_blue_max and away_green_min < mean[1] < away_green_max and away_red_min < mean[2] < away_red_max:
-      #   detection["colour"] = (255, 0, 0)
-      # else:
-      #   detection["colour"] = (0, 255, 255) # Likely the refs - so yellow
+      # Get average colour
+      mean = cv.mean(cropped_frame, mask=mask)
 
-      # # Output for preview
-      # output = cv.resize(output, (50, 100))
-      detection["colour"] = (0, 0, 255)
+      detection["colour"] = (round(mean[2], 0), round(mean[1], 0), round(mean[0], 0)) # BGR to RGB
     elif detection['class'] == 1: # ball
       detection["colour"] = (255, 255, 255)
     elif detection['class'] == 2: # goal
@@ -69,8 +48,49 @@ def classify_players(settings, frame, detections):
     detection["ymin"] = round(detection["ymin"] / resolution[1] * 100, 2)
     detection["xmax"] = round(detection["xmax"] / resolution[0] * 100, 2)
     detection["ymax"] = round(detection["ymax"] / resolution[1] * 100, 2)
-    
+    detection["team"] = -1 # Set default team to unknown
+
     classified_detections.append(detection)
+  
+  # k-mean team classification using clustered colours
+  rgb_colours = []
+  for d in classified_detections:
+    if d["class"] == 0:
+      rgb_colours.append([d["colour"][0], d["colour"][1], d["colour"][2]])
+
+  if (len(rgb_colours) > 1): # Makes sure enough players
+    X = np.array(rgb_colours)
+    if first_frame is True:
+      first_frame = False
+      mbKmeans = MiniBatchKMeans(
+        n_clusters = 2,
+        batch_size = 1,
+        n_init = 10,
+        max_no_improvement = 10,
+      )
+      kmeans = mbKmeans.fit(X)
+
+  if kmeans is not False:
+    for d in classified_detections:
+      if d["class"] == 0:
+        cluster0 = kmeans.cluster_centers_[0]
+        cluster1 = kmeans.cluster_centers_[1]
+
+        # euclidean distance0 for cluster0
+        distance0 = cv.norm([[d["colour"][0], d["colour"][1], d["colour"][2]]] - cluster0, cv.NORM_L2)
+        # euclidean distance1 for cluster1
+        distance1 = cv.norm([[d["colour"][0], d["colour"][1], d["colour"][2]]] - cluster1, cv.NORM_L2)
+        
+        # if distance0 < distance1: team is 0, else 1
+        if distance0 < distance1:
+          if distance0 < 150: # Only assign team if distance below 100 threshold
+            d["team"] = 0
+            d["colour"] = cluster0
+        else:
+          if distance1 < 150:
+            d["team"] = 1 # Only assign team if distance below 100 threshold
+            d["colour"] = cluster1
+
   return classified_detections  
 
 def morph_shape(val):
@@ -85,7 +105,7 @@ def get_base64_from_frame(frame):
   _, buffer = cv.imencode('.jpg', frame)
   return base64.b64encode(buffer).decode("utf-8")
 
-def classify_lines(lines):
+def classify_lines(settings, lines):
   classified_lines = []
   for line in lines:
     x1, y1, x2, y2 = line[0]
@@ -105,46 +125,46 @@ def classify_lines(lines):
       direction = 0
 
     # Center Line
-    centre_min_angle = 80
-    centre_max_angle = 100
-    centre_min_length = 200
-    centre_max_length = 600
+    centre_min_angle = settings["lineClassifications"]["centre"]["angle"][0]
+    centre_max_angle = settings["lineClassifications"]["centre"]["angle"][1]
+    centre_min_length = settings["lineClassifications"]["centre"]["length"][0]
+    centre_max_length = settings["lineClassifications"]["centre"]["length"][1]
     
     # Goal Line
-    goal_min_angle = 13
-    goal_max_angle = 19
-    goal_min_length = 150
-    goal_max_length = 600
+    goal_min_angle = settings["lineClassifications"]["goal"]["angle"][0]
+    goal_max_angle = settings["lineClassifications"]["goal"]["angle"][1]
+    goal_min_length = settings["lineClassifications"]["goal"]["length"][0]
+    goal_max_length = settings["lineClassifications"]["goal"]["length"][1]
     
     # Box Line
-    box_min_angle = 20
-    box_max_angle = 35
-    box_min_length = 200
-    box_max_length = 250
+    box_min_angle = settings["lineClassifications"]["penaltyBox"]["angle"][0]
+    box_max_angle = settings["lineClassifications"]["penaltyBox"]["angle"][1]
+    box_min_length = settings["lineClassifications"]["penaltyBox"]["length"][0]
+    box_max_length = settings["lineClassifications"]["penaltyBox"]["length"][1]
     
     # 6yrd Line
-    six_min_angle = 10
-    six_max_angle = 22
-    six_min_length = 100
-    six_max_length = 250
+    six_min_angle = settings["lineClassifications"]["sixYardLine"]["angle"][0]
+    six_max_angle = settings["lineClassifications"]["sixYardLine"]["angle"][1]
+    six_min_length = settings["lineClassifications"]["sixYardLine"]["length"][0]
+    six_max_length = settings["lineClassifications"]["sixYardLine"]["length"][1]
     
     # Box Edge Line
-    boxedge_min_angle = 5
-    boxedge_max_angle = 10
-    boxedge_min_length = 50
-    boxedge_max_length = 250
+    boxedge_min_angle = settings["lineClassifications"]["penaltyBoxSide"]["angle"][0]
+    boxedge_max_angle = settings["lineClassifications"]["penaltyBoxSide"]["angle"][1]
+    boxedge_min_length = settings["lineClassifications"]["penaltyBoxSide"]["length"][0]
+    boxedge_max_length = settings["lineClassifications"]["penaltyBoxSide"]["length"][1]
     
     # Side Line
-    side_min_angle = 0
-    side_max_angle = 50
-    side_min_length = 150
-    side_max_length = 600
+    side_min_angle = settings["lineClassifications"]["side"]["angle"][0]
+    side_max_angle = settings["lineClassifications"]["side"]["angle"][1]
+    side_min_length = settings["lineClassifications"]["side"]["length"][0]
+    side_max_length = settings["lineClassifications"]["side"]["length"][1]
       
     # Return line with classification
     # LineID, Point1, Point2, Angle of line, Length of line, Line vert/hori
     
-    # Centre line
     lineId = 0
+    # Centre line
     if centre_min_angle < norm_angle_of_line < centre_max_angle and centre_min_length < length_of_line < centre_max_length:
       lineId = 1
     # Goal line
@@ -198,7 +218,7 @@ def draw_lines(lines, frame):
       cv.line(frame, line["point1"], line["point2"], (255, 255, 0), 2, cv.LINE_AA)
       cv.putText(frame, str("BE: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1, cv.LINE_AA)
     elif line["id"] == 5:
-      cv.line(frame, line["point1"], line["point2"], (0, 128, 128), 2, cv.LINE_AA)
+      cv.line(frame, line["point1"], line["point2"], (255, 0, 255), 2, cv.LINE_AA)
       cv.putText(frame, str("6: {:.2f}".format(line["angle"])), line["point1"], cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 128, 128), 1, cv.LINE_AA)
     elif line["id"] == 6:
       cv.line(frame, line["point1"], line["point2"], (0, 255, 0), 2, cv.LINE_AA)
@@ -242,12 +262,17 @@ def transform_detections(matrix, detections):
   transformed_detections = []
   for detection in detections:
     # Use ymax and xcentre as the point at the players feet
-    feet = np.array([[[detection['xmin'] + ((detection['xmax'] - detection['xmin']) / 2), detection['ymax']]]], dtype=np.float32)
+    xmin = (detection['xmin'] / 100) * resolution[0]
+    xmax = (detection['xmax'] / 100) * resolution[0]
+    ymax = (detection['ymax'] / 100) * resolution[1]
+
+    feet = np.array([[[xmin + ((xmax - xmin) / 2), ymax]]], dtype=np.float32)
     feet_converted = cv.perspectiveTransform(feet, matrix)
 
     transformed_detections.append({
       "class": detection['class'],
-      "colour": detection['colour'],
+      "colour": [detection["colour"][0], detection["colour"][1], detection["colour"][2]],
+      "team": detection['team'],
       "x": round(float(feet_converted[0][0][0] / resolution[0]) * 100, 2),
       "y": round(float(feet_converted[0][0][1] / resolution[1]) * 100, 2)
     })

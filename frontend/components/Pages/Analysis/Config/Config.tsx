@@ -15,6 +15,7 @@ import HoughSettings from './Settings/HoughSettings';
 import useConfig from '../../../../hooks/Configs/useConfig';
 import useUpdateConfig from '../../../../hooks/Configs/useUpdateConfig';
 import Error from '../../../Common/Error/Error';
+import LineClassification from './Settings/LineClassification';
 
 const Config = () => {
   const { data: config, status: configStatus } = useConfig();
@@ -37,13 +38,10 @@ const Config = () => {
           stage = 'lines';
           break;
         case 4:
-          stage = 'intersections';
+          stage = 'lines';
           break;
         case 5:
-          stage = 'homography';
-          break;
-        case 6:
-          stage = 'detections';
+          stage = 'intersections';
           break;
         default:
           break;
@@ -84,8 +82,8 @@ const Config = () => {
         <Tabs.Tab label="Player Mask" icon={<IoMan />}><PlayerMaskSettings /></Tabs.Tab>
         <Tabs.Tab label="Canny" icon={<IoLinkOutline />}><CannySettings /></Tabs.Tab>
         <Tabs.Tab label="Hough Transform" icon={<IoTv />}><HoughSettings /></Tabs.Tab>
-        <Tabs.Tab label="Line Classification" icon={<IoCodeSlashSharp />}>Sliders to define lines etc</Tabs.Tab>
-        <Tabs.Tab label="Intersections" icon={<IoSyncCircle />}>Intersections</Tabs.Tab>
+        <Tabs.Tab label="Line Classification" icon={<IoCodeSlashSharp />}><LineClassification /></Tabs.Tab>
+        {/* <Tabs.Tab label="Intersections" icon={<IoSyncCircle />}>Intersections</Tabs.Tab> */}
       </Tabs>
     </Container>
   );

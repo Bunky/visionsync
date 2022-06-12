@@ -3,7 +3,7 @@ const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const {
   startAnalysis, getActive, stopAnalysis
-} = require('../processor/lineDetection');
+} = require('../processor/analysis');
 const Analysis = require('../models/analysis.model');
 const { uploadAnalysis, deleteAnalysis, deleteAnalyses } = require('../components/analysis');
 const validation = require('../middleware/validation/validation');

@@ -19,7 +19,9 @@ const ConfigsMenu = ({ configId }) => {
 
   return (
     <>
-      <Menu>
+      <Menu
+        menuButtonLabel="Config Options"
+      >
         <Menu.Label>Config</Menu.Label>
         <Menu.Item
           icon={<IoPencil />}

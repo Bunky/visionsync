@@ -76,3 +76,4 @@ typings/
 .fusebox/
 *.pyc
 backend/.vscode/launch.json
+backend/backend.zip

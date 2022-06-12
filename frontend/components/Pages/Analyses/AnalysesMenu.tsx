@@ -12,7 +12,9 @@ const AnalysesMenu = ({ analysisId }) => {
 
   return (
     <>
-      <Menu>
+      <Menu
+        menuButtonLabel="Analysis Options"
+      >
         <Menu.Label>Danger Zone</Menu.Label>
         <Menu.Item
           color="red"

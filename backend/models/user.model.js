@@ -27,8 +27,7 @@ const userSchema = new Schema({
   termsOfService: {
     type: Boolean,
     required: true
-  },
-  settings: { }
+  }
 }, {
   timestamps: true
 });

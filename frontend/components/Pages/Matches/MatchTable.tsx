@@ -29,8 +29,10 @@ const MatchTable = () => {
       <Group dir="row" noWrap sx={{ width: '100%' }}>
         <AspectRatio ratio={16 / 9} sx={{ width: 100, minWidth: 100 }}>
           <Image
-            src={`http://d1pu8bxuwsqdvz.cloudfront.net/thumbnails/${row.original._id}.png`}
+            src={`https://d1pu8bxuwsqdvz.cloudfront.net/thumbnails/${row.original._id}.png`}
+            alt="Match thumbnail"
             width={100}
+            height={56.25}
             withPlaceholder
             placeholder={(
               <Paper
