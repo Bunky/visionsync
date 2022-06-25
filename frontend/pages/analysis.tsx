@@ -33,7 +33,8 @@ const Analysis = () => {
   const useStop = useStopAnalysis();
   const [detections, setDetections] = useState(true);
   const [heatmap, setHeatmap] = useState(false);
-  const [boundaries, setBoundaries] = useState(false);
+  const [boundaries, setBoundaries] = useState(true);
+  const [performance, setPerformance] = useState(false);
   const [open, setOpen] = useState(false);
   const [config, setConfig] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -56,12 +57,19 @@ const Analysis = () => {
                 >
                   {matches.find((match) => match._id === analysis.matchId)?.title}
                 </Text>
-                <Button
-                  onClick={() => setConfig(!config)}
-                  leftIcon={config ? <BiAnalyse /> : <IoSettingsOutline />}
-                >
-                  {config ? 'Analysis' : 'Config'}
-                </Button>
+                <Group dir="row" position="apart">
+                  <Switch
+                    checked={performance}
+                    onChange={(v) => setPerformance(v.target.checked)}
+                    label="Performance Mode"
+                  />
+                  <Button
+                    onClick={() => setConfig(!config)}
+                    leftIcon={config ? <BiAnalyse /> : <IoSettingsOutline />}
+                  >
+                    {config ? 'Analysis' : 'Config'}
+                  </Button>
+                </Group>
               </Group>
             </Paper>
           </Grid.Col>
@@ -77,10 +85,10 @@ const Analysis = () => {
           ) : (
             <>
               <Grid.Col sm={12} md={6} lg={6} style={{ height: 'calc(100% - 151.89px)' }}>
-                <Livefeed showDetections={detections} />
+                <Livefeed showDetections={detections} performance={performance} />
               </Grid.Col>
               <Grid.Col sm={12} md={6} lg={6} style={{ height: 'calc(100% - 151.89px)' }}>
-                <Minimap heatmap={heatmap} boundaries={boundaries} team={team} />
+                <Minimap heatmap={heatmap} boundaries={boundaries} team={team} performance={performance} />
               </Grid.Col>
             </>
           )}
@@ -133,7 +141,8 @@ const Analysis = () => {
                         data={[
                           { value: 'both', label: 'Both Teams' },
                           { value: '1', label: 'Team 1' },
-                          { value: '2', label: 'Team 2' }
+                          { value: '2', label: 'Team 2' },
+                          { value: 'ball', label: 'Football' }
                         ]}
                       />
                     )}

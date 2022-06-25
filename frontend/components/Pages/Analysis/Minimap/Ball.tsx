@@ -3,15 +3,27 @@ import {
   Modal, AspectRatio
 } from '@mantine/core';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+// import { motion } from 'framer-motion';
+import { useRecoilState } from 'recoil';
+import analysisHoverState from '../../../../atoms/analysisHoverState';
 
-const Ball = ({ ball }) => {
+const Ball = ({ ball, ballId }) => {
   const [open, setOpen] = useState(false);
+  const [hover, setHover] = useRecoilState(analysisHoverState);
 
   return (
-    <Container ball={ball}>
+    <Container x={ball.x} y={ball.y}>
       <AspectRatio ratio={1}>
-        <Football onClick={() => setOpen(true)} />
+        <Football
+          hover={hover.playerId === ballId || open}
+          onClick={() => setOpen(true)}
+          onMouseEnter={() => setHover({
+            playerId: ballId
+          })}
+          onMouseLeave={() => setHover({
+            playerId: -1
+          })}
+        />
       </AspectRatio>
       <Modal
         opened={open}
@@ -26,31 +38,15 @@ const Ball = ({ ball }) => {
   );
 };
 
-const Container = styled(motion.div).attrs(({ ball }) => ({
-  transition: {
-    type: 'tween',
-    duration: 1
-  },
-  animate: {
-    left: `${ball.x}%`,
-    top: `${ball.y}%`,
-    x: '-1rem',
-    y: '-1rem'
-  }
-}))`
+const Container = styled.div`
   position: absolute;
-  width: 2%;
+  width: 15px;
+  height: 15px;
+  left: ${({ x }) => `calc(${x}% - 7.5px)`};
+  top: ${({ y }) => `calc(${y}% - 7.5px)`};
 `;
 
-const Football = styled(motion.div).attrs(() => ({
-  whileHover: {
-    scale: 1.3,
-    border: '1px solid rgba(0,0,0,1)',
-  },
-  whileTap: {
-    scale: 0.9
-  },
-}))`
+const Football = styled.div`
   background: white;
   background-image: url("images/football.png");
   background-position: center;
@@ -63,6 +59,15 @@ const Football = styled(motion.div).attrs(() => ({
   height: 100%;
   width: 100%;
   cursor: pointer;
+  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out, z-index 0.5s step-end;
+  z-index: 0;
+
+  ${({ hover }) => hover && `
+    z-index: 1;
+    box-shadow: 0 0 2rem 0.5rem #000;
+    transform: scale(1.3);
+    transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out, z-index 0.5s step-start;
+  `};
 `;
 
 export default Ball;

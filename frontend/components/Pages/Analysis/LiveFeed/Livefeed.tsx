@@ -2,9 +2,10 @@ import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { AspectRatio } from '@mantine/core';
 import DetectionCanvas from './DetectionCanvas';
+import BoundingBoxes from './BoundingBoxes';
 import AnalysisContext from '../../../../contexts/analysis/AnalysisContext';
 
-const Livefeed = ({ showDetections }) => {
+const Livefeed = ({ showDetections, performance }) => {
   const { livefeed, detections } = useContext(AnalysisContext);
 
   useEffect(() => {
@@ -17,9 +18,13 @@ const Livefeed = ({ showDetections }) => {
         <Live id="live" width="640" height="360" />
         {showDetections && (
           <DetectionsOverlay>
-            <DetectionCanvas
-              data={detections}
-            />
+            {performance ? (
+              <DetectionCanvas
+                data={detections}
+              />
+            ) : (
+              <BoundingBoxes data={detections} />
+            )}
           </DetectionsOverlay>
         )}
       </AspectRatio>

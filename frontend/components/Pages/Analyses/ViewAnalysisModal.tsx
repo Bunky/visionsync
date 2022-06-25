@@ -41,7 +41,8 @@ const ViewAnalysisModal = () => {
               data={[
                 { value: 'both', label: 'Both Teams' },
                 { value: '1', label: 'Team 1' },
-                { value: '2', label: 'Team 2' }
+                { value: '2', label: 'Team 2' },
+                { value: 'ball', label: 'Football' }
               ]}
               mb="xs"
             />
@@ -54,6 +55,9 @@ const ViewAnalysisModal = () => {
                   return true;
                 }
                 if (team === 'both' && d.team > -1) {
+                  return true;
+                }
+                if (team === 'ball' && d.class === 1) {
                   return true;
                 }
                 return false;

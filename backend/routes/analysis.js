@@ -58,7 +58,7 @@ router.route('/start').post(validation(analysisSchemas.start, 'body'), catchErro
     await startAnalysis(req.user._id.toString(), req.body.matchId);
     return res.sendStatus(200);
   }
-  return res.sendStatus(500);
+  return res.sendStatus(200);
 }));
 
 // Stop analysis

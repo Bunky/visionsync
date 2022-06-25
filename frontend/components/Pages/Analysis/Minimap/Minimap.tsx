@@ -5,27 +5,27 @@ import {
   // Image
 } from '@mantine/core';
 import { useContext } from 'react';
-// import Player from './Player';
-// import Ball from './Ball';
+import Player from './Player';
+import Ball from './Ball';
 import HeatmapCanvas from '../../../Common/Heatmap/HeatmapCanvas';
 import MinimapCanvas from './MinimapCanvas';
 import AnalysisContext from '../../../../contexts/analysis/AnalysisContext';
 
 interface MinimapProps {
-  overlay?: boolean;
   heatmap: boolean;
   boundaries: boolean;
   team: string;
+  performance: boolean;
 }
 
 const Minimap = ({
-  overlay, heatmap, boundaries, team = 'both'
+  heatmap, boundaries, team = 'both', performance
 }: MinimapProps) => {
   const { positions, corners, allPositions } = useContext(AnalysisContext);
 
   return (
     <AspectRatio ratio={16 / 9}>
-      <Container overlay={overlay}>
+      <Container>
         {/* <Image
           radius="md"
           src="/images/pitch.svg"
@@ -54,24 +54,33 @@ const Minimap = ({
                 if (team === 'both' && d.team > -1) {
                   return true;
                 }
+                if (team === 'ball' && d.class === 1) {
+                  return true;
+                }
                 return false;
               }).map((d) => ([d.x, d.y, 1]))}
-              blur={overlay ? 5 : 25}
-              radius={overlay ? 1 : 5}
             />
           </OverlayContainer>
         )}
         <OverlayContainer>
-          <MinimapCanvas data={positions} />
-          {/* {positions.map((player, index) => (player.class === 1 ? (
-            <Ball ball={player} />
+          {performance ? (
+            <MinimapCanvas data={positions} />
           ) : (
-            <Player
-              id={`playerIcon-${index}`}
-              playerId={index}
-              player={player}
-            />
-          )))} */}
+            <PlayerContainer>
+              {positions.filter((player) => player.class !== 2 && ((player.class === 0 && player.team > -1) || player.class === 1)).map((player, i) => (player.class === 1 ? (
+                <Ball
+                  ball={player}
+                  ballId={i}
+                />
+              ) : (
+                <Player
+                  // id={`playerIcon-${index}`}
+                  playerId={i}
+                  player={player}
+                />
+              )))}
+            </PlayerContainer>
+          )}
         </OverlayContainer>
       </Container>
     </AspectRatio>
@@ -80,7 +89,6 @@ const Minimap = ({
 
 const Container = styled.div`
   position: relative;
-  pointer-events: ${({ overlay }) => overlay && 'none'};
   object-fit: contain;
   background-color: rgb(89 178 0);
   border-radius: 8px;
@@ -96,6 +104,12 @@ const OverlayContainer = styled.div`
   height: 100%;
   overflow: hidden;
   border-radius: 8px;
+`;
+
+const PlayerContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
 `;
 
 const FieldOfView = styled.div`

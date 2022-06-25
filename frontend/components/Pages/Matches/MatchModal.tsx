@@ -63,7 +63,7 @@ const NewMatchModal = () => {
       const formData = new FormData();
       formData.append('match', files[0]);
       formData.append('title', values.title);
-      formData.append('configId', values.config);
+      formData.append('configId', values.config === null ? '' : values.config);
       createMatch.mutate(formData);
       handleClose();
     } else {

@@ -63,7 +63,7 @@ const schemas = {
     editBody: Joi.object({
       title: Joi.string()
         .min(3)
-        .max(35)
+        .max(50)
         .required()
     }),
 
@@ -84,7 +84,7 @@ const schemas = {
     upload: Joi.object({
       title: Joi.string()
         .min(3)
-        .max(35)
+        .max(50)
         .required()
     }),
 
@@ -99,7 +99,7 @@ const schemas = {
       changes: Joi.object({
         title: Joi.string()
           .min(3)
-          .max(35)
+          .max(50)
       }).required()
     }),
 

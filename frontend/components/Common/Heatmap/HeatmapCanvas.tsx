@@ -2,11 +2,35 @@ import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 const Heatmap = ({
-  radius, blur, data, maxOccurances
+  data
 }) => {
   const ref = useRef();
   const [width, setWidth] = useState(1);
   const [height, setHeight] = useState(1);
+
+  // cluster coordinates within a range of each other for heatmap
+  data = data.reduce((acc, d) => {
+    const found = acc.find((a) => {
+      const dist = Math.sqrt((a[0] - d[0]) ** 2 + (a[1] - d[1]) ** 2);
+      return dist < 5;
+    });
+    if (found) {
+      found[2] += 1;
+    } else {
+      acc.push([d[0], d[1], 1]);
+    }
+    return acc;
+  }, []);
+
+  const maxOccurances = data.reduce((acc, d) => {
+    if (d[2] > acc) {
+      return d[2];
+    }
+    return acc;
+  }, 0);
+
+  const blur = 40;
+  const radius = 30;
 
   let circleCanvas = null;
   let gradientCanvas = null;
@@ -36,7 +60,7 @@ const Heatmap = ({
   }, [ref.current?.offsetWidth, ref.current?.offsetHeight]);
 
   const draw = () => {
-    const opacity = 0.05;
+    const opacity = 0.9;
 
     if (!circleCanvas) {
       createCircleBrushCanvas(radius);

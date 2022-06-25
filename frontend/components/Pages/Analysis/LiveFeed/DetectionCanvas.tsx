@@ -44,7 +44,7 @@ const DetectionCanvas = ({ data }) => {
       } else if (detection.name === 'ball') {
         ctx.fillStyle = '#ffffff7f';
       } else {
-        ctx.fillStyle = '#00ff007f';
+        ctx.fillStyle = '#00ff0000';
       }
       ctx.fillRect(x, y, w, h);
     }
