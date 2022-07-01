@@ -5,8 +5,9 @@ import {
 import {
   IoClose, IoSadOutline, IoSearch, IoTrash
 } from 'react-icons/io5';
-import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa';
-import { BsPlusLg } from 'react-icons/bs';
+import {
+  FaRegFile, FaSort, FaSortDown, FaSortUp
+} from 'react-icons/fa';
 import {
   useTable, useSortBy, usePagination, useGlobalFilter, useRowSelect, useFlexLayout
 } from 'react-table';
@@ -80,7 +81,7 @@ const CustomTable = ({
       <Group noWrap mb="md" spacing="sm">
         {openCreateModal && (
           <Button
-            leftIcon={<BsPlusLg />}
+            leftIcon={<FaRegFile />}
             onClick={openCreateModal}
             disabled={openCreateDisabled}
           >

@@ -1,5 +1,5 @@
 const { spawn } = require('child_process');
-const { sendMessage, isConnected } = require('../utils/socket-io');
+const { sendMessage } = require('../utils/socket-io');
 const Match = require('../models/match.model');
 const { setJsonValue, getJsonValue, delJsonValue } = require('../utils/redis');
 const { uploadAnalysis } = require('../components/analysis');
@@ -12,6 +12,8 @@ exports.getActive = (room) => activeAnalysis.find((analysis) => analysis.room ==
 exports.startAnalysis = async (room, matchId) => {
   const match = await Match.findById(matchId);
 
+  await delJsonValue(`${matchId}-settings`);
+  await delJsonValue(`${matchId}-analysis`);
   await setJsonValue(`${matchId}-settings`, match.config);
   await setJsonValue(`${matchId}-analysis`, []);
 
@@ -60,19 +62,13 @@ exports.startAnalysis = async (room, matchId) => {
       if (message.type === 'positions') {
         const positions = JSON.parse(message.data);
         const corners = JSON.parse(message.corners);
-        // {
-        //   class
-        //   colour
-        //   team
-        //   x
-        //   y
-        // }
+        const detections = JSON.parse(`[${message.detections}]`);
 
-        // {
-        //   x
-        //   y
-        // }
-        sendMessage(room, 'positions', { positions, corners });
+        sendMessage(room, 'detections', {
+          detections,
+          positions,
+          corners
+        });
 
         const currentAnalysis = await getJsonValue(`${matchId}-analysis`);
         await setJsonValue(`${matchId}-analysis`, [...currentAnalysis, positions]);

@@ -38,12 +38,9 @@ const AnalysisSocketProvider = ({ children }) => {
     });
 
     socket.on('detections', (data) => {
-      setValue((prev) => ({ ...prev, detections: data }));
-    });
-
-    socket.on('positions', (data) => {
       setValue((prev) => ({
         ...prev,
+        detections: data.detections,
         positions: data.positions,
         allPositions: [...prev.allPositions, data.positions],
         corners: data.corners,

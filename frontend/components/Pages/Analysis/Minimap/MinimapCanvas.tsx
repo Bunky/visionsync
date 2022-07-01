@@ -33,25 +33,35 @@ const MinimapCanvas = ({ data }) => {
       const x = (detection.x / 100) * width;
       const y = (detection.y / 100) * height;
 
-      ctx.shadowColor = '#000000';
-      ctx.shadowBlur = 4;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
       if (detection.class === 0) {
         if (detection.team !== -1) {
           ctx.beginPath();
-          ctx.arc(x, y, 10, 0, 2 * Math.PI, false);
+          ctx.arc(x, y, 9, 0, 2 * Math.PI, false);
           let color = Color.rgb(detection.colour);
           color = color.saturate(1.5);
           ctx.fillStyle = `rgb(${color.red()}, ${color.green()}, ${color.blue()})`;
+
+          ctx.shadowColor = '#000000';
+          ctx.shadowBlur = 17;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+
           ctx.fill();
           ctx.lineWidth = 3;
           ctx.strokeStyle = '#ffffff';
           ctx.stroke();
+
+          ctx.shadowColor = 0;
+          ctx.shadowBlur = 0;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+
+          ctx.fill();
+          ctx.stroke();
         }
       } else if (detection.class === 1) {
         ctx.beginPath();
-        ctx.arc(x, y, 5, 0, 2 * Math.PI, false);
+        ctx.arc(x, y, 7, 0, 2 * Math.PI, false);
         ctx.fillStyle = '#ffffff';
         ctx.fill();
         ctx.lineWidth = 2;

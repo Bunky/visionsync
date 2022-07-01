@@ -11,7 +11,7 @@ first_frame = True
 mbKmeans = False
 kmeans = False
 
-def classify_players(frame, detections):
+def classify_players(settings, frame, detections):
   global first_frame
   global mbKmeans
   global kmeans
@@ -21,19 +21,10 @@ def classify_players(frame, detections):
     if detection["class"] == 0:
       # Crop the frame to bounding box
       cropped_frame = frame[int(detection['ymin']):int(detection['ymax']), int(detection['xmin']):int(detection['xmax'])]
-      
-      # Player pitch mask
-      hue_min = 0
-      hue_max = 255
-      sat_min = 0
-      sat_max = 255
-      val_min = 175
-      val_max = 255
-      
-      lower = np.array([hue_min, sat_min, val_min])
-      upper = np.array([hue_max, sat_max, val_max])
-
-      mask = cv.inRange(cropped_frame, lower, upper)
+          
+      # Invert player mask
+      mask = cv.inRange(cropped_frame, np.array(settings["playerMask"]["hsv"]["lower"]), np.array(settings["playerMask"]["hsv"]["upper"]))
+      mask = 255 - mask
 
       # Get average colour
       mean = cv.mean(cropped_frame, mask=mask)

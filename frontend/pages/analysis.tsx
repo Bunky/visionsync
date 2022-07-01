@@ -34,7 +34,7 @@ const Analysis = () => {
   const [detections, setDetections] = useState(true);
   const [heatmap, setHeatmap] = useState(false);
   const [boundaries, setBoundaries] = useState(true);
-  const [performance, setPerformance] = useState(false);
+  const [performance, setPerformance] = useState(true);
   const [open, setOpen] = useState(false);
   const [config, setConfig] = useState(false);
   const [paused, setPaused] = useState(false);

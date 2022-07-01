@@ -6,9 +6,10 @@ import utilties as utils
 resolution = (640, 360)
 
 def detect_players(settings, frame, model):
+  model.conf = 0.433
   detections = model(frame)
   detections = detections.pandas().xyxy[0]
-  detections = utils.classify_players(frame, detections)
+  detections = utils.classify_players(settings, frame, detections)
   
   # Preview 
   if (settings["preview"]["enabled"] and settings["preview"]["stage"] == 'detections'):

@@ -30,23 +30,33 @@ const DetectionCanvas = ({ data }) => {
     // Draw each bounding box
     for (let i = 0; i < data.length; i++) {
       const detection = data[i];
-      const x = (detection.xmin / 100) * width;
-      const y = (detection.ymin / 100) * height;
-      const w = ((detection.xmax - detection.xmin) / 100) * width;
-      const h = ((detection.ymax - detection.ymin) / 100) * height;
+      const w = (((detection.xmax - detection.xmin) / 100) * width) * 1.3;
+      const h = (((detection.ymax - detection.ymin) / 100) * height) * 1.3;
+      const tw = (((detection.xmax - detection.xmin) / 100) * width) - w;
+      const th = (((detection.ymax - detection.ymin) / 100) * height) - h;
+      const x = ((detection.xmin / 100) * width) + (tw / 2);
+      const y = ((detection.ymin / 100) * height) + (th / 2);
 
       if (detection.name === 'player') {
         if (detection.team !== -1) {
           let color = Color.rgb(detection.colour);
           color = color.saturate(1.5);
-          ctx.fillStyle = `rgba(${color.red()}, ${color.green()}, ${color.blue()}, 0.5)`;
+
+          ctx.fillStyle = `rgba(${color.red()}, ${color.green()}, ${color.blue()}, 0.3)`;
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = `rgba(${color.red()}, ${color.green()}, ${color.blue()}, 1)`;
+          ctx.strokeRect(x, y, w, h);
+          ctx.fillRect(x, y, w, h);
         }
       } else if (detection.name === 'ball') {
+        ctx.beginPath();
+        ctx.arc(x + 5, y + 5, 5, 0, 2 * Math.PI, false);
         ctx.fillStyle = '#ffffff7f';
-      } else {
-        ctx.fillStyle = '#00ff0000';
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
       }
-      ctx.fillRect(x, y, w, h);
     }
   };
 

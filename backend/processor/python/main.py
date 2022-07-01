@@ -39,7 +39,6 @@ def main():
   last_matrix = False
 
   # detections_limit_time = int(round(time.time() * 1000))
-  # positions_limit_time = int(round(time.time() * 1000))
   overall_limit_time = int(round(time.time() * 1000))
   while True:
     try:
@@ -131,22 +130,14 @@ def main():
 
       message.append({
         "type": "detections",
-        "data": detections_message
+        "detections": detections_message,
+        "positions": json.dumps(biv_detections),
+        "corners": json.dumps(corners)
       })
       # detections_limit_time = current_ms
 
-      # 10fps
-      # if positions_limit_time + 100 < current_ms:
-      if (settings["analysis"]["paused"] == False):
-        message.append({
-          "type": "positions",
-          "data": json.dumps(biv_detections),
-          "corners": json.dumps(corners)
-        })
-      # positions_limit_time = current_ms
-
       # 20fps
-      if overall_limit_time + 50 < current_ms:
+      if overall_limit_time + (1/30) < current_ms:
         sys.stdout.write(json.dumps(message))
         sys.stdout.flush()
         overall_limit_time = current_ms
